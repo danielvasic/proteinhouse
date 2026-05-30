@@ -140,24 +140,24 @@ export default function Header() {
           onMouseLeave={scheduleClose}
           aria-hidden={!shopOpen}
         >
-          <div className="container grid grid-cols-4 xl:grid-cols-8 gap-5 py-7">
+          <div className="container grid grid-cols-4 xl:grid-cols-8 gap-x-6 gap-y-2 py-10">
             {categories.map((c) => {
               const Icon = CAT_ICONS[c.slug] || Tag
               return (
                 <div key={c.slug}>
                   <button
-                    className="flex items-center gap-1.5 w-full text-left pb-2 mb-2.5 border-b border-gray-200 font-bold text-[13px] tracking-[0.06em] uppercase bg-transparent border-x-0 border-t-0 cursor-pointer transition-colors duration-150 text-[#0F2952] hover:text-[#0A1F42]"
+                    className="flex items-center gap-1.5 w-full text-left pb-3 mb-4 border-b border-gray-200 font-bold text-[13px] tracking-[0.06em] uppercase bg-transparent border-x-0 border-t-0 cursor-pointer transition-colors duration-150 text-[#0F2952] hover:text-[#0A1F42]"
                     style={{ fontFamily: 'Oswald, Impact, sans-serif' }}
                     onClick={() => { navigate(`/kategorija/${c.slug}`); setShopOpen(false) }}
                   >
                     <Icon size={13} weight="bold" /> {c.label}
                   </button>
                   {c.subs?.length > 0 && (
-                    <ul className="flex flex-col gap-1.5 p-0 m-0 list-none">
+                    <ul className="flex flex-col gap-2.5 p-0 m-0 list-none">
                       {c.subs.map((s) => (
                         <li
                           key={s}
-                          className="text-[11px] text-gray-500 cursor-pointer py-0.5 hover:text-[#0F2952] transition-colors duration-150"
+                          className="text-[12px] text-gray-500 cursor-pointer hover:text-[#0F2952] transition-colors duration-150 leading-snug"
                           onClick={() => { navigate(`/kategorija/${c.slug}`); setShopOpen(false) }}
                           role="button" tabIndex={0}
                           onKeyDown={(e) => e.key === 'Enter' && navigate(`/kategorija/${c.slug}`)}
@@ -173,7 +173,7 @@ export default function Header() {
           </div>
 
           <div className="bg-gray-50 border-t border-gray-200">
-            <div className="container flex items-center gap-2.5 py-3 flex-wrap">
+            <div className="container flex items-center gap-2.5 py-4 flex-wrap">
               <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400">BRZI PREČAC:</span>
               {[
                 { label: 'AKCIJA −70%', to: '/kategorija/akcija', Icon: Tag },
