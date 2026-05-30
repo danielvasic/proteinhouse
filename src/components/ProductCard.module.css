@@ -1,0 +1,177 @@
+.card {
+  background: var(--ph-white);
+  border: 1px solid var(--ph-gray-200);
+  border-radius: var(--ph-radius-md);
+  overflow: visible;
+  cursor: pointer;
+  transform: translateY(0);
+  box-shadow: var(--ph-shadow-sm);
+  transition: transform var(--ph-dur-base) var(--ph-ease-out),
+              box-shadow var(--ph-dur-base);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ph-shadow-md);
+}
+
+/* ── Discount sticker ── */
+.stickerWrap {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  width: 58px;
+  height: 58px;
+  z-index: 2;
+  filter: drop-shadow(2px 6px 6px rgba(15, 41, 82, 0.30))
+          drop-shadow(0 1px 0 rgba(0, 0, 0, 0.05));
+  pointer-events: none;
+}
+
+.stickerDisc {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--ph-radius-circle);
+  border: 3px solid var(--ph-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ph-white);
+  font-family: var(--ph-font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.14);
+  position: relative;
+  overflow: hidden;
+}
+
+.stickerCoral {
+  background: radial-gradient(circle at 30% 30%, #FF9683 0%, #FF7A6B 55%, #ED5D4E 100%);
+}
+
+.stickerDeep {
+  background: radial-gradient(circle at 30% 30%, #355A8C 0%, #0F2952 55%, #06173A 100%);
+}
+
+.stickerSheen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--ph-radius-circle);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0) 45%);
+  pointer-events: none;
+}
+
+.stickerText {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── NOVO tag ── */
+.novoTag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  padding: 5px 10px;
+  background: var(--ph-mist);
+  color: var(--ph-navy-700);
+  font-family: var(--ph-font-body);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  border: 2px solid var(--ph-white);
+  box-shadow: 1px 3px 6px rgba(15, 41, 82, 0.20);
+}
+
+/* ── Image ── */
+.imageWrap {
+  background: var(--ph-white);
+  padding: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* ── Body ── */
+.body {
+  padding: 12px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  border-top: 1px solid var(--ph-gray-100);
+}
+
+.brand {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: var(--ph-tracking-widest);
+  text-transform: uppercase;
+  color: var(--ph-gray-600);
+  margin: 0;
+}
+
+.title {
+  font-size: var(--ph-text-sm);
+  font-weight: 700;
+  letter-spacing: var(--ph-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ph-black);
+  line-height: var(--ph-leading-snug);
+  min-height: 34px;
+  margin: 0;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.price {
+  font-family: var(--ph-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ph-navy-700);
+  letter-spacing: 0.02em;
+}
+
+.priceSale { color: var(--ph-coral-500); }
+
+.oldPrice {
+  font-size: var(--ph-text-xs);
+  color: var(--ph-gray-500);
+  text-decoration: line-through;
+}
+
+.addBtn {
+  margin-top: 4px;
+  width: 100%;
+  padding: 10px 0;
+  font-family: var(--ph-font-body);
+  font-weight: 700;
+  font-size: var(--ph-text-xs);
+  letter-spacing: var(--ph-tracking-wider);
+  text-transform: uppercase;
+  color: var(--ph-white);
+  background: var(--ph-navy-700);
+  border: 0;
+  border-radius: var(--ph-radius-sm);
+  cursor: pointer;
+  transition: background var(--ph-dur-fast) var(--ph-ease-out);
+}
+
+.addBtn:hover { background: var(--ph-navy-900); }

@@ -1,0 +1,130 @@
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+}
+
+.box {
+  background: var(--ph-white);
+  border: 1px solid var(--ph-gray-200);
+  border-radius: var(--ph-radius-md);
+  padding: 18px;
+}
+
+.boxTitle {
+  font-family: var(--ph-font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: var(--ph-tracking-wider);
+  text-transform: uppercase;
+  color: var(--ph-navy-700);
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ph-gray-100);
+}
+
+/* Categories */
+.catList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.catItem {
+  font-size: var(--ph-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ph-navy-700);
+  cursor: pointer;
+  padding: 7px 8px;
+  border-radius: var(--ph-radius-xs);
+  border-bottom: 1px solid var(--ph-gray-100);
+  transition: color var(--ph-dur-fast), background var(--ph-dur-fast);
+}
+
+.catItem:hover {
+  background: var(--ph-gray-50);
+  color: var(--ph-coral-500);
+}
+
+.catActive {
+  color: var(--ph-coral-500) !important;
+  background: var(--ph-coral-100);
+}
+
+/* Price slider */
+.slider {
+  width: 100%;
+  accent-color: var(--ph-navy-700);
+  margin: 4px 0;
+}
+
+.priceLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ph-gray-600);
+  margin-top: 6px;
+}
+
+.priceMax {
+  font-weight: 700;
+  color: var(--ph-navy-700);
+}
+
+.applyBtn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 8px 0;
+  font-family: var(--ph-font-body);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: var(--ph-tracking-wider);
+  text-transform: uppercase;
+  color: var(--ph-white);
+  background: var(--ph-navy-700);
+  border: 0;
+  border-radius: var(--ph-radius-sm);
+  cursor: pointer;
+  transition: background var(--ph-dur-fast);
+}
+
+.applyBtn:hover { background: var(--ph-navy-900); }
+
+/* Brands */
+.brandList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.brandItem {
+  font-size: var(--ph-text-xs);
+}
+
+.brandLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ph-gray-700);
+  cursor: pointer;
+}
+
+.checkbox {
+  accent-color: var(--ph-navy-700);
+  width: 14px;
+  height: 14px;
+}

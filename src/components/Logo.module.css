@@ -1,0 +1,29 @@
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--ph-font-display);
+  line-height: 1;
+  color: var(--ph-navy-700);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  cursor: default;
+  gap: 0;
+}
+
+.logo[role='button'] {
+  cursor: pointer;
+}
+
+.onDark {
+  color: var(--ph-white);
+}
+
+.protein {
+  font-weight: 700;
+}
+
+.house {
+  font-weight: 200;
+}

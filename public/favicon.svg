@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#0F2952"/>
+  <text x="3" y="23" font-family="'Oswald',sans-serif" font-size="16" font-weight="700" fill="#FF7A6B">P</text>
+  <text x="13" y="23" font-family="'Oswald',sans-serif" font-size="16" font-weight="200" fill="white">H</text>
+</svg>

@@ -1,0 +1,124 @@
+.main {
+  padding: 48px 0 80px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.heading {
+  font-family: var(--ph-font-display);
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: var(--ph-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ph-navy-700);
+  margin: 0;
+}
+
+.intro {
+  color: var(--ph-gray-700);
+  font-size: 15px;
+  line-height: var(--ph-leading-relaxed);
+  margin-top: 12px;
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--ph-gray-900);
+  font-size: 14px;
+}
+
+/* Form */
+.form {
+  background: var(--ph-gray-50);
+  border: 1px solid var(--ph-gray-200);
+  border-radius: var(--ph-radius-md);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formTitle {
+  font-family: var(--ph-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: var(--ph-tracking-wider);
+  text-transform: uppercase;
+  color: var(--ph-navy-700);
+  margin: 0 0 8px;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid var(--ph-gray-300);
+  border-radius: var(--ph-radius-sm);
+  font-size: 14px;
+  font-family: var(--ph-font-body);
+  color: var(--ph-gray-900);
+  background: var(--ph-white);
+  transition: border-color var(--ph-dur-fast), box-shadow var(--ph-dur-fast);
+  box-sizing: border-box;
+}
+
+.input {
+  height: 44px;
+}
+
+.textarea {
+  padding: 14px;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--ph-navy-700);
+  box-shadow: var(--ph-shadow-focus);
+}
+
+.submitBtn {
+  align-self: flex-start;
+  padding: 12px 24px;
+  font-family: var(--ph-font-body);
+  font-weight: 700;
+  font-size: var(--ph-text-sm);
+  letter-spacing: var(--ph-tracking-wider);
+  text-transform: uppercase;
+  color: var(--ph-white);
+  background: var(--ph-navy-700);
+  border: 0;
+  border-radius: var(--ph-radius-sm);
+  cursor: pointer;
+  transition: background var(--ph-dur-fast);
+}
+
+.submitBtn:hover { background: var(--ph-navy-900); }
+
+.success {
+  padding: 16px;
+  background: var(--ph-sage-100);
+  color: var(--ph-green);
+  border-radius: var(--ph-radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+}

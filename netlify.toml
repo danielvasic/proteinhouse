@@ -1,0 +1,21 @@
+# Netlify build + deploy config for ProteinHouse SSR
+# Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # build:netlify = vite build (client + server) then generate the Lambda function
+  command = "npm run build:netlify"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[functions]
+  # esbuild bundles the function + all imports into a single file — no runtime path issues
+  node_bundler = "esbuild"
+
+# Static assets in dist/client are served directly by Netlify CDN (fast, cached, no function hit).
+# Every other URL is an SSR rewrite — the browser URL stays the same (status 200).
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/ssr"
+  status = 200

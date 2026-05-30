@@ -1,0 +1,118 @@
+.footer {
+  background: var(--ph-navy-900);
+  color: #CBD5E1;
+  margin-top: 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 32px;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 580px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.blurb {
+  font-size: var(--ph-text-sm);
+  line-height: var(--ph-leading-relaxed);
+  color: #A8B4C8;
+  margin-top: 14px;
+  max-width: 320px;
+}
+
+.social {
+  margin-top: 18px;
+  display: flex;
+  gap: 8px;
+}
+
+.socialBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--ph-radius-sm);
+  background: var(--ph-navy-mid);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ph-white);
+  cursor: pointer;
+  transition: background var(--ph-dur-fast);
+}
+
+.socialBtn:hover { background: var(--ph-coral-500); }
+
+/* Link columns */
+.colHeading {
+  font-family: var(--ph-font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ph-coral-500);
+  margin: 0 0 16px;
+}
+
+.colList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.colLink {
+  font-size: var(--ph-text-sm);
+  color: #CBD5E1;
+  transition: color var(--ph-dur-fast);
+}
+
+.colLink:hover { color: var(--ph-white); }
+
+/* Bottom bar */
+.bottomBar {
+  border-top: 1px solid var(--ph-navy-mid);
+}
+
+.bottomInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.copyright {
+  font-size: var(--ph-text-xs);
+  color: #A8B4C8;
+}
+
+.payments {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--ph-white);
+  padding: 8px 12px;
+  border-radius: var(--ph-radius-sm);
+}
+
+.cod {
+  border-left: 1px solid var(--ph-gray-200);
+  padding-left: 10px;
+  margin-left: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: var(--ph-tracking-wider);
+  text-transform: uppercase;
+  color: var(--ph-gray-600);
+}
