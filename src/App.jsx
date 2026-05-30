@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import CartDrawer from './components/CartDrawer'
+import { AdminProvider } from './store/AdminContext'
 
 // Eager — above-the-fold critical pages
 import Home from './pages/Home'
@@ -15,6 +16,16 @@ const Login   = lazy(() => import('./pages/Login'))
 const Blog    = lazy(() => import('./pages/Blog'))
 const About   = lazy(() => import('./pages/About'))
 const Search  = lazy(() => import('./pages/Search'))
+
+// Lazy — admin (own chunk, never loaded for regular visitors)
+const AdminLogin   = lazy(() => import('./pages/admin/AdminLogin'))
+const AdminLayout  = lazy(() => import('./pages/admin/AdminLayout'))
+const Dashboard    = lazy(() => import('./pages/admin/Dashboard'))
+const AdminBlog    = lazy(() => import('./pages/admin/Blog'))
+const BlogEdit     = lazy(() => import('./pages/admin/BlogEdit'))
+const Products     = lazy(() => import('./pages/admin/Products'))
+const ProductEdit  = lazy(() => import('./pages/admin/ProductEdit'))
+const Orders       = lazy(() => import('./pages/admin/Orders'))
 
 function PageLoader() {
   return (
@@ -39,9 +50,32 @@ function NotFound() {
 
 export default function App() {
   return (
+    <AdminProvider>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* ── Admin routes — no shop Header/Footer ── */}
+          <Route path="/admin/prijava" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="proizvodi"        element={<Products />} />
+            <Route path="proizvodi/:id"    element={<ProductEdit />} />
+            <Route path="blog"             element={<AdminBlog />} />
+            <Route path="blog/:id"         element={<BlogEdit />} />
+            <Route path="narudzbe"         element={<Orders />} />
+          </Route>
+
+          {/* ── Public shop routes ── */}
+          <Route path="/*" element={<ShopLayout />} />
+        </Routes>
+      </Suspense>
+    </AdminProvider>
+  )
+}
+
+function ShopLayout() {
+  return (
     <>
       <Header />
-
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/"                     element={<Home />} />
@@ -56,7 +90,6 @@ export default function App() {
           <Route path="*"                     element={<NotFound />} />
         </Routes>
       </Suspense>
-
       <Footer />
       <CartDrawer />
     </>

@@ -1,0 +1,97 @@
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.statusFilters { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.filterBtn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  text-transform: capitalize;
+  background: var(--ph-white);
+  border: 1.5px solid var(--ph-gray-200);
+  color: var(--ph-gray-600);
+  cursor: pointer;
+  transition: background var(--ph-dur-fast), border-color var(--ph-dur-fast), color var(--ph-dur-fast);
+}
+
+.filterBtn:hover { border-color: var(--ph-navy-700); color: var(--ph-navy-700); }
+
+.filterActive {
+  background: var(--ph-navy-700) !important;
+  border-color: var(--ph-navy-700) !important;
+  color: var(--ph-white) !important;
+}
+
+/* Status select */
+.statusSelect {
+  padding: 4px 8px;
+  border: 1.5px solid var(--ph-gray-200);
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  color: var(--ph-gray-700);
+  background: var(--ph-white);
+  cursor: pointer;
+  appearance: auto;
+}
+
+/* Expand button */
+.expandBtn {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ph-gray-100); border: 0; border-radius: 6px;
+  color: var(--ph-gray-500); cursor: pointer;
+  transition: background var(--ph-dur-fast);
+}
+.expandBtn:hover { background: var(--ph-gray-200); }
+
+.expandedRow td { background: #FAFBFF; }
+
+.expandedCell { background: #F8FAFC !important; padding: 0 !important; }
+
+/* Detail panel */
+.detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding: 20px 16px;
+}
+
+@media (max-width: 640px) { .detail { grid-template-columns: 1fr; } }
+
+.detailTitle {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ph-gray-500);
+  margin: 0 0 10px;
+}
+
+.detailLeft, .detailRight {
+  font-size: 13px;
+  color: var(--ph-gray-700);
+  line-height: 1.6;
+}
+
+.detailRight p { margin: 0; }
+
+.item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ph-gray-100);
+  font-size: 13px;
+}
+
+.itemName { flex: 1; color: var(--ph-navy-700); font-weight: 600; }
+.itemQty  { color: var(--ph-gray-500); }
+.itemPrice { font-weight: 700; color: var(--ph-navy-700); min-width: 80px; text-align: right; }
+
+.totalRow {
+  display: flex; justify-content: space-between;
+  padding: 10px 0 0;
+  font-weight: 700; font-size: 14px;
+  color: var(--ph-navy-900);
+}

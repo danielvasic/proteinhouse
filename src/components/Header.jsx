@@ -50,6 +50,7 @@ export default function Header() {
     { key: 'ciljevi', icon: Target, label: 'CILJEVI', to: '/kategorija/kontrola' },
     { key: 'blog', icon: Newspaper, label: 'BLOG', to: '/blog' },
     { key: 'o-nama', icon: Info, label: 'O NAMA', to: '/o-nama' },
+    { key: 'kontakt', icon: MapPin, label: 'KONTAKT', to: '/kontakt' },
   ]
 
   return (
@@ -127,34 +128,21 @@ export default function Header() {
       {/* ── Primary nav ── */}
       <nav className={styles.nav}>
         <div className={`container ${styles.navInner}`}>
-          {navItems.map((n) => {
-            const Icon = n.icon
-            return (
-              <span
-                key={n.key}
-                className={styles.navLink}
-                onMouseEnter={n.hasMenu ? openMenu : undefined}
-                onMouseLeave={n.hasMenu ? scheduleClose : undefined}
-                onClick={() => navigate(n.to)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(n.to)}
-              >
-                <Icon size={18} weight="regular" /> {n.label}
-                {n.hasMenu && <CaretDown size={12} weight="bold" style={{ marginLeft: 2, opacity: 0.8 }} />}
-              </span>
-            )
-          })}
-
-          <span
-            className={`${styles.navLink} ${styles.navRight}`}
-            onClick={() => navigate('/kontakt')}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && navigate('/kontakt')}
-          >
-            <MapPin size={18} weight="regular" /> KONTAKT
-          </span>
+          {navItems.map((n) => (
+            <span
+              key={n.key}
+              className={`${styles.navLink} ${n.key === 'kontakt' ? styles.navRight : ''}`}
+              onMouseEnter={n.hasMenu ? openMenu : undefined}
+              onMouseLeave={n.hasMenu ? scheduleClose : undefined}
+              onClick={() => navigate(n.to)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate(n.to)}
+            >
+              {n.label}
+              {n.hasMenu && <CaretDown size={11} weight="bold" style={{ marginLeft: 4, opacity: 0.7 }} />}
+            </span>
+          ))}
         </div>
 
         {/* ── Mega menu ── */}

@@ -1,0 +1,138 @@
+.page { padding: 32px; max-width: 860px; }
+
+.topBar { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+
+.back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--ph-gray-600);
+  text-decoration: none; transition: color var(--ph-dur-fast);
+}
+.back:hover { color: var(--ph-navy-700); }
+
+.heading {
+  font-family: var(--ph-font-display);
+  font-size: 24px; font-weight: 700;
+  color: var(--ph-navy-900); margin: 0; letter-spacing: 0.02em;
+}
+
+.error {
+  margin-bottom: 20px; padding: 12px 16px;
+  background: #FEF2F2; color: #DC2626;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  border: 1px solid #FECACA;
+}
+
+.form {
+  background: var(--ph-white);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.label {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ph-gray-600);
+}
+
+.input {
+  width: 100%; height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid var(--ph-gray-200);
+  border-radius: var(--ph-radius-sm);
+  font-size: 14px; font-family: var(--ph-font-body);
+  color: var(--ph-gray-900);
+  background: var(--ph-white);
+  box-sizing: border-box;
+  transition: border-color var(--ph-dur-fast);
+  appearance: auto;
+}
+
+.input:focus { outline: none; border-color: var(--ph-navy-700); box-shadow: var(--ph-shadow-focus); }
+
+.textarea { height: auto !important; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+
+.imgPreview {
+  margin-top: 8px; max-height: 100px; border-radius: 8px;
+  border: 1px solid var(--ph-gray-200); object-fit: cover;
+}
+
+/* Flavors */
+.flavorRow { display: flex; gap: 8px; }
+.flavorRow .input { flex: 1; }
+
+.addFlavor {
+  height: 44px; width: 44px; flex-shrink: 0;
+  background: var(--ph-navy-700); color: var(--ph-white);
+  border: 0; border-radius: var(--ph-radius-sm);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background var(--ph-dur-fast);
+}
+.addFlavor:hover { background: var(--ph-navy-900); }
+
+.flavors { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+.flavorTag {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  background: var(--ph-gray-100); border-radius: 20px;
+  font-size: 12px; font-weight: 600; color: var(--ph-navy-700);
+}
+
+.flavorTag button {
+  background: transparent; border: 0; cursor: pointer; padding: 0;
+  display: flex; color: var(--ph-gray-500); line-height: 1;
+}
+
+.flavorTag button:hover { color: var(--ph-coral-500); }
+
+/* Checkbox */
+.checkLabel {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600; color: var(--ph-navy-700);
+  cursor: pointer;
+}
+.checkLabel input { accent-color: var(--ph-navy-700); width: 16px; height: 16px; }
+
+/* Actions */
+.actions {
+  display: flex; justify-content: flex-end; gap: 12px;
+  padding-top: 8px; border-top: 1px solid var(--ph-gray-100);
+}
+
+.cancelBtn {
+  padding: 11px 24px; font-size: 13px; font-weight: 700;
+  color: var(--ph-gray-600); background: var(--ph-gray-100);
+  border-radius: var(--ph-radius-sm); text-decoration: none;
+  transition: background var(--ph-dur-fast);
+}
+.cancelBtn:hover { background: var(--ph-gray-200); }
+
+.saveBtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 28px; font-size: 13px; font-weight: 700;
+  color: var(--ph-white); background: var(--ph-coral-500);
+  border: 0; border-radius: var(--ph-radius-sm); cursor: pointer;
+  transition: background var(--ph-dur-fast);
+  letter-spacing: 0.04em;
+}
+.saveBtn:hover:not(:disabled) { background: var(--ph-coral-700, #e05c4d); }
+.saveBtn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* Loading */
+.loading { display: flex; justify-content: center; padding: 60px; }
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #E2E8F0;
+  border-top-color: var(--ph-coral-500);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

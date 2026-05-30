@@ -43,13 +43,6 @@ const SOCIAL = [
   { Icon: TiktokLogo, label: 'TikTok', href: 'https://tiktok.com' },
 ]
 
-const PAYMENTS = [
-  { src: 'https://cdn.simpleicons.org/visa/103178', alt: 'Visa', h: 18 },
-  { src: 'https://cdn.simpleicons.org/mastercard', alt: 'Mastercard', h: 22 },
-  { src: 'https://cdn.simpleicons.org/maestro', alt: 'Maestro', h: 22 },
-  { src: 'https://cdn.simpleicons.org/americanexpress/006FCF', alt: 'Amex', h: 18 },
-  { src: 'https://cdn.simpleicons.org/paypal/003087', alt: 'PayPal', h: 20 },
-]
 
 export default function Footer() {
   return (
@@ -100,10 +93,7 @@ export default function Footer() {
             © {new Date().getFullYear()} ProteinHouse. Sva prava zadržana.
           </span>
           <div className={styles.payments}>
-            {PAYMENTS.map(({ src, alt, h }) => (
-              <img key={alt} src={src} alt={alt} style={{ height: h }} loading="lazy" />
-            ))}
-            <span className={styles.cod}>POUZEĆEM</span>
+            <span className={styles.cod}>✓ PLAĆANJE POUZEĆEM</span>
           </div>
         </div>
       </div>
