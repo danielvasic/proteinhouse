@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, FloppyDisk } from '@phosphor-icons/react'
+import { ArrowLeft, Save } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import styles from './AdminForm.module.css'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Label } from '../../components/ui/label'
+import { Textarea } from '../../components/ui/textarea'
+import { Switch } from '../../components/ui/switch'
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 
 const EMPTY = {
   title: '', slug: '', excerpt: '', content: '',
@@ -13,6 +18,16 @@ function slugify(str) {
   return str.toLowerCase()
     .replace(/[čć]/g, 'c').replace(/[šđ]/g, (m) => m === 'š' ? 's' : 'd')
     .replace(/ž/g, 'z').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+function Field({ label, children, hint }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      {children}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+    </div>
+  )
 }
 
 export default function BlogEdit() {
@@ -66,77 +81,81 @@ export default function BlogEdit() {
     }
   }
 
-  if (loading) return <div className={styles.loading}><div className={styles.spinner} /></div>
+  if (loading) {
+    return <div className="flex items-center justify-center py-16"><div className="h-7 w-7 rounded-full border-4 border-gray-200 border-t-emerald-500 animate-spin" /></div>
+  }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.topBar}>
-        <Link to="/admin/blog" className={styles.back}><ArrowLeft size={16} /> Nazad</Link>
-        <h1 className={styles.heading}>{isNew ? 'Novi blog post' : 'Uredi post'}</h1>
+    <div className="space-y-5 animate-fade-in max-w-3xl">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild>
+          <Link to="/admin/blog"><ArrowLeft size={18} /></Link>
+        </Button>
+        <h2 className="text-xl font-bold text-gray-900">{isNew ? 'Novi blog post' : 'Uredi post'}</h2>
       </div>
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">{error}</div>
+      )}
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <Field label="Naslov *">
-          <input className={styles.input} value={form.title} onChange={set('title')} required placeholder="Naslov posta" />
-        </Field>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Osnovno</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <Field label="Naslov *">
+              <Input value={form.title} onChange={set('title')} required placeholder="Naslov posta" />
+            </Field>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field label="Slug (URL) *" hint="Auto-generisan iz naslova">
+                <Input value={form.slug} onChange={set('slug')} required placeholder="naslov-posta" />
+              </Field>
+              <Field label="Autor">
+                <Input value={form.author} onChange={set('author')} placeholder="Ime autora" />
+              </Field>
+            </div>
+            <Field label="URL naslovne slike">
+              <Input value={form.cover_url} onChange={set('cover_url')} placeholder="https://..." />
+              {form.cover_url && (
+                <img src={form.cover_url} alt="" className="mt-2 h-28 rounded-lg object-cover border w-full max-w-sm" onError={(e) => { e.target.style.display = 'none' }} />
+              )}
+            </Field>
+          </CardContent>
+        </Card>
 
-        <div className={styles.grid2}>
-          <Field label="Slug (URL) *">
-            <input className={styles.input} value={form.slug} onChange={set('slug')} required placeholder="naslov-posta" />
-          </Field>
-          <Field label="Autor">
-            <input className={styles.input} value={form.author} onChange={set('author')} placeholder="Ime autora" />
-          </Field>
-        </div>
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Sadržaj</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <Field label="Kratki opis (excerpt)">
+              <Textarea value={form.excerpt} onChange={set('excerpt')} rows={2} placeholder="Kratki opis koji se prikazuje na listi…" />
+            </Field>
+            <Field label="Sadržaj (Markdown ili HTML)">
+              <Textarea
+                value={form.content} onChange={set('content')}
+                rows={16} placeholder="Pišite sadržaj posta ovdje…"
+                className="font-mono text-[13px]"
+              />
+            </Field>
+          </CardContent>
+        </Card>
 
-        <Field label="URL naslovne slike">
-          <input className={styles.input} value={form.cover_url} onChange={set('cover_url')} placeholder="https://..." />
-          {form.cover_url && (
-            <img src={form.cover_url} alt="" className={styles.imgPreview} onError={(e) => e.target.style.display='none'} />
-          )}
-        </Field>
+        <Card>
+          <CardContent className="py-4 flex items-center justify-between">
+            <div>
+              <p className="font-medium text-sm">Objavi</p>
+              <p className="text-xs text-muted-foreground">Vidljivo na blogu</p>
+            </div>
+            <Switch checked={form.published} onCheckedChange={(v) => setForm((f) => ({ ...f, published: v }))} />
+          </CardContent>
+        </Card>
 
-        <Field label="Kratki opis (excerpt)">
-          <textarea
-            className={`${styles.input} ${styles.textarea}`}
-            value={form.excerpt} onChange={set('excerpt')}
-            rows={2} placeholder="Kratki opis koji se prikazuje na listi…"
-          />
-        </Field>
-
-        <Field label="Sadržaj (Markdown ili HTML)">
-          <textarea
-            className={`${styles.input} ${styles.textarea}`}
-            value={form.content} onChange={set('content')}
-            rows={14} placeholder="Pišite sadržaj posta ovdje…"
-            style={{ fontFamily: 'monospace', fontSize: 13 }}
-          />
-        </Field>
-
-        <label className={styles.checkLabel}>
-          <input type="checkbox" checked={form.published} onChange={set('published')} />
-          Objavi (vidljivo na blogu)
-        </label>
-
-        <div className={styles.actions}>
-          <Link to="/admin/blog" className={styles.cancelBtn}>Otkaži</Link>
-          <button type="submit" className={styles.saveBtn} disabled={saving}>
-            <FloppyDisk size={16} weight="fill" />
+        <div className="flex items-center justify-end gap-3">
+          <Button variant="outline" asChild><Link to="/admin/blog">Otkaži</Link></Button>
+          <Button type="submit" disabled={saving} className="flex items-center gap-2">
+            <Save size={15} />
             {saving ? 'Snimanje…' : 'Snimi post'}
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
-  )
-}
-
-function Field({ label, children }) {
-  return (
-    <div className={styles.field}>
-      <label className={styles.label}>{label}</label>
-      {children}
     </div>
   )
 }

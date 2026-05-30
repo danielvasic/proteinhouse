@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Envelope, LockKey, ShieldCheck } from '@phosphor-icons/react'
+import { ShieldCheck } from 'lucide-react'
 import { useAdmin } from '../../store/AdminContext'
-import styles from './AdminLogin.module.css'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Label } from '../../components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card'
 
 export default function AdminLogin() {
   const { signIn, admin } = useAdmin()
@@ -11,7 +14,6 @@ export default function AdminLogin() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Already logged in
   if (admin) { navigate('/admin'); return null }
 
   const handleSubmit = async (e) => {
@@ -29,41 +31,67 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.icon}><ShieldCheck size={32} weight="duotone" /></div>
-        <h1 className={styles.title}>Admin pristup</h1>
-        <p className={styles.sub}>ProteinHouse upravljačka ploča</p>
-
-        {error && <div className={styles.error}>{error}</div>}
-
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.field}>
-            <div className={styles.inputWrap}>
-              <Envelope size={16} className={styles.icon2} />
-              <input
-                type="email" className={styles.input} placeholder="Email adresa"
-                autoComplete="email" value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                required
-              />
-            </div>
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: '#0F2952', fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+    >
+      <div className="w-full max-w-sm space-y-6">
+        {/* Logo */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <img src="/logo.svg" alt="ProteinHouse" className="h-16 w-16" />
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-widest" style={{ fontFamily: 'Oswald, Impact, sans-serif' }}>
+              PROTEIN<span className="font-light">HOUSE</span>
+            </h1>
+            <p className="text-sm text-blue-200/70 mt-1">Admin panel</p>
           </div>
-          <div className={styles.field}>
-            <div className={styles.inputWrap}>
-              <LockKey size={16} className={styles.icon2} />
-              <input
-                type="password" className={styles.input} placeholder="Šifra"
-                autoComplete="current-password" value={form.password}
-                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                required
-              />
-            </div>
-          </div>
-          <button type="submit" className={styles.btn} disabled={loading}>
-            {loading ? 'Prijavljivanje…' : 'PRIJAVI SE'}
-          </button>
-        </form>
+        </div>
+
+        <Card className="shadow-xl border-0">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <ShieldCheck size={18} className="text-emerald-600" />
+              Prijava
+            </CardTitle>
+            <CardDescription>Unesite vaše admin podatke.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <div className="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+                {error}
+              </div>
+            )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email adresa</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="admin@proteinhouse.ba"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Šifra</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full mt-2" disabled={loading}>
+                {loading ? 'Prijavljivanje…' : 'Prijavi se'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

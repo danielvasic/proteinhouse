@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { CartProvider } from './store/CartContext'
 import App from './App'
+import './globals.css'
 import './theme.css'
 
 hydrateRoot(

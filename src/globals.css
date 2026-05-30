@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── shadcn/ui CSS variables ─────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --background:   0 0% 100%;
+    --foreground:   222 47% 11%;
+
+    --card:         0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover:      0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Navy as primary */
+    --primary:        214 76% 19%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary:    220 13% 96%;
+    --secondary-foreground: 214 76% 19%;
+
+    --muted:        220 13% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Emerald green as accent (replaces coral/orange) */
+    --accent:       160 84% 30%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive:  0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border:       220 13% 91%;
+    --input:        220 13% 91%;
+    --ring:         214 76% 19%;
+
+    --radius:       0.5rem;
+
+    /* Admin sidebar — navy dark */
+    --sidebar-background:        214 76% 16%;
+    --sidebar-foreground:        214 30% 88%;
+    --sidebar-primary:           160 84% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent:            214 40% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border:            214 40% 22%;
+    --sidebar-ring:              160 84% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

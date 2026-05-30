@@ -26,11 +26,16 @@ const BlogEdit     = lazy(() => import('./pages/admin/BlogEdit'))
 const Products     = lazy(() => import('./pages/admin/Products'))
 const ProductEdit  = lazy(() => import('./pages/admin/ProductEdit'))
 const Orders       = lazy(() => import('./pages/admin/Orders'))
+const AdminUsers   = lazy(() => import('./pages/admin/Users'))
+const AdminCategories = lazy(() => import('./pages/admin/Categories'))
+const AdminPromotions = lazy(() => import('./pages/admin/Promotions'))
+const AdminBanners    = lazy(() => import('./pages/admin/Banners'))
+const AdminSiteContent = lazy(() => import('./pages/admin/SiteContent'))
 
 function PageLoader() {
   return (
     <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ width: 40, height: 40, border: '3px solid var(--ph-gray-200)', borderTopColor: 'var(--ph-coral-500)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+      <div style={{ width: 40, height: 40, border: '3px solid var(--ph-gray-200)', borderTopColor: 'var(--ph-emerald-500)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
   )
@@ -62,6 +67,11 @@ export default function App() {
             <Route path="blog"             element={<AdminBlog />} />
             <Route path="blog/:id"         element={<BlogEdit />} />
             <Route path="narudzbe"         element={<Orders />} />
+            <Route path="korisnici"        element={<AdminUsers />} />
+            <Route path="kategorije"       element={<AdminCategories />} />
+            <Route path="ponude"           element={<AdminPromotions />} />
+            <Route path="baneri"           element={<AdminBanners />} />
+            <Route path="sadrzaj"          element={<AdminSiteContent />} />
           </Route>
 
           {/* ── Public shop routes ── */}

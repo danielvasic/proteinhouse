@@ -19,11 +19,19 @@
   --ph-navy-mid: #1D3A6A;   /* Footer borders */
   --ph-navy-100: #e3eaf7;
 
-  --ph-coral-700: #C44A3A;
-  --ph-coral-600: #E8604D;
-  --ph-coral-500: #FF7A6B;  /* PRIMARY accent */
-  --ph-coral-200: #FFC9BF;
-  --ph-coral-100: #FFE5DF;
+  /* Emerald green — replaces coral/orange */
+  --ph-coral-700: #047857;   /* kept as alias for old usages */
+  --ph-coral-600: #059669;
+  --ph-coral-500: #10b981;  /* PRIMARY accent — emerald */
+  --ph-coral-200: #a7f3d0;
+  --ph-coral-100: #d1fae5;
+
+  --ph-emerald-700: #047857;
+  --ph-emerald-600: #059669;
+  --ph-emerald-500: #10b981;
+  --ph-emerald-400: #34d399;
+  --ph-emerald-100: #d1fae5;
+  --ph-emerald-50:  #ecfdf5;
 
   /* Pastel chips */
   --ph-sand-100: #F4EBD9;

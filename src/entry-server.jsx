@@ -3,6 +3,7 @@ import { StaticRouter } from 'react-router-dom/server'
 import { HelmetProvider } from 'react-helmet-async'
 import { CartProvider } from './store/CartContext'
 import App from './App'
+import './globals.css'
 import './theme.css'
 
 export async function render(url) {
