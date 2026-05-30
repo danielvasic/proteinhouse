@@ -60,13 +60,10 @@ export default {
           500: '#3d63c4',
           100: '#e3eaf7',
         },
-        emerald: {
-          700: '#047857',
-          600: '#059669',
-          500: '#10b981',
-          400: '#34d399',
-          100: '#d1fae5',
-          50:  '#ecfdf5',
+        ph: {
+          blue:   '#2563EB',
+          'blue-dark': '#1D4ED8',
+          'blue-light': '#DBEAFE',
         },
       },
       borderRadius: {

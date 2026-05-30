@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import styles from './CategoryStrip.module.css'
 
 const BANNERS = [
   {
@@ -29,28 +28,39 @@ export default function CategoryStrip() {
   const navigate = useNavigate()
 
   return (
-    <section className={styles.section}>
-      <div className={`container ${styles.grid}`}>
-        {BANNERS.map((b) => (
-          <div
-            key={b.tag}
-            className={styles.banner}
-            style={{
-              backgroundImage: `linear-gradient(180deg, rgba(15,41,82,0.45) 0%, rgba(15,41,82,0.78) 100%), url('${b.img}')`,
-            }}
-            onClick={() => navigate(`/kategorija/${b.slug}`)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && navigate(`/kategorija/${b.slug}`)}
-          >
-            <span className={styles.tag}>{b.tag}</span>
-            <div>
-              <h3 className={styles.title}>{b.title}</h3>
-              <p className={styles.sub}>{b.sub}</p>
+    <section className="py-8 md:py-10 bg-gray-50">
+      <div className="container">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {BANNERS.map((b) => (
+            <div
+              key={b.tag}
+              className="relative flex flex-col justify-end min-h-[220px] md:min-h-[260px] rounded-xl overflow-hidden cursor-pointer group bg-cover bg-center"
+              style={{
+                backgroundImage: `linear-gradient(180deg, rgba(15,41,82,0.35) 0%, rgba(15,41,82,0.82) 100%), url('${b.img}')`,
+              }}
+              onClick={() => navigate(`/kategorija/${b.slug}`)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate(`/kategorija/${b.slug}`)}
+            >
+              <span className="absolute top-4 left-4 px-2.5 py-1 bg-[#2563EB] text-white text-[10px] font-bold tracking-[0.12em] uppercase rounded">
+                {b.tag}
+              </span>
+              <div className="p-5">
+                <h3
+                  className="text-2xl font-bold text-white leading-tight mb-1"
+                  style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                >
+                  {b.title}
+                </h3>
+                <p className="text-white/70 text-xs mb-3">{b.sub}</p>
+                <button className="px-4 py-2 bg-white/15 hover:bg-white/25 border border-white/30 text-white text-[11px] font-bold tracking-[0.1em] uppercase rounded transition-colors duration-150">
+                  POGLEDAJ
+                </button>
+              </div>
             </div>
-            <button className={styles.cta}>POGLEDAJ</button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   )
