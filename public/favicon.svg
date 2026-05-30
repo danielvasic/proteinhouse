@@ -1,5 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0F2952"/>
-  <text x="3" y="23" font-family="'Oswald',sans-serif" font-size="16" font-weight="700" fill="#FF7A6B">P</text>
-  <text x="13" y="23" font-family="'Oswald',sans-serif" font-size="16" font-weight="200" fill="white">H</text>
+  <!-- Navy circle -->
+  <circle cx="16" cy="16" r="15" fill="#0F2952"/>
+  <!-- White ring -->
+  <circle cx="16" cy="16" r="15" fill="none" stroke="white" stroke-width="1.5"/>
+  <!-- PH -->
+  <text
+    x="16" y="21"
+    font-family="Oswald, Impact, sans-serif"
+    font-size="16"
+    font-weight="700"
+    text-anchor="middle"
+    letter-spacing="-0.5"
+    fill="white"
+  >PH</text>
 </svg>
