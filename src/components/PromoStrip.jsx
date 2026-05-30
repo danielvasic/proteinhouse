@@ -14,7 +14,9 @@ export default function PromoStrip() {
       <div className={`container ${styles.grid}`}>
         {ITEMS.map(({ Icon, title, sub }) => (
           <div key={title} className={styles.item}>
-            <Icon size={28} weight="duotone" color="var(--ph-navy-700)" />
+            <div className={styles.iconWrap}>
+              <Icon size={26} weight="duotone" color="var(--ph-navy-700)" />
+            </div>
             <div>
               <p className={styles.title}>{title}</p>
               <p className={styles.sub}>{sub}</p>
