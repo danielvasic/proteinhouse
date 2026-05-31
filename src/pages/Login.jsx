@@ -3,28 +3,44 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Envelope, LockKey, User as UserIcon } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
-import styles from './Login.module.css'
+
+const inputCls = 'w-full border border-gray-300 pl-10 pr-4 py-3.5 text-[13px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none focus:border-[#0F2952] transition-colors duration-150 bg-white'
+
+function Field({ label, children }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-500">{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function InputWrap({ Icon, children }) {
+  return (
+    <div className="relative">
+      <Icon size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+      {children}
+    </div>
+  )
+}
 
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const isRegister = location.pathname === '/nalog/registracija'
 
-  const [form, setForm] = useState({
-    name: '', email: '', password: '', confirmPassword: '', remember: false,
-  })
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', remember: false })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: form.email,
-        password: form.password,
-      })
+      const { error: authError } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
       if (authError) throw authError
       navigate('/')
     } catch (err) {
@@ -37,15 +53,11 @@ export default function Login() {
   const handleRegister = async (e) => {
     e.preventDefault()
     setError('')
-    if (form.password !== form.confirmPassword) {
-      setError('Šifre se ne podudaraju.')
-      return
-    }
+    if (form.password !== form.confirmPassword) { setError('Šifre se ne podudaraju.'); return }
     setLoading(true)
     try {
       const { error: authError } = await supabase.auth.signUp({
-        email: form.email,
-        password: form.password,
+        email: form.email, password: form.password,
         options: { data: { full_name: form.name } },
       })
       if (authError) throw authError
@@ -57,178 +69,122 @@ export default function Login() {
     }
   }
 
-  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
-
   return (
     <>
       <Helmet>
         <title>{isRegister ? 'Registracija' : 'Prijava'} — ProteinHouse</title>
-        <meta
-          name="description"
-          content={isRegister
-            ? 'Kreirajte ProteinHouse nalog i sakupljajte bodove lojalnosti.'
-            : 'Prijavite se na vaš ProteinHouse nalog.'}
-        />
+        <meta name="description" content={isRegister ? 'Kreirajte ProteinHouse nalog.' : 'Prijavite se na vaš ProteinHouse nalog.'} />
         <link rel="canonical" href={`https://proteinhouse.ba${isRegister ? '/nalog/registracija' : '/nalog'}`} />
       </Helmet>
 
-      <main className={styles.main}>
-        <div className={styles.card}>
-          <h1 className={styles.title}>{isRegister ? 'REGISTRACIJA' : 'PRIJAVA'}</h1>
-          <p className={styles.sub}>
-            {isRegister
-              ? 'Kreirajte nalog i sakupljajte bodove lojalnosti uz svaku kupovinu.'
-              : 'Prijavite se da pratite narudžbe i sakupite bodove lojalnosti.'}
-          </p>
+      <main
+        className="min-h-[calc(100vh-220px)] bg-gray-50 flex items-center justify-center py-16 px-4"
+        style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+      >
+        <div className="w-full max-w-[440px]">
 
-          {error && <div className={styles.error}>{error}</div>}
-
-          {isRegister ? (
-            /* ── Registration form ── */
-            <form className={styles.form} onSubmit={handleRegister}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="reg-name">Ime i prezime</label>
-                <div className={styles.inputWrap}>
-                  <UserIcon size={16} className={styles.inputIcon} />
-                  <input
-                    id="reg-name"
-                    type="text"
-                    className={styles.input}
-                    placeholder="Vaše ime i prezime"
-                    autoComplete="name"
-                    value={form.name}
-                    onChange={set('name')}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="reg-email">Email adresa</label>
-                <div className={styles.inputWrap}>
-                  <Envelope size={16} className={styles.inputIcon} />
-                  <input
-                    id="reg-email"
-                    type="email"
-                    className={styles.input}
-                    placeholder="vas@email.com"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={set('email')}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="reg-password">Šifra</label>
-                <div className={styles.inputWrap}>
-                  <LockKey size={16} className={styles.inputIcon} />
-                  <input
-                    id="reg-password"
-                    type="password"
-                    className={styles.input}
-                    placeholder="Min. 8 znakova"
-                    autoComplete="new-password"
-                    value={form.password}
-                    onChange={set('password')}
-                    required
-                    minLength={8}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="confirm-password">Potvrdi šifru</label>
-                <div className={styles.inputWrap}>
-                  <LockKey size={16} className={styles.inputIcon} />
-                  <input
-                    id="confirm-password"
-                    type="password"
-                    className={styles.input}
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                    value={form.confirmPassword}
-                    onChange={set('confirmPassword')}
-                    required
-                  />
-                </div>
-              </div>
-
-              <button type="submit" className={styles.submitBtn} disabled={loading}>
-                {loading ? 'Kreiranje naloga…' : 'KREIRAJ NALOG'}
-              </button>
-            </form>
-          ) : (
-            /* ── Login form ── */
-            <form className={styles.form} onSubmit={handleLogin}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="email">Email adresa</label>
-                <div className={styles.inputWrap}>
-                  <Envelope size={16} className={styles.inputIcon} />
-                  <input
-                    id="email"
-                    type="email"
-                    className={styles.input}
-                    placeholder="vas@email.com"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={set('email')}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="password">Šifra</label>
-                <div className={styles.inputWrap}>
-                  <LockKey size={16} className={styles.inputIcon} />
-                  <input
-                    id="password"
-                    type="password"
-                    className={styles.input}
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    value={form.password}
-                    onChange={set('password')}
-                    required
-                  />
-                </div>
-              </div>
-
-              <label className={styles.rememberLabel}>
-                <input
-                  type="checkbox"
-                  className={styles.checkbox}
-                  checked={form.remember}
-                  onChange={(e) => setForm((f) => ({ ...f, remember: e.target.checked }))}
-                />
-                Zapamti me
-              </label>
-
-              <button type="submit" className={styles.submitBtn} disabled={loading}>
-                {loading ? 'Prijavljivanje…' : 'PRIJAVI SE'}
-              </button>
-
-              <Link to="/nalog/zaboravljena-sifra" className={styles.forgotLink}>
-                Zaboravljena šifra?
-              </Link>
-            </form>
-          )}
-
-          <div className={styles.divider}>
-            <span>ili</span>
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="h-px w-8 bg-gray-300" />
+              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">
+                {isRegister ? 'Novi nalog' : 'Dobrodošli nazad'}
+              </span>
+              <div className="h-px w-8 bg-gray-300" />
+            </div>
+            <h1
+              className="text-3xl font-bold text-[#0F2952] uppercase"
+              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+            >
+              {isRegister ? 'Registracija' : 'Prijava'}
+            </h1>
+            <p className="text-[13px] text-gray-500 mt-2">
+              {isRegister
+                ? 'Kreirajte nalog i sakupljajte bodove lojalnosti.'
+                : 'Prijavite se da pratite narudžbe i sakupite bodove.'}
+            </p>
           </div>
 
-          {isRegister ? (
-            <Link to="/nalog" className={styles.registerBtn}>
-              IMAM NALOG — PRIJAVI SE
-            </Link>
-          ) : (
-            <Link to="/nalog/registracija" className={styles.registerBtn}>
-              KREIRAJ NALOG
-            </Link>
-          )}
+          {/* Card */}
+          <div className="bg-white border border-gray-200 p-8">
+
+            {error && (
+              <div className="border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-[12px] mb-5">
+                {error}
+              </div>
+            )}
+
+            {isRegister ? (
+              <form className="flex flex-col gap-4" onSubmit={handleRegister}>
+                <Field label="Ime i prezime">
+                  <InputWrap Icon={UserIcon}>
+                    <input className={inputCls} type="text" placeholder="Vaše ime i prezime" autoComplete="name" value={form.name} onChange={set('name')} required />
+                  </InputWrap>
+                </Field>
+                <Field label="Email adresa">
+                  <InputWrap Icon={Envelope}>
+                    <input className={inputCls} type="email" placeholder="vas@email.com" autoComplete="email" value={form.email} onChange={set('email')} required />
+                  </InputWrap>
+                </Field>
+                <Field label="Šifra">
+                  <InputWrap Icon={LockKey}>
+                    <input className={inputCls} type="password" placeholder="Min. 8 znakova" autoComplete="new-password" value={form.password} onChange={set('password')} required minLength={8} />
+                  </InputWrap>
+                </Field>
+                <Field label="Potvrdi šifru">
+                  <InputWrap Icon={LockKey}>
+                    <input className={inputCls} type="password" placeholder="••••••••" autoComplete="new-password" value={form.confirmPassword} onChange={set('confirmPassword')} required />
+                  </InputWrap>
+                </Field>
+                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0A1F42] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
+                  {loading ? 'Kreiranje naloga…' : 'Kreiraj nalog'}
+                </button>
+              </form>
+            ) : (
+              <form className="flex flex-col gap-4" onSubmit={handleLogin}>
+                <Field label="Email adresa">
+                  <InputWrap Icon={Envelope}>
+                    <input className={inputCls} type="email" placeholder="vas@email.com" autoComplete="email" value={form.email} onChange={set('email')} required />
+                  </InputWrap>
+                </Field>
+                <Field label="Šifra">
+                  <InputWrap Icon={LockKey}>
+                    <input className={inputCls} type="password" placeholder="••••••••" autoComplete="current-password" value={form.password} onChange={set('password')} required />
+                  </InputWrap>
+                </Field>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-[12px] text-gray-600 cursor-pointer">
+                    <input type="checkbox" className="w-4 h-4 accent-[#0F2952]" checked={form.remember} onChange={(e) => setForm((f) => ({ ...f, remember: e.target.checked }))} />
+                    Zapamti me
+                  </label>
+                  <Link to="/nalog/zaboravljena-sifra" className="text-[12px] text-gray-500 hover:text-[#0F2952] transition-colors">
+                    Zaboravljena šifra?
+                  </Link>
+                </div>
+                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0A1F42] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
+                  {loading ? 'Prijavljivanje…' : 'Prijavi se'}
+                </button>
+              </form>
+            )}
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 my-6">
+              <div className="h-px flex-1 bg-gray-200" />
+              <span className="text-[11px] text-gray-400">ili</span>
+              <div className="h-px flex-1 bg-gray-200" />
+            </div>
+
+            {isRegister ? (
+              <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150">
+                Imam nalog — Prijavi se
+              </Link>
+            ) : (
+              <Link to="/nalog/registracija" className="block w-full text-center py-3.5 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150">
+                Kreiraj nalog
+              </Link>
+            )}
+
+          </div>
         </div>
       </main>
     </>

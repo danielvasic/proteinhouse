@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { categories } from '../data/catalog'
-import styles from './CategorySidebar.module.css'
 
 const BRANDS = ['Optimum Nutrition', 'Ostrovit', 'BSN', 'MuscleTech', 'AllNutrition', 'Scitec']
 
@@ -11,25 +10,31 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
   const [selectedBrands, setSelectedBrands] = useState([])
 
   const toggleBrand = (b) =>
-    setSelectedBrands((prev) =>
-      prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b]
-    )
+    setSelectedBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])
+
+  const boxTitle = 'text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-4'
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className="flex flex-col gap-6 min-w-[200px]" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+
       {/* Categories */}
-      <div className={styles.box}>
-        <h3 className={styles.boxTitle}>KATEGORIJE</h3>
-        <ul className={styles.catList}>
+      <div className="border border-gray-200 bg-white p-5">
+        <h3 className={boxTitle}>Kategorije</h3>
+        <ul className="flex flex-col gap-0 list-none p-0 m-0">
           {categories.map((c) => (
             <li
               key={c.slug}
-              className={`${styles.catItem} ${c.slug === activeSlug ? styles.catActive : ''}`}
+              className={`px-0 py-2 border-b border-gray-100 last:border-0 text-[12px] cursor-pointer transition-colors duration-150 font-medium ${
+                c.slug === activeSlug
+                  ? 'text-[#0F2952] font-bold'
+                  : 'text-gray-500 hover:text-[#0F2952]'
+              }`}
               onClick={() => navigate(`/kategorija/${c.slug}`)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && navigate(`/kategorija/${c.slug}`)}
             >
+              {c.slug === activeSlug && <span className="inline-block w-1.5 h-1.5 bg-[#0F2952] mr-2 mb-px" />}
               {c.label}
             </li>
           ))}
@@ -37,48 +42,51 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
       </div>
 
       {/* Price filter */}
-      <div className={styles.box}>
-        <h3 className={styles.boxTitle}>FILTER PO CIJENI</h3>
+      <div className="border border-gray-200 bg-white p-5">
+        <h3 className={boxTitle}>Filter po cijeni</h3>
         <input
           type="range"
           min={0}
           max={300}
           value={priceMax}
           onChange={(e) => setPriceMax(Number(e.target.value))}
-          className={styles.slider}
+          className="w-full accent-[#0F2952] cursor-pointer"
           aria-label="Maksimalna cijena"
         />
-        <div className={styles.priceLabels}>
-          <span>0 KM</span>
-          <span className={styles.priceMax}>{priceMax} KM</span>
+        <div className="flex items-center justify-between mt-2 mb-4">
+          <span className="text-[11px] text-gray-400">0 KM</span>
+          <span className="text-[12px] font-bold text-[#0F2952]">{priceMax} KM</span>
         </div>
         <button
-          className={styles.applyBtn}
+          className="w-full py-2.5 border border-[#0F2952] text-[#0F2952] text-[10px] font-bold tracking-[0.12em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
           onClick={() => onPriceFilter?.(priceMax)}
         >
-          PRIMIJENI
+          Primijeni
         </button>
       </div>
 
       {/* Brands */}
-      <div className={styles.box}>
-        <h3 className={styles.boxTitle}>BRENDOVI</h3>
-        <ul className={styles.brandList}>
+      <div className="border border-gray-200 bg-white p-5">
+        <h3 className={boxTitle}>Brendovi</h3>
+        <ul className="flex flex-col gap-2.5 list-none p-0 m-0">
           {BRANDS.map((b) => (
-            <li key={b} className={styles.brandItem}>
-              <label className={styles.brandLabel}>
+            <li key={b}>
+              <label className="flex items-center gap-2.5 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={selectedBrands.includes(b)}
                   onChange={() => toggleBrand(b)}
-                  className={styles.checkbox}
+                  className="w-4 h-4 accent-[#0F2952] cursor-pointer"
                 />
-                {b}
+                <span className={`text-[12px] transition-colors duration-150 ${selectedBrands.includes(b) ? 'text-[#0F2952] font-semibold' : 'text-gray-600 group-hover:text-[#0F2952]'}`}>
+                  {b}
+                </span>
               </label>
             </li>
           ))}
         </ul>
       </div>
+
     </aside>
   )
 }

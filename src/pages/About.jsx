@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async'
-import { ShieldCheck, Truck, Star, Users } from '@phosphor-icons/react'
-import styles from './About.module.css'
+import { ShieldCheck, Truck, Star, Users, MapPin, Clock } from '@phosphor-icons/react'
 
 const STATS = [
   { label: 'Godina iskustva', value: '10+' },
@@ -10,11 +9,19 @@ const STATS = [
 ]
 
 const VALUES = [
-  { Icon: ShieldCheck, title: 'Originalnost', desc: 'Svi naši proizvodi su 100% originalni s certifikatima proizvođača.' },
-  { Icon: Truck, title: 'Brza dostava', desc: 'Isporuka unutar 1–3 radna dana na cijelu teritoriju BiH.' },
-  { Icon: Star, title: 'Lojalnost', desc: 'Za svaku kupovinu sakupljate bodove i ostvarujete dodatne popuste.' },
-  { Icon: Users, title: 'Stručnost', desc: 'Naš tim su certificirani nutricionisti i fitness treneri.' },
+  { Icon: ShieldCheck, title: 'Originalnost', desc: 'Svi naši proizvodi su 100% originalni s certifikatima proizvođača i garantiranom autentičnošću.' },
+  { Icon: Truck,       title: 'Brza dostava', desc: 'Isporuka unutar 1–3 radna dana na cijelu teritoriju Bosne i Hercegovine.' },
+  { Icon: Star,        title: 'Lojalnost',    desc: 'Za svaku kupovinu sakupljate bodove i ostvarujete dodatne popuste na buduće narudžbe.' },
+  { Icon: Users,       title: 'Stručnost',    desc: 'Naš tim čine certificirani nutricionisti i fitness treneri koji vam pomažu pri odabiru.' },
 ]
+
+const STORES = [
+  { city: 'Sarajevo',   addr: 'Maršala Tita 28', hours: 'PON–PET 9–17 · SUB 9–14' },
+  { city: 'Mostar',     addr: 'Bulevar 12',       hours: 'PON–PET 9–17 · SUB 9–13' },
+  { city: 'Banja Luka', addr: 'Kralja Petra I 5', hours: 'PON–PET 9–17 · SUB 9–14' },
+]
+
+const HERO = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80&auto=format&fit=crop'
 
 export default function About() {
   return (
@@ -25,70 +32,114 @@ export default function About() {
         <link rel="canonical" href="https://proteinhouse.ba/o-nama" />
       </Helmet>
 
-      <main className={styles.main}>
-        {/* Hero */}
-        <section className={styles.hero}>
-          <div className="container">
-            <p className={styles.eyebrow}>NAŠA PRIČA</p>
-            <h1 className={styles.heading}>O NAMA</h1>
-            <p className={styles.intro}>
-              ProteinHouse je osnovan s jednim ciljem — omogućiti svim sportašima i
-              fitness entuzijastima u Bosni i Hercegovini pristup originalnim,
-              kvalitetnim suplementima po fer cijenama. Od 2015. godine, gradimo
-              povjerenje jednom narudžbom u isto vrijeme.
+      <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+
+        {/* ── Hero ── */}
+        <section
+          className="relative flex items-end min-h-[340px] md:min-h-[420px] bg-cover bg-center"
+          style={{ backgroundImage: `linear-gradient(105deg, rgba(10,31,66,0.94) 0%, rgba(10,31,66,0.60) 60%, rgba(10,31,66,0.20) 100%), url('${HERO}')` }}
+        >
+          <div className="container pb-12 md:pb-16">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-px w-10 bg-white/35" />
+              <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/55">Naša priča</span>
+            </div>
+            <h1
+              className="text-4xl md:text-5xl font-bold text-white uppercase leading-tight"
+              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+            >
+              O nama
+            </h1>
+          </div>
+        </section>
+
+        {/* ── Intro ── */}
+        <section className="py-14 md:py-16 border-b border-gray-200">
+          <div className="container max-w-[720px]">
+            <p className="text-[15px] text-gray-600 leading-[1.8]">
+              ProteinHouse je osnovan s jednim ciljem — omogućiti svim sportašima i fitness entuzijastima
+              u Bosni i Hercegovini pristup originalnim, kvalitetnim suplementima po fer cijenama.
+              Od <strong className="text-[#0F2952] font-bold">2015. godine</strong> gradimo povjerenje
+              jednom narudžbom u isto vrijeme.
             </p>
           </div>
         </section>
 
-        {/* Stats */}
-        <section className={styles.statsSection}>
-          <div className={`container ${styles.statsGrid}`}>
-            {STATS.map((s) => (
-              <div key={s.label} className={styles.statItem}>
-                <span className={styles.statValue}>{s.value}</span>
-                <span className={styles.statLabel}>{s.label}</span>
-              </div>
-            ))}
+        {/* ── Stats ── */}
+        <section className="bg-[#0F2952] py-12 md:py-16">
+          <div className="container">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10">
+              {STATS.map((s) => (
+                <div key={s.label} className="bg-[#0F2952] flex flex-col items-center justify-center py-10 px-6 text-center">
+                  <span
+                    className="text-4xl md:text-5xl font-bold text-white leading-none mb-2"
+                    style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  >
+                    {s.value}
+                  </span>
+                  <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-white/45">{s.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Values */}
-        <section className={styles.valuesSection}>
+        {/* ── Values ── */}
+        <section className="py-14 md:py-20 border-b border-gray-200">
           <div className="container">
-            <h2 className={styles.sectionTitle}>NAŠE VRIJEDNOSTI</h2>
-            <div className={styles.valuesGrid}>
+            <div className="flex items-center gap-4 mb-10">
+              <div className="h-px flex-1 bg-gray-200" />
+              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Naše vrijednosti</span>
+              <div className="h-px flex-1 bg-gray-200" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-gray-200">
               {VALUES.map(({ Icon, title, desc }) => (
-                <div key={title} className={styles.valueCard}>
-                  <div className={styles.valueIcon}>
-                    <Icon size={28} weight="duotone" color="var(--ph-coral-500)" />
-                  </div>
-                  <h3 className={styles.valueTitle}>{title}</h3>
-                  <p className={styles.valueDesc}>{desc}</p>
+                <div key={title} className="bg-white p-8">
+                  <Icon size={26} weight="duotone" color="#0F2952" className="mb-5 opacity-70" />
+                  <h3
+                    className="text-[15px] font-bold text-[#0F2952] mb-3 uppercase"
+                    style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  >
+                    {title}
+                  </h3>
+                  <p className="text-[13px] text-gray-500 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Team */}
-        <section className={styles.teamSection}>
+        {/* ── Stores ── */}
+        <section className="py-14 md:py-20 bg-gray-50">
           <div className="container">
-            <h2 className={styles.sectionTitle}>NAŠE PRODAVNICE</h2>
-            <div className={styles.storeGrid}>
-              {[
-                { city: 'Sarajevo', addr: 'Maršala Tita 28', hours: 'PON–PET 9–17, SUB 9–14' },
-                { city: 'Mostar', addr: 'Bulevar 12', hours: 'PON–PET 9–17, SUB 9–13' },
-                { city: 'Banja Luka', addr: 'Kralja Petra I 5', hours: 'PON–PET 9–17, SUB 9–14' },
-              ].map((s) => (
-                <div key={s.city} className={styles.storeCard}>
-                  <h3 className={styles.storeCity}>{s.city}</h3>
-                  <p className={styles.storeAddr}>{s.addr}</p>
-                  <p className={styles.storeHours}>{s.hours}</p>
+            <div className="flex items-center gap-4 mb-10">
+              <div className="h-px flex-1 bg-gray-200" />
+              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Naše prodavnice</span>
+              <div className="h-px flex-1 bg-gray-200" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-gray-200">
+              {STORES.map((s) => (
+                <div key={s.city} className="bg-white p-8">
+                  <h3
+                    className="text-xl font-bold text-[#0F2952] mb-4 uppercase"
+                    style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  >
+                    {s.city}
+                  </h3>
+                  <div className="flex items-start gap-2.5 mb-2.5">
+                    <MapPin size={14} weight="fill" className="text-gray-400 mt-0.5 shrink-0" />
+                    <span className="text-[13px] text-gray-600">{s.addr}</span>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <Clock size={14} weight="fill" className="text-gray-400 mt-0.5 shrink-0" />
+                    <span className="text-[13px] text-gray-600">{s.hours}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
+
       </main>
     </>
   )

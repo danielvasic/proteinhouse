@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { MagnifyingGlass, House } from '@phosphor-icons/react'
+import { MagnifyingGlass, House, CaretRight } from '@phosphor-icons/react'
 import ProductCard from '../components/ProductCard'
 import { products } from '../data/catalog'
-import styles from './Search.module.css'
 
 function searchProducts(query) {
   if (!query || query.trim().length < 2) return []
@@ -19,7 +18,7 @@ function searchProducts(query) {
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const q = searchParams.get('q') || ''
+  const q       = searchParams.get('q') || ''
   const results = useMemo(() => searchProducts(q), [q])
 
   const handleSubmit = (e) => {
@@ -28,8 +27,6 @@ export default function Search() {
     if (val) setSearchParams({ q: val })
   }
 
-  const resultWord = results.length === 1 ? 'rezultat' : 'rezultata'
-
   return (
     <>
       <Helmet>
@@ -37,67 +34,97 @@ export default function Search() {
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 
-      <main className={styles.main}>
-        <div className="container">
-          {/* Breadcrumb */}
-          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <Link to="/" className={styles.breadLink}>
-              <House size={13} weight="fill" /> POČETNA
-            </Link>
-            <span className={styles.breadSep}>/</span>
-            <span className={styles.breadCurrent}>PRETRAGA</span>
-          </nav>
+      <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
 
-          <h1 className={styles.heading}>PRETRAGA</h1>
+        {/* ── Header ── */}
+        <section className="border-b border-gray-200 bg-white">
+          <div className="container py-8 md:py-10">
+            <nav className="flex items-center gap-2 text-[11px] text-gray-400 mb-5" aria-label="Breadcrumb">
+              <Link to="/" className="flex items-center gap-1 hover:text-[#0F2952] transition-colors">
+                <House size={12} weight="fill" /> Početna
+              </Link>
+              <CaretRight size={11} className="opacity-40" />
+              <span className="text-[#0F2952] font-semibold">Pretraga</span>
+            </nav>
 
-          {/* Search bar */}
-          <form className={styles.searchForm} onSubmit={handleSubmit}>
-            <div className={styles.searchWrap}>
-              <MagnifyingGlass size={20} className={styles.searchIcon} color="var(--ph-gray-500)" />
-              <input
-                name="q"
-                defaultValue={q}
-                key={q}
-                className={styles.searchInput}
-                placeholder="Pretraži proizvode, brendove…"
-                aria-label="Pretraga"
-                autoFocus
-              />
-              <button type="submit" className={styles.searchBtn}>PRETRAŽI</button>
-            </div>
-          </form>
+            <h1
+              className="text-3xl md:text-4xl font-bold text-[#0F2952] uppercase mb-6"
+              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+            >
+              Pretraga
+            </h1>
 
-          {/* Result count */}
-          {q && (
-            <p className={styles.resultCount}>
-              {results.length > 0
-                ? `${results.length} ${resultWord} za „${q}"`
-                : `Nema rezultata za „${q}"`}
-            </p>
-          )}
+            {/* Search bar */}
+            <form onSubmit={handleSubmit} className="max-w-[600px]">
+              <div className="flex border border-gray-300 focus-within:border-[#0F2952] transition-colors duration-150">
+                <div className="flex items-center pl-4">
+                  <MagnifyingGlass size={18} className="text-gray-400" />
+                </div>
+                <input
+                  name="q"
+                  defaultValue={q}
+                  key={q}
+                  className="flex-1 px-4 py-3.5 text-[14px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none bg-transparent"
+                  placeholder="Pretraži proizvode, brendove…"
+                  aria-label="Pretraga"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="px-6 py-3.5 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0A1F42] transition-colors duration-150 cursor-pointer border-0 shrink-0"
+                >
+                  Pretraži
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
 
-          {/* Results grid */}
-          {results.length > 0 ? (
-            <div className={styles.grid}>
-              {results.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          ) : q ? (
-            <div className={styles.empty}>
-              <MagnifyingGlass size={52} color="var(--ph-gray-300)" weight="light" />
-              <p className={styles.emptyTitle}>Nema rezultata</p>
-              <p className={styles.emptyText}>
-                Pokušajte s drugačijim pojmom ili pretražite naše kategorije.
+        {/* ── Results ── */}
+        <section className="py-10 bg-gray-50 min-h-[400px]">
+          <div className="container">
+
+            {q && (
+              <p className="text-[12px] text-gray-500 mb-6">
+                {results.length > 0
+                  ? <><strong className="text-[#0F2952]">{results.length}</strong> {results.length === 1 ? 'rezultat' : 'rezultata'} za „{q}"</>
+                  : <>Nema rezultata za „{q}"</>}
               </p>
-              <Link to="/" className={styles.emptyLink}>← Nazad na početnu</Link>
-            </div>
-          ) : (
-            <div className={styles.empty}>
-              <p className={styles.emptyText}>Unesite pojam za pretragu iznad.</p>
-            </div>
-          )}
-        </div>
+            )}
+
+            {results.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200">
+                {results.map((p) => (
+                  <div key={p.id} className="bg-white">
+                    <ProductCard product={p} />
+                  </div>
+                ))}
+              </div>
+            ) : q ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+                <MagnifyingGlass size={48} color="#D1D5DB" weight="thin" />
+                <div>
+                  <p className="text-[15px] font-bold text-[#0F2952] mb-1" style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}>
+                    Nema rezultata
+                  </p>
+                  <p className="text-[13px] text-gray-400">Pokušajte s drugačijim pojmom ili pretražite naše kategorije.</p>
+                </div>
+                <Link
+                  to="/"
+                  className="mt-2 px-6 py-3 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150"
+                >
+                  ← Nazad na početnu
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-16">
+                <p className="text-[13px] text-gray-400">Unesite pojam za pretragu iznad.</p>
+              </div>
+            )}
+
+          </div>
+        </section>
+
       </main>
     </>
   )
