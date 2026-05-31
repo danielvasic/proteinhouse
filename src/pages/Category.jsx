@@ -4,7 +4,8 @@ import { Helmet } from 'react-helmet-async'
 import { House, CaretRight } from '@phosphor-icons/react'
 import CategorySidebar from '../components/CategorySidebar'
 import ProductCard from '../components/ProductCard'
-import { getCategoryBySlug, getProductsByCategory } from '../data/catalog'
+import { getCategoryBySlug } from '../data/catalog'
+import { useProductsByCategory } from '../hooks/useProducts'
 
 const SORT_OPTIONS = [
   { value: 'newest',     label: 'Najnovije' },
@@ -28,10 +29,10 @@ export default function Category() {
   const [sort, setSort] = useState('newest')
   const [maxPrice, setMaxPrice] = useState(300)
 
-  const category    = getCategoryBySlug(slug)
-  const allProducts = getProductsByCategory(slug)
-  const filtered    = allProducts.filter((p) => p.price <= maxPrice)
-  const sorted      = sortProducts(filtered, sort)
+  const category = getCategoryBySlug(slug)
+  const { products: allProducts } = useProductsByCategory(slug)
+  const filtered = allProducts.filter((p) => p.price <= maxPrice)
+  const sorted   = sortProducts(filtered, sort)
 
   const pageTitle = category?.label || slug?.toUpperCase() || 'KATEGORIJA'
   const metaDesc  = `Kupujte ${pageTitle.toLowerCase()} online na ProteinHouse. ${filtered.length} proizvoda u ponudi.`

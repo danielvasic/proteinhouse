@@ -29,6 +29,38 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 })
 
 // ------------------------------------------------
+// Storage helpers
+// ------------------------------------------------
+
+/**
+ * Resolve a product's display image URL.
+ * Priority: Supabase Storage path → image_url field → img field (catalog fallback)
+ */
+export function getProductImageUrl(product) {
+  if (!product) return ''
+  if (product.image_path) {
+    const { data } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(product.image_path)
+    return data?.publicUrl || ''
+  }
+  return product.image_url || product.img || ''
+}
+
+/**
+ * Upload a file to the product-images bucket.
+ * Returns { path, error }
+ */
+export async function uploadProductImage(file, slug) {
+  const ext  = file.name.split('.').pop().toLowerCase()
+  const path = `${slug || 'product'}-${Date.now()}.${ext}`
+  const { error } = await supabase.storage
+    .from('product-images')
+    .upload(path, file, { upsert: true, contentType: file.type })
+  return { path: error ? null : path, error }
+}
+
+// ------------------------------------------------
 // Product helpers (replace catalog.js once live)
 // ------------------------------------------------
 

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Save, Plus, X } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Save, Plus, X, Upload, Image as ImageIcon, RefreshCw } from 'lucide-react'
+import { supabase, getProductImageUrl, uploadProductImage } from '../../lib/supabase'
 import { categories } from '../../data/catalog'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -13,8 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 const EMPTY = {
   brand: '', title: '', slug: '', price: '', old_price: '',
-  description: '', category: 'proteini', image_url: '',
-  badge: '', is_active: true, flavors: [], sort_order: 0,
+  description: '', category: 'proteini', image_url: '', image_path: '',
+  badge: '', is_active: true, flavors: [], sizes: [], sort_order: 0,
 }
 
 function slugify(str) {
@@ -33,21 +33,76 @@ function Field({ label, children, hint }) {
   )
 }
 
+/** Reusable tag-list editor for flavors and sizes */
+function TagEditor({ label, hint, placeholder, value, onChange }) {
+  const [input, setInput] = useState('')
+
+  const add = () => {
+    const v = input.trim()
+    if (!v || value.includes(v)) return
+    onChange([...value, v])
+    setInput('')
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        <Input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
+          placeholder={placeholder}
+          className="flex-1"
+        />
+        <Button type="button" variant="outline" size="icon" onClick={add}>
+          <Plus size={14} />
+        </Button>
+      </div>
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {value.map((v) => (
+            <span key={v} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-sm font-medium">
+              {v}
+              <button
+                type="button"
+                onClick={() => onChange(value.filter((x) => x !== v))}
+                className="text-gray-400 hover:text-gray-700 cursor-pointer bg-transparent border-0 p-0"
+              >
+                <X size={12} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+    </div>
+  )
+}
+
 export default function ProductEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
   const isNew = id === 'novi'
+  const fileRef = useRef(null)
 
-  const [form, setForm] = useState(EMPTY)
-  const [flavorInput, setFlavorInput] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(!isNew)
+  const [form,      setForm]      = useState(EMPTY)
+  const [saving,    setSaving]    = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [error,     setError]     = useState('')
+  const [loading,   setLoading]   = useState(!isNew)
 
   useEffect(() => {
     if (isNew) return
     supabase.from('products').select('*').eq('id', id).single().then(({ data }) => {
-      if (data) setForm({ ...data, old_price: data.old_price ?? '' })
+      if (data) setForm({
+        ...EMPTY,
+        ...data,
+        old_price:  data.old_price  ?? '',
+        flavors:    data.flavors    ?? [],
+        sizes:      data.sizes      ?? [],
+        image_path: data.image_path ?? '',
+        image_url:  data.image_url  ?? '',
+      })
       setLoading(false)
     })
   }, [id, isNew])
@@ -61,14 +116,23 @@ export default function ProductEdit() {
     })
   }
 
-  const addFlavor = () => {
-    const v = flavorInput.trim()
-    if (!v || form.flavors.includes(v)) return
-    setForm((f) => ({ ...f, flavors: [...f.flavors, v] }))
-    setFlavorInput('')
+  /** Upload file to Supabase Storage */
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setError('')
+    const { path, error: uploadErr } = await uploadProductImage(file, form.slug || 'product')
+    if (uploadErr) {
+      setError(`Upload greška: ${uploadErr.message}`)
+    } else {
+      setForm((f) => ({ ...f, image_path: path, image_url: '' }))
+    }
+    setUploading(false)
+    e.target.value = ''
   }
 
-  const removeFlavor = (f) => setForm((p) => ({ ...p, flavors: p.flavors.filter((x) => x !== f) }))
+  const clearImage = () => setForm((f) => ({ ...f, image_path: '', image_url: '' }))
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -77,9 +141,10 @@ export default function ProductEdit() {
     try {
       const payload = {
         ...form,
-        price: parseFloat(form.price),
-        old_price: form.old_price ? parseFloat(form.old_price) : null,
+        price:      parseFloat(form.price),
+        old_price:  form.old_price ? parseFloat(form.old_price) : null,
         sort_order: parseInt(form.sort_order) || 0,
+        updated_at: new Date().toISOString(),
       }
       if (isNew) {
         const { error: err } = await supabase.from('products').insert(payload)
@@ -96,8 +161,13 @@ export default function ProductEdit() {
     }
   }
 
+  // Resolve preview URL
+  const previewUrl = form.image_path
+    ? getProductImageUrl({ image_path: form.image_path })
+    : form.image_url || ''
+
   if (loading) {
-    return <div className="flex items-center justify-center py-16"><div className="h-7 w-7 rounded-full border-4 border-gray-200 border-t-emerald-500 animate-spin" /></div>
+    return <div className="flex items-center justify-center py-16"><div className="h-7 w-7 rounded-full border-4 border-gray-200 border-t-primary animate-spin" /></div>
   }
 
   return (
@@ -117,8 +187,12 @@ export default function ProductEdit() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* ── Osnovno ── */}
         <Card>
-          <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Osnovno</CardTitle></CardHeader>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Osnovno</CardTitle>
+          </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Brend *">
               <Input value={form.brand} onChange={set('brand')} required placeholder="npr. OPTIMUM NUTRITION" />
@@ -142,8 +216,11 @@ export default function ProductEdit() {
           </CardContent>
         </Card>
 
+        {/* ── Cijene ── */}
         <Card>
-          <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Cijene i prikaz</CardTitle></CardHeader>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Cijene i prikaz</CardTitle>
+          </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Cijena (KM) *">
               <Input type="number" step="0.01" min="0" value={form.price} onChange={set('price')} required placeholder="0.00" />
@@ -160,51 +237,119 @@ export default function ProductEdit() {
           </CardContent>
         </Card>
 
+        {/* ── Slika ── */}
         <Card>
-          <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Slika i opis</CardTitle></CardHeader>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Slika proizvoda</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4">
-            <Field label="URL slike">
-              <Input value={form.image_url} onChange={set('image_url')} placeholder="https://..." />
-              {form.image_url && (
-                <img src={form.image_url} alt="" className="mt-2 h-24 w-24 rounded-lg object-cover border" onError={(e) => { e.target.style.display = 'none' }} />
-              )}
-            </Field>
-            <Field label="Opis">
-              <Textarea value={form.description} onChange={set('description')} rows={4} placeholder="Kratak opis proizvoda…" />
-            </Field>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Okusi / varijante</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex gap-2">
-              <Input
-                value={flavorInput}
-                onChange={(e) => setFlavorInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addFlavor() } }}
-                placeholder="Dodaj okus, Enter za potvrdu"
-                className="flex-1"
-              />
-              <Button type="button" variant="outline" size="icon" onClick={addFlavor}>
-                <Plus size={14} />
-              </Button>
-            </div>
-            {form.flavors.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {form.flavors.map((f) => (
-                  <span key={f} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-sm font-medium">
-                    {f}
-                    <button type="button" onClick={() => removeFlavor(f)} className="text-gray-400 hover:text-gray-600">
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
+            <div className="flex gap-4 items-start">
+              {/* Preview */}
+              <div className="w-28 h-28 border-2 border-dashed border-gray-200 flex items-center justify-center bg-gray-50 shrink-0 overflow-hidden">
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.target.style.display = 'none' }}
+                  />
+                ) : (
+                  <ImageIcon size={28} className="text-gray-300" />
+                )}
               </div>
-            )}
+
+              <div className="flex-1 space-y-3">
+                {/* Upload dugme */}
+                <div>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    {uploading
+                      ? <><RefreshCw size={14} className="animate-spin" /> Uploaduje se…</>
+                      : <><Upload size={14} /> Učitaj sliku</>
+                    }
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    JPG, PNG ili WebP · max 5MB · čuva se u Supabase Storage
+                  </p>
+                </div>
+
+                {/* Ili URL alternativa */}
+                <Field label="Ili unesi URL slike" hint="Koristi se samo ako nije uploadovana slika">
+                  <div className="flex gap-2">
+                    <Input
+                      value={form.image_url}
+                      onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value, image_path: '' }))}
+                      placeholder="https://..."
+                      disabled={!!form.image_path}
+                    />
+                    {previewUrl && (
+                      <Button type="button" variant="ghost" size="icon" onClick={clearImage} title="Ukloni sliku">
+                        <X size={15} />
+                      </Button>
+                    )}
+                  </div>
+                </Field>
+
+                {form.image_path && (
+                  <p className="text-xs text-muted-foreground font-mono bg-gray-50 px-2 py-1 border rounded truncate">
+                    📦 Storage: {form.image_path}
+                  </p>
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
+        {/* ── Opis ── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Opis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Textarea value={form.description} onChange={set('description')} rows={4} placeholder="Kratak opis proizvoda…" />
+          </CardContent>
+        </Card>
+
+        {/* ── Okusi + Težine ── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Varijante</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">Okusi</p>
+              <TagEditor
+                value={form.flavors}
+                onChange={(v) => setForm((f) => ({ ...f, flavors: v }))}
+                placeholder="npr. Chocolate Fudge, Vanilla…"
+                hint="Enter za dodavanje"
+              />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">Težine / Veličine</p>
+              <TagEditor
+                value={form.sizes}
+                onChange={(v) => setForm((f) => ({ ...f, sizes: v }))}
+                placeholder="npr. 500g, 1kg, 2kg, 5kg…"
+                hint="Enter za dodavanje"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Status ── */}
         <Card>
           <CardContent className="py-4 flex items-center justify-between">
             <div>
@@ -219,11 +364,12 @@ export default function ProductEdit() {
           <Button variant="outline" asChild>
             <Link to="/admin/proizvodi">Otkaži</Link>
           </Button>
-          <Button type="submit" disabled={saving} className="flex items-center gap-2">
+          <Button type="submit" disabled={saving || uploading} className="flex items-center gap-2">
             <Save size={15} />
             {saving ? 'Snimanje…' : 'Snimi proizvod'}
           </Button>
         </div>
+
       </form>
     </div>
   )

@@ -1,25 +1,13 @@
-import { useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { MagnifyingGlass, House, CaretRight } from '@phosphor-icons/react'
 import ProductCard from '../components/ProductCard'
-import { products } from '../data/catalog'
-
-function searchProducts(query) {
-  if (!query || query.trim().length < 2) return []
-  const q = query.toLowerCase().trim()
-  return products.filter(
-    (p) =>
-      p.title.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      (p.description && p.description.toLowerCase().includes(q))
-  )
-}
+import { useSearchProducts } from '../hooks/useProducts'
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams()
   const q       = searchParams.get('q') || ''
-  const results = useMemo(() => searchProducts(q), [q])
+  const results = useSearchProducts(q)
 
   const handleSubmit = (e) => {
     e.preventDefault()

@@ -6,7 +6,8 @@ import {
   ShoppingBag, House, CaretRight,
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
-import { getProductBySlug, getCategoryBySlug, fmtKM } from '../data/catalog'
+import { getCategoryBySlug, fmtKM } from '../data/catalog'
+import { useProduct } from '../hooks/useProducts'
 
 function StarRating({ rating }) {
   return (
@@ -23,13 +24,50 @@ function StarRating({ rating }) {
   )
 }
 
+function VariantSelector({ label, options, value, onChange }) {
+  if (!options?.length) return null
+  return (
+    <div className="mb-6">
+      <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">{label}</p>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            className={`px-3 py-2 text-[11px] font-bold tracking-[0.06em] border transition-all duration-150 cursor-pointer ${
+              opt === value
+                ? 'border-[#0F2952] bg-[#0F2952] text-white'
+                : 'border-gray-300 text-gray-600 bg-transparent hover:border-[#0F2952] hover:text-[#0F2952]'
+            }`}
+            onClick={() => onChange(opt)}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Product() {
   const { slug } = useParams()
   const { addItem } = useCart()
+  const { product, loading } = useProduct(slug)
 
-  const product = getProductBySlug(slug)
-  const [qty, setQty]       = useState(1)
-  const [flavor, setFlavor] = useState(product?.flavors?.[0] || '')
+  const [qty,    setQty]    = useState(1)
+  const [flavor, setFlavor] = useState(null)
+  const [size,   setSize]   = useState(null)
+
+  // Set defaults when product loads
+  if (product && flavor === null && product.flavors?.length) setFlavor(product.flavors[0])
+  if (product && size   === null && product.sizes?.length)   setSize(product.sizes[0])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+        <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#0F2952] animate-spin" />
+      </div>
+    )
+  }
 
   if (!product) {
     return (
@@ -45,7 +83,10 @@ export default function Product() {
   const category   = getCategoryBySlug(product.cat)
   const isDiscount = product.badge?.startsWith('-')
 
-  const handleAdd = () => { for (let i = 0; i < qty; i++) addItem(product) }
+  const handleAdd = () => {
+    const item = { ...product, selectedFlavor: flavor, selectedSize: size }
+    for (let i = 0; i < qty; i++) addItem(item)
+  }
 
   return (
     <>
@@ -58,7 +99,7 @@ export default function Product() {
           name: product.title, brand: { '@type': 'Brand', name: product.brand },
           description: product.description, image: product.img,
           offers: { '@type': 'Offer', price: product.price, priceCurrency: 'BAM', availability: 'https://schema.org/InStock' },
-          aggregateRating: { '@type': 'AggregateRating', ratingValue: product.rating, reviewCount: product.reviews },
+          ...(product.rating && { aggregateRating: { '@type': 'AggregateRating', ratingValue: product.rating, reviewCount: product.reviews } }),
         })}</script>
       </Helmet>
 
@@ -86,23 +127,29 @@ export default function Product() {
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200">
 
-              {/* Image panel */}
+              {/* Image */}
               <div className="relative bg-white flex items-center justify-center p-10 md:p-14">
                 {isDiscount && (
                   <div className="absolute top-5 left-5 w-[52px] h-[52px] rounded-full bg-[#0F2952] flex items-center justify-center">
                     <span className="text-white text-[11px] font-extrabold text-center leading-tight">{product.badge}</span>
                   </div>
                 )}
-                <img
-                  src={product.img}
-                  alt={product.title}
-                  className="w-full max-w-[400px] object-contain"
-                  width={600}
-                  height={540}
-                />
+                {product.img ? (
+                  <img
+                    src={product.img}
+                    alt={product.title}
+                    className="w-full max-w-[400px] object-contain"
+                    width={600}
+                    height={540}
+                  />
+                ) : (
+                  <div className="w-full max-w-[400px] aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-sm">
+                    Nema slike
+                  </div>
+                )}
               </div>
 
-              {/* Info panel */}
+              {/* Info */}
               <div className="bg-white p-8 md:p-12 flex flex-col">
 
                 <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-2">{product.brand}</p>
@@ -137,29 +184,23 @@ export default function Product() {
                 </div>
 
                 {/* Description */}
-                <p className="text-[13px] text-gray-500 leading-relaxed mb-6">{product.description}</p>
+                <p className="text-[13px] text-gray-500 leading-relaxed mb-5">{product.description}</p>
 
-                {/* Flavor selector */}
-                {product.flavors?.length > 0 && (
-                  <div className="mb-6">
-                    <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">Okus</p>
-                    <div className="flex flex-wrap gap-2">
-                      {product.flavors.map((f) => (
-                        <button
-                          key={f}
-                          className={`px-3 py-2 text-[11px] font-bold tracking-[0.06em] border transition-all duration-150 cursor-pointer ${
-                            f === flavor
-                              ? 'border-[#0F2952] bg-[#0F2952] text-white'
-                              : 'border-gray-300 text-gray-600 bg-transparent hover:border-[#0F2952] hover:text-[#0F2952]'
-                          }`}
-                          onClick={() => setFlavor(f)}
-                        >
-                          {f}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {/* Sizes selector */}
+                <VariantSelector
+                  label="Težina / Veličina"
+                  options={product.sizes}
+                  value={size}
+                  onChange={setSize}
+                />
+
+                {/* Flavors selector */}
+                <VariantSelector
+                  label="Okus"
+                  options={product.flavors}
+                  value={flavor}
+                  onChange={setFlavor}
+                />
 
                 {/* Qty + Add to cart */}
                 <div className="flex gap-3 mb-6">
@@ -199,8 +240,8 @@ export default function Product() {
                 {/* Trust badges */}
                 <div className="grid grid-cols-2 gap-px bg-gray-200 mt-auto">
                   {[
-                    { Icon: Truck,        title: 'Besplatna dostava', sub: 'Preko 100 KM' },
-                    { Icon: ShieldCheck,  title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
+                    { Icon: Truck,       title: 'Besplatna dostava', sub: 'Preko 100 KM' },
+                    { Icon: ShieldCheck, title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
                   ].map(({ Icon, title, sub }) => (
                     <div key={title} className="flex items-center gap-3 bg-gray-50 px-4 py-3">
                       <Icon size={18} weight="duotone" color="#0F2952" className="shrink-0 opacity-70" />

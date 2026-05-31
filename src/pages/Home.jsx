@@ -6,7 +6,7 @@ import CategoryStrip from '../components/CategoryStrip'
 import ProductCarousel from '../components/ProductCarousel'
 import BrandStrip from '../components/BrandStrip'
 import { useSiteContent } from '../hooks/useSiteContent'
-import { products } from '../data/catalog'
+import { useAllProducts } from '../hooks/useProducts'
 
 // Default product selections (used as fallback)
 const DEFAULT_NEW_IDS  = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']
@@ -29,18 +29,19 @@ const DEFAULTS = {
 }
 
 export default function Home() {
-  const { data } = useSiteContent(CONTENT_KEYS, DEFAULTS)
+  const { data }     = useSiteContent(CONTENT_KEYS, DEFAULTS)
+  const { products } = useAllProducts()
 
-  // Resolve product objects from IDs, preserve order
+  // Resolve product objects from admin-selected IDs, preserve order
   const newest = useMemo(() => {
     const ids = Array.isArray(data.carousel_new_arrivals_ids) ? data.carousel_new_arrivals_ids : DEFAULT_NEW_IDS
     return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean)
-  }, [data.carousel_new_arrivals_ids])
+  }, [data.carousel_new_arrivals_ids, products])
 
   const bestsellers = useMemo(() => {
     const ids = Array.isArray(data.carousel_bestsellers_ids) ? data.carousel_bestsellers_ids : DEFAULT_BEST_IDS
     return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean)
-  }, [data.carousel_bestsellers_ids])
+  }, [data.carousel_bestsellers_ids, products])
 
   return (
     <>
