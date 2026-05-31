@@ -8,7 +8,8 @@ import {
 } from '@phosphor-icons/react'
 import Logo from './Logo'
 import { useCart } from '../store/CartContext'
-import { categories } from '../data/catalog'
+import { useCategories } from '../hooks/useCategories'
+import { useSiteContent } from '../hooks/useSiteContent'
 
 const CAT_ICONS = {
   proteini:    Flask,
@@ -21,25 +22,41 @@ const CAT_ICONS = {
   akcija:      Tag,
 }
 
-const NAV_ITEMS = [
-  { key: 'shop',     label: 'SHOP',    hasMenu: true, to: '/' },
-  { key: 'sportovi', label: 'SPORTOVI',              to: '/kategorija/performanse' },
-  { key: 'ciljevi',  label: 'CILJEVI',               to: '/kategorija/kontrola' },
-  { key: 'blog',     label: 'BLOG',                  to: '/blog' },
-  { key: 'o-nama',   label: 'O NAMA',                to: '/o-nama' },
-  { key: 'kontakt',  label: 'KONTAKT', right: true,  to: '/kontakt' },
+// Fallback icons for mobile nav by key
+const MOBILE_ICONS = { shop: Storefront, sportovi: Barbell, ciljevi: Target, blog: Newspaper, 'o-nama': Info, kontakt: MapPin }
+
+// Default nav items — overridden by DB values from site_content
+const DEFAULT_NAV = [
+  { key: 'shop',     label: 'SHOP',     to: '/',                         hasMenu: true,  right: false, active: true },
+  { key: 'sportovi', label: 'SPORTOVI', to: '/kategorija/performanse',   hasMenu: false, right: false, active: true },
+  { key: 'ciljevi',  label: 'CILJEVI',  to: '/kategorija/kontrola',      hasMenu: false, right: false, active: true },
+  { key: 'blog',     label: 'BLOG',     to: '/blog',                     hasMenu: false, right: false, active: true },
+  { key: 'o-nama',   label: 'O NAMA',   to: '/o-nama',                   hasMenu: false, right: false, active: true },
+  { key: 'kontakt',  label: 'KONTAKT',  to: '/kontakt',                  hasMenu: false, right: true,  active: true },
 ]
 
-const MOBILE_ICONS = { shop: Storefront, sportovi: Barbell, ciljevi: Target, blog: Newspaper, 'o-nama': Info, kontakt: MapPin }
+const UTILITY_KEYS    = ['contact_phone', 'contact_email', 'contact_hours', 'footer_shipping']
+const UTILITY_DEFAULT = {
+  contact_phone:    '+387 33 545 000',
+  contact_email:    'info@proteinhouse.ba',
+  contact_hours:    'PON–PET 9–17 · SUB 9–14',
+  footer_shipping:  'BESPLATNA DOSTAVA > 100 KM',
+}
 
 export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const { totalItems, openDrawer } = useCart()
-  const [shopOpen, setShopOpen] = useState(false)
+  const [shopOpen,   setShopOpen]   = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [searchVal, setSearchVal] = useState('')
+  const [searchVal,  setSearchVal]  = useState('')
   const closeTimer = useRef(null)
+
+  // Dynamic data from DB
+  const { categories }     = useCategories()
+  const { data: utility }  = useSiteContent(UTILITY_KEYS, UTILITY_DEFAULT)
+  const { data: navData }  = useSiteContent(['nav_items'], { nav_items: null })
+  const NAV_ITEMS = (navData.nav_items?.items ?? DEFAULT_NAV).filter(n => n.active !== false)
 
   useEffect(() => { setMobileOpen(false) }, [location.pathname])
   useEffect(() => () => clearTimeout(closeTimer.current), [])
@@ -56,12 +73,10 @@ export default function Header() {
       <div className="bg-[#0A1F42] text-white hidden md:block">
         <div className="container">
           <div className="flex items-center gap-5 py-[7px] text-[11px] tracking-[0.06em] text-white/60">
-            <span className="flex items-center gap-1.5"><Phone size={11} weight="fill" /> +387 33 545 000</span>
-            <span className="flex items-center gap-1.5"><Envelope size={11} weight="fill" /> info@proteinhouse.ba</span>
-            <span className="ml-auto flex items-center gap-1.5"><Clock size={11} weight="fill" /> PON–PET 9–17 · SUB 9–14</span>
-            <span className="flex items-center gap-1.5 font-bold text-white/90">
-              <Truck size={11} weight="fill" /> BESPLATNA DOSTAVA &gt; 100 KM
-            </span>
+            {utility.contact_phone  && <span className="flex items-center gap-1.5"><Phone    size={11} weight="fill" /> {utility.contact_phone}</span>}
+            {utility.contact_email  && <span className="flex items-center gap-1.5"><Envelope size={11} weight="fill" /> {utility.contact_email}</span>}
+            {utility.contact_hours  && <span className="ml-auto flex items-center gap-1.5"><Clock size={11} weight="fill" /> {utility.contact_hours}</span>}
+            {utility.footer_shipping && <span className="flex items-center gap-1.5 font-bold text-white/90"><Truck size={11} weight="fill" /> {utility.footer_shipping}</span>}
           </div>
         </div>
       </div>

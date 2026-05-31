@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Pencil, Trash2, Tag, Save, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, Tag, Save, X, ChevronRight } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -10,7 +10,7 @@ import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 
-const EMPTY = { slug: '', label: '', description: '', image_url: '', sort_order: 0, is_active: true, accent: false }
+const EMPTY = { slug: '', label: '', description: '', image_url: '', sort_order: 0, is_active: true, accent: false, subs: [] }
 
 function slugify(str) {
   return str.toLowerCase()
@@ -36,8 +36,18 @@ export default function Categories() {
 
   useEffect(() => { load() }, [])
 
-  const openNew = () => { setEditItem(null); setForm(EMPTY); setError(''); setDialogOpen(true) }
-  const openEdit = (cat) => { setEditItem(cat); setForm({ ...cat }); setError(''); setDialogOpen(true) }
+  const [subInput, setSubInput] = useState('')
+
+  const openNew  = () => { setEditItem(null);  setForm(EMPTY);    setSubInput(''); setError(''); setDialogOpen(true) }
+  const openEdit = (cat) => { setEditItem(cat); setForm({ ...cat, subs: cat.subs ?? [] }); setSubInput(''); setError(''); setDialogOpen(true) }
+
+  const addSub = () => {
+    const v = subInput.trim()
+    if (!v || form.subs.includes(v)) return
+    setForm((f) => ({ ...f, subs: [...f.subs, v] }))
+    setSubInput('')
+  }
+  const removeSub = (s) => setForm((f) => ({ ...f, subs: f.subs.filter((x) => x !== s) }))
 
   const set = (key) => (e) => {
     const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value
@@ -130,7 +140,9 @@ export default function Categories() {
                           }
                           <div>
                             <p className="font-semibold text-sm">{c.label}</p>
-                            {c.description && <p className="text-xs text-muted-foreground truncate max-w-48">{c.description}</p>}
+                            {c.subs?.length > 0 && (
+                              <p className="text-xs text-muted-foreground mt-0.5">{c.subs.slice(0, 3).join(', ')}{c.subs.length > 3 ? ` +${c.subs.length - 3}` : ''}</p>
+                            )}
                           </div>
                         </div>
                       </TableCell>
@@ -186,6 +198,41 @@ export default function Categories() {
               <Label>Redosljed prikaza</Label>
               <Input type="number" value={form.sort_order} onChange={set('sort_order')} />
             </div>
+
+            {/* Subcategories */}
+            <div className="space-y-2">
+              <Label>Pod-kategorije (prikazuju se u mega meniju)</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={subInput}
+                  onChange={(e) => setSubInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSub() } }}
+                  placeholder="npr. Whey, Izolat, Kazein…"
+                  className="flex-1"
+                />
+                <Button type="button" variant="outline" size="icon" onClick={addSub}>
+                  <Plus size={14} />
+                </Button>
+              </div>
+              {form.subs?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {form.subs.map((s) => (
+                    <span key={s} className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-700">
+                      <ChevronRight size={10} className="text-gray-400" />
+                      {s}
+                      <button
+                        type="button"
+                        onClick={() => removeSub(s)}
+                        className="ml-0.5 text-gray-400 hover:text-gray-700 cursor-pointer bg-transparent border-0 p-0"
+                      >
+                        <X size={11} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium">Aktivan</p>
