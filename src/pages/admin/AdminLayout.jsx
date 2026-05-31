@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Package, FileText, ShoppingCart, Users, Tag,
   Percent, LayoutTemplate, Image, LogOut, Menu, X, ChevronRight,
-  Bell, Settings, ExternalLink,
+  Bell, Settings, ExternalLink, Star, Newspaper,
 } from 'lucide-react'
 import { useAdmin } from '../../store/AdminContext'
 import { Button } from '../../components/ui/button'
@@ -19,6 +19,8 @@ const NAV = [
   { label: 'Kategorije',  to: '/admin/kategorije',  icon: Tag },
   { label: 'Ponude',      to: '/admin/ponude',      icon: Percent },
   { label: 'Baneri',      to: '/admin/baneri',      icon: Image },
+  { label: 'Istaknuti',   to: '/admin/istaknuti',   icon: Star },
+  { label: 'Vijesti',     to: '/admin/vijesti',     icon: Newspaper },
   { label: 'Sadržaj',     to: '/admin/sadrzaj',     icon: LayoutTemplate },
 ]
 
@@ -33,6 +35,8 @@ function PageTitle() {
     '/admin/kategorije': 'Kategorije',
     '/admin/ponude': 'Ponude',
     '/admin/baneri': 'Baneri',
+    '/admin/istaknuti': 'Istaknuti sadržaj',
+    '/admin/vijesti': 'Vijesti',
     '/admin/sadrzaj': 'Sadržaj stranice',
     '/admin/postavke': 'Postavke',
   }

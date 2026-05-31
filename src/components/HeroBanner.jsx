@@ -1,7 +1,23 @@
 import { useNavigate } from 'react-router-dom'
 import { Tag, ArrowRight } from '@phosphor-icons/react'
+import { useSiteContent } from '../hooks/useSiteContent'
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1920&q=85&auto=format&fit=crop'
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1920&q=85&auto=format&fit=crop'
+
+const CONTENT_KEYS = [
+  'hero_eyebrow', 'hero_title', 'hero_subtitle',
+  'hero_cta_primary', 'hero_cta_primary_link', 'hero_cta_secondary', 'hero_image_url',
+]
+
+const DEFAULTS = {
+  hero_eyebrow:       'Black Friday 2026',
+  hero_title:         'Snaga u/svakoj/mjerici',
+  hero_subtitle:      'Do −70% na izabrane proteinske formule. Besplatna dostava na sve narudžbe preko 100 KM.',
+  hero_cta_primary:   'Pogledaj akcije',
+  hero_cta_primary_link: '/kategorija/akcija',
+  hero_cta_secondary: 'Svi proteini',
+  hero_image_url:     DEFAULT_IMAGE,
+}
 
 const STATS = [
   { value: '500+', label: 'Proizvoda' },
@@ -11,12 +27,16 @@ const STATS = [
 
 export default function HeroBanner() {
   const navigate = useNavigate()
+  const { data } = useSiteContent(CONTENT_KEYS, DEFAULTS)
+
+  // Title supports "/" as line break separator
+  const titleLines = (data.hero_title || DEFAULTS.hero_title).split('/')
 
   return (
     <section
       className="relative min-h-[600px] lg:min-h-[680px] flex items-center bg-cover bg-center bg-no-repeat overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(105deg, rgba(10,31,66,0.95) 0%, rgba(10,31,66,0.70) 52%, rgba(10,31,66,0.18) 100%), url('${HERO_IMAGE}')`,
+        backgroundImage: `linear-gradient(105deg, rgba(10,31,66,0.95) 0%, rgba(10,31,66,0.70) 52%, rgba(10,31,66,0.18) 100%), url('${data.hero_image_url || DEFAULT_IMAGE}')`,
       }}
     >
       <div className="container w-full">
@@ -29,7 +49,7 @@ export default function HeroBanner() {
               className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/55"
               style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
             >
-              Black Friday 2026
+              {data.hero_eyebrow}
             </span>
           </div>
 
@@ -38,33 +58,33 @@ export default function HeroBanner() {
             className="text-5xl md:text-6xl lg:text-[72px] font-bold text-white uppercase leading-[0.95] tracking-[-0.02em] mb-7"
             style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
           >
-            Snaga u<br />svakoj<br />mjerici
+            {titleLines.map((line, i) => (
+              <span key={i}>{line}{i < titleLines.length - 1 && <br />}</span>
+            ))}
           </h1>
 
           {/* Body */}
           <p
             className="text-[15px] text-white/65 leading-relaxed mb-8 max-w-[440px]"
             style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
-          >
-            Do <strong className="text-white font-extrabold">−70%</strong> na izabrane
-            proteinske formule. Besplatna dostava na sve narudžbe preko 100 KM.
-          </p>
+            dangerouslySetInnerHTML={{ __html: (data.hero_subtitle || DEFAULTS.hero_subtitle).replace('−70%', '<strong class="text-white font-extrabold">−70%</strong>') }}
+          />
 
           {/* CTAs */}
           <div className="flex flex-wrap gap-3">
             <button
               className="flex items-center gap-2.5 px-8 py-3.5 bg-white text-[#0F2952] text-[12px] font-bold tracking-[0.1em] uppercase hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
               style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
-              onClick={() => navigate('/kategorija/akcija')}
+              onClick={() => navigate(data.hero_cta_primary_link || '/kategorija/akcija')}
             >
-              <Tag size={15} weight="fill" /> Pogledaj akcije
+              <Tag size={15} weight="fill" /> {data.hero_cta_primary}
             </button>
             <button
               className="flex items-center gap-2 px-8 py-3.5 border border-white/35 text-white text-[12px] font-bold tracking-[0.1em] uppercase hover:border-white/70 hover:bg-white/8 transition-all duration-150 cursor-pointer"
               style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
               onClick={() => navigate('/kategorija/proteini')}
             >
-              Svi proteini <ArrowRight size={14} weight="bold" />
+              {data.hero_cta_secondary} <ArrowRight size={14} weight="bold" />
             </button>
           </div>
 

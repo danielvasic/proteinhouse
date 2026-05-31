@@ -15,7 +15,8 @@ const Contact = lazy(() => import('./pages/Contact'))
 const Login   = lazy(() => import('./pages/Login'))
 const Blog    = lazy(() => import('./pages/Blog'))
 const About   = lazy(() => import('./pages/About'))
-const Search  = lazy(() => import('./pages/Search'))
+const Search   = lazy(() => import('./pages/Search'))
+const Novosti  = lazy(() => import('./pages/Novosti'))
 
 // Lazy — admin (own chunk, never loaded for regular visitors)
 const AdminLogin   = lazy(() => import('./pages/admin/AdminLogin'))
@@ -30,7 +31,9 @@ const AdminUsers   = lazy(() => import('./pages/admin/Users'))
 const AdminCategories = lazy(() => import('./pages/admin/Categories'))
 const AdminPromotions = lazy(() => import('./pages/admin/Promotions'))
 const AdminBanners    = lazy(() => import('./pages/admin/Banners'))
-const AdminSiteContent = lazy(() => import('./pages/admin/SiteContent'))
+const AdminSiteContent   = lazy(() => import('./pages/admin/SiteContent'))
+const AdminFeatured      = lazy(() => import('./pages/admin/FeaturedSections'))
+const AdminNews          = lazy(() => import('./pages/admin/News'))
 
 function PageLoader() {
   return (
@@ -72,6 +75,8 @@ export default function App() {
             <Route path="ponude"           element={<AdminPromotions />} />
             <Route path="baneri"           element={<AdminBanners />} />
             <Route path="sadrzaj"          element={<AdminSiteContent />} />
+            <Route path="istaknuti"        element={<AdminFeatured />} />
+            <Route path="vijesti"          element={<AdminNews />} />
           </Route>
 
           {/* ── Public shop routes ── */}
@@ -97,6 +102,7 @@ function ShopLayout() {
           <Route path="/blog"                 element={<Blog />} />
           <Route path="/o-nama"               element={<About />} />
           <Route path="/pretraga"             element={<Search />} />
+          <Route path="/novosti"              element={<Novosti />} />
           <Route path="*"                     element={<NotFound />} />
         </Routes>
       </Suspense>
