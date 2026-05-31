@@ -2,56 +2,27 @@ import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 
-// Static fallback news in case table doesn't exist yet
-const FALLBACK_NEWS = [
-  {
-    id: '1',
-    title: 'Novo: Gold Standard Whey 2026 formula',
-    excerpt: 'Optimum Nutrition uvodi poboljšanu formulu s 25g proteina po porciji i boljim ukusima.',
-    published_at: '2026-05-20T09:00:00Z',
-    published: true,
-  },
-  {
-    id: '2',
-    title: 'Besplatna dostava produžena do kraja maja',
-    excerpt: 'Za sve narudžbe iznad 80 KM do 31. maja dostava je besplatna — bez izuzetaka.',
-    published_at: '2026-05-10T09:00:00Z',
-    published: true,
-  },
-  {
-    id: '3',
-    title: 'Nova prodavnica u Banja Luci otvorena!',
-    excerpt: 'Ponosni smo što najavimo otvaranje treće ProteinHouse prodavnice na lokaciji Kralja Petra I 5.',
-    published_at: '2026-04-28T09:00:00Z',
-    published: true,
-  },
-]
-
 function formatDate(iso) {
   if (!iso) return ''
   return new Date(iso).toLocaleDateString('bs', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 export default function Novosti() {
-  const [news, setNews] = useState([])
+  const [news,    setNews]    = useState([])
   const [loading, setLoading] = useState(true)
+  const [error,   setError]   = useState(false)
 
   useEffect(() => {
-    async function load() {
-      const { data, error } = await supabase
-        .from('news')
-        .select('id, title, excerpt, content, published_at')
-        .eq('published', true)
-        .order('published_at', { ascending: false })
-
-      if (error || !data?.length) {
-        setNews(FALLBACK_NEWS)
-      } else {
-        setNews(data)
-      }
-      setLoading(false)
-    }
-    load()
+    supabase
+      .from('news')
+      .select('id, title, excerpt, content, published_at')
+      .eq('published', true)
+      .order('published_at', { ascending: false })
+      .then(({ data, error: err }) => {
+        if (err) setError(true)
+        else setNews(data ?? [])
+        setLoading(false)
+      })
   }, [])
 
   return (
@@ -64,7 +35,6 @@ export default function Novosti() {
 
       <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
 
-        {/* ── Page header ── */}
         <section className="border-b border-gray-200 bg-white">
           <div className="container py-10 md:py-14">
             <div className="flex items-center gap-3 mb-4">
@@ -80,12 +50,22 @@ export default function Novosti() {
           </div>
         </section>
 
-        {/* ── News list ── */}
         <section className="py-12 bg-gray-50 min-h-[400px]">
           <div className="container max-w-[760px]">
             {loading ? (
               <div className="flex justify-center py-16">
                 <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#0F2952] animate-spin" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-16">
+                <p className="text-[13px] text-gray-400">Nije moguće učitati vijesti.</p>
+              </div>
+            ) : news.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-[15px] font-bold text-[#0F2952] uppercase mb-2" style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}>
+                  Nema vijesti
+                </p>
+                <p className="text-[13px] text-gray-400">Uskoro dolaze novosti.</p>
               </div>
             ) : (
               <div className="flex flex-col gap-px bg-gray-200">
@@ -101,14 +81,10 @@ export default function Novosti() {
                       {item.title}
                     </h2>
                     {item.excerpt && (
-                      <p className="text-[13px] text-gray-500 leading-relaxed">
-                        {item.excerpt}
-                      </p>
+                      <p className="text-[13px] text-gray-500 leading-relaxed">{item.excerpt}</p>
                     )}
                     {item.content && item.content !== item.excerpt && (
-                      <p className="text-[13px] text-gray-600 leading-relaxed mt-3 whitespace-pre-line">
-                        {item.content}
-                      </p>
+                      <p className="text-[13px] text-gray-600 leading-relaxed mt-3 whitespace-pre-line">{item.content}</p>
                     )}
                   </div>
                 ))}

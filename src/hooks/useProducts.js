@@ -1,5 +1,6 @@
 /**
- * useProducts — fetches products from Supabase with static catalog fallback.
+ * useProducts — fetches products exclusively from Supabase.
+ * No static catalog fallback — if the DB is empty, the UI shows empty state.
  *
  * DB shape  → { id, brand, title, slug, price, old_price, badge, category,
  *               description, flavors, sizes, image_path, image_url,
@@ -10,12 +11,8 @@
  */
 import { useEffect, useState, useMemo } from 'react'
 import { supabase, getProductImageUrl } from '../lib/supabase'
-import {
-  products        as catalogAll,
-  getProductBySlug as catalogBySlug,
-} from '../data/catalog'
 
-/** Normalise a DB row to the same shape as catalog entries */
+/** Normalise a DB row */
 function norm(p) {
   return {
     id:          p.id,
@@ -35,9 +32,9 @@ function norm(p) {
   }
 }
 
-/** All products — Supabase first, catalog fallback */
+/** All active products from DB */
 export function useAllProducts() {
-  const [products, setProducts] = useState(catalogAll)
+  const [products, setProducts] = useState([])
   const [loading,  setLoading]  = useState(true)
 
   useEffect(() => {
@@ -47,7 +44,7 @@ export function useAllProducts() {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .then(({ data, error }) => {
-        if (!error && data?.length > 0) setProducts(data.map(norm))
+        if (!error && data) setProducts(data.map(norm))
         setLoading(false)
       })
   }, [])
@@ -65,9 +62,9 @@ export function useProductsByCategory(slug) {
   return { products: filtered, loading }
 }
 
-/** Single product by slug */
+/** Single product by slug — DB only */
 export function useProduct(slug) {
-  const [product, setProduct] = useState(() => catalogBySlug(slug) || null)
+  const [product, setProduct] = useState(null)
   const [loading,  setLoading]  = useState(true)
 
   useEffect(() => {
@@ -79,7 +76,7 @@ export function useProduct(slug) {
       .eq('is_active', true)
       .maybeSingle()
       .then(({ data, error }) => {
-        if (!error && data) setProduct(norm(data))
+        setProduct(!error && data ? norm(data) : null)
         setLoading(false)
       })
   }, [slug])
@@ -87,7 +84,7 @@ export function useProduct(slug) {
   return { product, loading }
 }
 
-/** Search products by query (brand + title + description) */
+/** Search products by query across brand + title + description */
 export function useSearchProducts(query) {
   const { products } = useAllProducts()
   return useMemo(() => {
