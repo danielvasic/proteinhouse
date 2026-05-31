@@ -3,14 +3,29 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key'
 
-// Supabase client — works with Supabase Cloud (cloud.supabase.com) or self-hosted EC2.
+// Detect SSR (Node.js) vs browser
+const isServer = typeof window === 'undefined'
+
+// Node.js 20 has no native WebSocket — Supabase Realtime crashes at init time.
+// On the server we don't use Realtime subscriptions, so we pass a no-op stub
+// as the transport to satisfy the constructor check without opening a socket.
+class _NoopWebSocket {
+  static CONNECTING = 0; static OPEN = 1; static CLOSING = 2; static CLOSED = 3
+  constructor() { this.readyState = 3 }
+  close() {}  send() {}
+  addEventListener() {}  removeEventListener() {}
+}
+
+// Supabase client — works with Supabase Cloud or self-hosted.
 // Set VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY in Netlify → Site config → Env vars.
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
+    autoRefreshToken: !isServer,
+    persistSession:   !isServer,
+    detectSessionInUrl: !isServer,
   },
+  // On server: provide stub transport so Realtime doesn't throw
+  ...(isServer && { realtime: { transport: _NoopWebSocket } }),
 })
 
 // ------------------------------------------------
