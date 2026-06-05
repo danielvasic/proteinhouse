@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ShoppingBag, X } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
@@ -6,6 +7,7 @@ import { fmtKM } from '../data/catalog'
 const FREE_SHIPPING_THRESHOLD = 100
 
 export default function CartDrawer() {
+  const navigate = useNavigate()
   const { items, drawerOpen, totalPrice, closeDrawer, removeItem } = useCart()
 
   useEffect(() => {
@@ -120,6 +122,7 @@ export default function CartDrawer() {
           <button
             className="w-full py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0A1F42] disabled:bg-gray-200 disabled:text-gray-400 transition-colors duration-150 cursor-pointer disabled:cursor-not-allowed"
             disabled={items.length === 0}
+            onClick={() => { closeDrawer(); navigate('/checkout') }}
           >
             Nastavi do plaćanja
           </button>

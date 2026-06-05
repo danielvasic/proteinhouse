@@ -16,7 +16,8 @@ const Login   = lazy(() => import('./pages/Login'))
 const Blog    = lazy(() => import('./pages/Blog'))
 const About   = lazy(() => import('./pages/About'))
 const Search   = lazy(() => import('./pages/Search'))
-const Novosti  = lazy(() => import('./pages/Novosti'))
+const Novosti   = lazy(() => import('./pages/Novosti'))
+const Checkout  = lazy(() => import('./pages/Checkout'))
 
 // Lazy — admin (own chunk, never loaded for regular visitors)
 const AdminLogin   = lazy(() => import('./pages/admin/AdminLogin'))
@@ -35,6 +36,7 @@ const AdminSiteContent   = lazy(() => import('./pages/admin/SiteContent'))
 const AdminFeatured      = lazy(() => import('./pages/admin/FeaturedSections'))
 const AdminNews          = lazy(() => import('./pages/admin/News'))
 const AdminNavigation    = lazy(() => import('./pages/admin/Navigation'))
+const AdminHeroBanners   = lazy(() => import('./pages/admin/HeroBanners'))
 
 function PageLoader() {
   return (
@@ -79,6 +81,7 @@ export default function App() {
             <Route path="istaknuti"        element={<AdminFeatured />} />
             <Route path="vijesti"          element={<AdminNews />} />
             <Route path="navigacija"       element={<AdminNavigation />} />
+            <Route path="hero-baneri"      element={<AdminHeroBanners />} />
           </Route>
 
           {/* ── Public shop routes ── */}
@@ -105,6 +108,7 @@ function ShopLayout() {
           <Route path="/o-nama"               element={<About />} />
           <Route path="/pretraga"             element={<Search />} />
           <Route path="/novosti"              element={<Novosti />} />
+          <Route path="/checkout"             element={<Checkout />} />
           <Route path="*"                     element={<NotFound />} />
         </Routes>
       </Suspense>
