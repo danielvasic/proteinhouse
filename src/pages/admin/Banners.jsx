@@ -77,7 +77,7 @@ export default function Banners() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Baneri</h2>
-          <p className="text-sm text-muted-foreground">Hero baneri na početnoj stranici</p>
+          <p className="text-sm text-muted-foreground">Promotivni baneri i oglasi (bočni paneli, kampanje)</p>
         </div>
         <Button onClick={openNew} className="flex items-center gap-2">
           <Plus size={16} /> Novi baner

@@ -44,7 +44,7 @@ function PageTitle() {
     '/admin/vijesti':    'Vijesti',
     '/admin/navigacija': 'Navigacija',
     '/admin/sadrzaj':    'Sadržaj stranice',
-    '/admin/postavke': 'Postavke',
+    '/admin/postavke':   'Postavke',
   }
   const base = Object.entries(map)
     .filter(([k]) => k !== '/admin')

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Save, RefreshCw, FileText, Info } from 'lucide-react'
+import { Save, RefreshCw, Settings, Info } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -8,39 +8,36 @@ import { Textarea } from '../../components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
 
-// Predefined editable content sections
 const SECTIONS = {
-  promo: {
-    label: 'Promo traka',
+  contact: {
+    label: 'Kontakt',
     fields: [
-      { key: 'promo_1_title', label: 'Stavka 1 — Naslov', type: 'text', placeholder: 'Besplatna dostava' },
-      { key: 'promo_1_sub',   label: 'Stavka 1 — Opis',   type: 'text', placeholder: 'Za narudžbe preko 100 KM' },
-      { key: 'promo_2_title', label: 'Stavka 2 — Naslov', type: 'text', placeholder: '100% sigurna kupovina' },
-      { key: 'promo_2_sub',   label: 'Stavka 2 — Opis',   type: 'text', placeholder: 'SSL · originalni proizvodi' },
-      { key: 'promo_3_title', label: 'Stavka 3 — Naslov', type: 'text', placeholder: 'Bodovi lojalnosti' },
-      { key: 'promo_3_sub',   label: 'Stavka 3 — Opis',   type: 'text', placeholder: 'Za svaku kupovinu' },
-      { key: 'promo_4_title', label: 'Stavka 4 — Naslov', type: 'text', placeholder: 'Poklon na izbor' },
-      { key: 'promo_4_sub',   label: 'Stavka 4 — Opis',   type: 'text', placeholder: 'Pri svakoj narudžbi' },
+      { key: 'contact_phone',   label: 'Telefon',                        type: 'text',     placeholder: '+387 36 xxx xxx' },
+      { key: 'contact_email',   label: 'Email adresa',                   type: 'text',     placeholder: 'info@proteinhouse.ba' },
+      { key: 'contact_hours',   label: 'Radno vrijeme',                  type: 'text',     placeholder: 'PON–PET 9–17 · SUB 9–14' },
+      { key: 'footer_shipping', label: 'Tekst dostave (header i footer)', type: 'text',     placeholder: 'BESPLATNA DOSTAVA > 100 KM' },
     ],
   },
-  oNama: {
-    label: 'O nama stranica',
+  footer: {
+    label: 'Footer',
     fields: [
-      { key: 'about_hero_image', label: 'Hero slika (URL iz Storage-a)', type: 'text', placeholder: 'https://...supabase.../storage/...' },
-      { key: 'about_intro',      label: 'Uvodni tekst',                   type: 'textarea', placeholder: 'ProteinHouse je osnovan…' },
-      { key: 'about_stat_1_value', label: 'Stat 1 — Vrijednost', type: 'text', placeholder: '10+' },
-      { key: 'about_stat_1_label', label: 'Stat 1 — Opis',      type: 'text', placeholder: 'Godina iskustva' },
-      { key: 'about_stat_2_value', label: 'Stat 2 — Vrijednost', type: 'text', placeholder: '50.000+' },
-      { key: 'about_stat_2_label', label: 'Stat 2 — Opis',      type: 'text', placeholder: 'Zadovoljnih kupaca' },
-      { key: 'about_stat_3_value', label: 'Stat 3 — Vrijednost', type: 'text', placeholder: '2.000+' },
-      { key: 'about_stat_3_label', label: 'Stat 3 — Opis',      type: 'text', placeholder: 'Proizvoda u ponudi' },
-      { key: 'about_stat_4_value', label: 'Stat 4 — Vrijednost', type: 'text', placeholder: '80+' },
-      { key: 'about_stat_4_label', label: 'Stat 4 — Opis',      type: 'text', placeholder: 'Brendova' },
+      { key: 'footer_about',     label: 'O nama (kratki opis)',     type: 'textarea', placeholder: 'Online protein i suplement shop u BiH…' },
+      { key: 'footer_phone',     label: 'Telefon u footeru',        type: 'text',     placeholder: '+387 33 545 000' },
+      { key: 'footer_email',     label: 'Email u footeru',          type: 'text',     placeholder: 'info@proteinhouse.ba' },
+      { key: 'footer_copyright', label: 'Copyright tekst',          type: 'text',     placeholder: 'ProteinHouse d.o.o. Sva prava zadržana.' },
+    ],
+  },
+  seo: {
+    label: 'SEO & Meta',
+    fields: [
+      { key: 'site_title',       label: 'Naziv sajta',         type: 'text',     placeholder: 'ProteinHouse' },
+      { key: 'meta_description', label: 'Meta opis (početna)',  type: 'textarea', placeholder: 'Kupujte proteine…' },
+      { key: 'og_image',         label: 'OG slika URL',        type: 'text',     placeholder: 'https://proteinhouse.ba/og-image.jpg' },
     ],
   },
 }
 
-export default function SiteContent() {
+export default function Postavke() {
   const [content, setContent] = useState({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState({})
@@ -84,17 +81,20 @@ export default function SiteContent() {
 
   return (
     <div className="space-y-5 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900">Sadržaj stranice</h2>
-        <p className="text-sm text-muted-foreground">Promo traka i O nama stranica. Hero baner upravljate kroz <strong>Hero baneri</strong>, a opće postavke kroz <strong>Postavke</strong>.</p>
+      <div className="flex items-center gap-3">
+        <Settings size={20} className="text-muted-foreground" />
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Postavke</h2>
+          <p className="text-sm text-muted-foreground">Kontakt informacije, footer i SEO podešavanja.</p>
+        </div>
       </div>
 
       <div className="rounded-lg bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 text-sm flex gap-2">
         <Info size={16} className="shrink-0 mt-0.5" />
-        <p>Izmjene ovdje se snimaju u bazu. Stranica mora biti ažurirana da ih pokupi (ili koristite SSR s live Supabase podacima).</p>
+        <p>Izmjene se odmah snimaju u bazu i prikazuju na sajtu.</p>
       </div>
 
-      <Tabs defaultValue="hero">
+      <Tabs defaultValue="contact">
         <TabsList className="flex flex-wrap h-auto gap-1 p-1">
           {Object.entries(SECTIONS).map(([key, { label }]) => (
             <TabsTrigger key={key} value={key} className="text-xs">{label}</TabsTrigger>
