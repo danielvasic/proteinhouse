@@ -1,19 +1,35 @@
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Phone, Envelope, MapPin, Clock } from '@phosphor-icons/react'
-
-const INFO = [
-  { Icon: Phone,    label: 'Telefon',       text: '+387 33 545 000 · +387 62 077 044' },
-  { Icon: Envelope, label: 'Email',         text: 'info@proteinhouse.ba' },
-  { Icon: MapPin,   label: 'Adresa',        text: 'Maršala Tita 28, 71000 Sarajevo' },
-  { Icon: Clock,    label: 'Radno vrijeme', text: 'PON–PET 9:00–17:00 · SUB 9:00–14:00' },
-]
+import { useSiteContent } from '../hooks/useSiteContent'
+import { useStores } from '../hooks/useStores'
 
 const inputCls = 'w-full border border-gray-300 px-4 py-3.5 text-[13px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none focus:border-[#0F2952] transition-colors duration-150 bg-white'
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', message: '' })
+
+  const { data } = useSiteContent(
+    ['contact_phone', 'contact_email', 'contact_hours'],
+    {
+      contact_phone: '',
+      contact_email: '',
+      contact_hours: '',
+    }
+  )
+  const { stores } = useStores()
+
+  // Build INFO list from site_content — skip empty fields
+  const INFO = [
+    data.contact_phone && { Icon: Phone,    label: 'Telefon',       text: data.contact_phone },
+    data.contact_email && { Icon: Envelope, label: 'Email',         text: data.contact_email },
+    // First active store address shown if available
+    stores[0]?.address && { Icon: MapPin,   label: 'Adresa',        text: `${stores[0].address}${stores[0].city ? ', ' + stores[0].city : ''}` },
+    data.contact_hours || stores[0]?.working_hours
+      ? { Icon: Clock, label: 'Radno vrijeme', text: data.contact_hours || stores[0]?.working_hours }
+      : null,
+  ].filter(Boolean)
 
   const handleSubmit = (e) => {
     e.preventDefault()

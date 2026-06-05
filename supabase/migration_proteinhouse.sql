@@ -136,3 +136,42 @@ alter table products    add column if not exists image_path  text;
 -- 2. Idi na /admin/proizvodi i dodaj proizvode (upload slika)
 -- 3. Idi na /admin/sadrzaj i provjeri sve tekstove
 -- 4. Idi na /admin/kategorije i uredi pod-kategorije
+
+-- ── 9. STORES tabela (dinamičke poslovnice) ──────────────────
+create table if not exists stores (
+  id            uuid primary key default gen_random_uuid(),
+  city          text not null,
+  address       text not null,
+  phone         text,
+  email         text,
+  working_hours text,
+  map_url       text,
+  sort_order    integer default 0,
+  is_active     boolean default true,
+  created_at    timestamptz default now(),
+  updated_at    timestamptz default now()
+);
+alter table stores enable row level security;
+create policy "Public read stores"  on stores for select using (true);
+create policy "Admin full stores"   on stores using (is_admin());
+
+-- OBRIŠI stare pogrešne store ključeve iz site_content
+delete from site_content where key in (
+  'store_sarajevo_addr', 'store_sarajevo_hours',
+  'store_bl_addr', 'store_bl_hours',
+  'store_mostar_addr', 'store_mostar_hours'
+);
+
+-- Ubaci stvarnu poslovnicu (Mostar)
+-- Podatke provjeri i korigiraj na proteinhouse.ba
+insert into stores (city, address, phone, email, working_hours, sort_order, is_active)
+values (
+  'Mostar',
+  'Adresu unesi iz proteinhouse.ba',   -- TODO: provjeri na sajtu
+  '',                                   -- TODO: provjeri telefon
+  'info@proteinhouse.ba',
+  'PON–PET 9–17 · SUB 9–14',           -- TODO: provjeri radno vrijeme
+  1,
+  true
+)
+on conflict do nothing;

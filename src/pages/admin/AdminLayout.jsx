@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Package, FileText, ShoppingCart, Users, Tag,
   Percent, LayoutTemplate, Image, LogOut, Menu, X, ChevronRight,
-  Bell, Settings, ExternalLink, Star, Newspaper, Navigation,
+  Bell, Settings, ExternalLink, Star, Newspaper, Navigation, MapPin,
 } from 'lucide-react'
 import { useAdmin } from '../../store/AdminContext'
 import { Button } from '../../components/ui/button'
@@ -21,6 +21,7 @@ const NAV = [
   { label: 'Hero baneri', to: '/admin/hero-baneri', icon: Image },
   { label: 'Baneri',      to: '/admin/baneri',      icon: Image },
   { label: 'Brendovi',    to: '/admin/brendovi',    icon: Tag },
+  { label: 'Poslovnice',  to: '/admin/poslovnice',  icon: MapPin },
   { label: 'Istaknuti',   to: '/admin/istaknuti',   icon: Star },
   { label: 'Vijesti',     to: '/admin/vijesti',     icon: Newspaper },
   { label: 'Navigacija',  to: '/admin/navigacija',  icon: Navigation },

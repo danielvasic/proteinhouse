@@ -51,18 +51,12 @@ const SECTIONS = {
     ],
   },
   contact: {
-    label: 'Kontakt & radno vrijeme',
+    label: 'Kontakt informacije',
     fields: [
-      { key: 'contact_phone',    label: 'Broj telefona',    type: 'text', placeholder: '+387 33 545 000 · +387 62 077 044' },
-      { key: 'contact_email',    label: 'Email adresa',     type: 'text', placeholder: 'info@proteinhouse.ba' },
-      { key: 'contact_address',  label: 'Adresa (Sarajevo)', type: 'text', placeholder: 'Maršala Tita 28, 71000 Sarajevo' },
-      { key: 'contact_hours',    label: 'Radno vrijeme',    type: 'text', placeholder: 'PON–PET 9:00–17:00 · SUB 9:00–14:00' },
-      { key: 'store_sarajevo_addr',   label: 'Sarajevo — adresa',    type: 'text', placeholder: 'Maršala Tita 28' },
-      { key: 'store_sarajevo_hours',  label: 'Sarajevo — radno vr.', type: 'text', placeholder: 'PON–PET 9–17 · SUB 9–14' },
-      { key: 'store_mostar_addr',     label: 'Mostar — adresa',      type: 'text', placeholder: 'Bulevar 12' },
-      { key: 'store_mostar_hours',    label: 'Mostar — radno vr.',   type: 'text', placeholder: 'PON–PET 9–17 · SUB 9–13' },
-      { key: 'store_bl_addr',         label: 'Banja Luka — adresa',  type: 'text', placeholder: 'Kralja Petra I 5' },
-      { key: 'store_bl_hours',        label: 'Banja Luka — radno vr.', type: 'text', placeholder: 'PON–PET 9–17 · SUB 9–14' },
+      { key: 'contact_phone',   label: 'Telefon (prikazuje se na kontakt stranici i headerу)', type: 'text', placeholder: '+387 36 xxx xxx' },
+      { key: 'contact_email',   label: 'Email adresa',   type: 'text', placeholder: 'info@proteinhouse.ba' },
+      { key: 'contact_hours',   label: 'Radno vrijeme (opće)', type: 'text', placeholder: 'PON–PET 9–17 · SUB 9–14' },
+      { key: 'footer_shipping', label: 'Tekst dostave u headerу', type: 'text', placeholder: 'BESPLATNA DOSTAVA > 100 KM' },
     ],
   },
   footer: {

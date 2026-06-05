@@ -38,6 +38,7 @@ const AdminNews          = lazy(() => import('./pages/admin/News'))
 const AdminNavigation    = lazy(() => import('./pages/admin/Navigation'))
 const AdminHeroBanners   = lazy(() => import('./pages/admin/HeroBanners'))
 const AdminBrands        = lazy(() => import('./pages/admin/Brands'))
+const AdminStores        = lazy(() => import('./pages/admin/Stores'))
 
 function PageLoader() {
   return (
@@ -84,6 +85,7 @@ export default function App() {
             <Route path="navigacija"       element={<AdminNavigation />} />
             <Route path="hero-baneri"      element={<AdminHeroBanners />} />
             <Route path="brendovi"         element={<AdminBrands />} />
+            <Route path="poslovnice"       element={<AdminStores />} />
           </Route>
 
           {/* ── Public shop routes ── */}
