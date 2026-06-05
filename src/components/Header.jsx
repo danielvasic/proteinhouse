@@ -155,7 +155,7 @@ export default function Header() {
           onMouseLeave={scheduleClose}
           aria-hidden={!shopOpen}
         >
-          <div className="container grid grid-cols-4 xl:grid-cols-8 gap-x-8 py-12 pb-14">
+          <div className="mx-auto w-full max-w-[1280px] px-8 md:px-12 lg:px-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-10 lg:gap-x-14 gap-y-10 py-12 pb-14">
             {categories.map((c) => {
               const Icon = CAT_ICONS[c.slug] || Tag
               return (
@@ -168,7 +168,7 @@ export default function Header() {
                     <Icon size={13} weight="bold" /> {c.label}
                   </button>
                   {c.subs?.length > 0 && (
-                    <ul className="flex flex-col gap-3 p-0 m-0 list-none">
+                    <ul className="flex flex-col gap-2.5 p-0 m-0 list-none">
                       {c.subs.map((s) => (
                         <li
                           key={s}
@@ -188,7 +188,7 @@ export default function Header() {
           </div>
 
           <div className="bg-gray-50 border-t border-gray-200">
-            <div className="container flex items-center gap-2.5 py-5 flex-wrap">
+            <div className="mx-auto w-full max-w-[1280px] px-8 md:px-12 lg:px-16 flex items-center gap-2.5 py-5 flex-wrap">
               <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400">BRZI PREČAC:</span>
               {[
                 { label: 'AKCIJA −70%', to: '/kategorija/akcija', Icon: Tag },
