@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { House, CaretRight, Check, Truck, ShieldCheck } from '@phosphor-icons/react'
+import { House, CaretRight, Check, Truck, ShieldCheck, UserCircle, LockKey, Envelope } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { supabase } from '../lib/supabase'
@@ -95,6 +95,50 @@ export default function Checkout() {
   const [errors,    setErrors]    = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [orderNum,  setOrderNum]  = useState('')
+
+  // Auth state
+  const [user,          setUser]          = useState(null)
+  const [loginOpen,     setLoginOpen]     = useState(false)
+  const [loginData,     setLoginData]     = useState({ email: '', password: '' })
+  const [loginError,    setLoginError]    = useState('')
+  const [loginLoading,  setLoginLoading]  = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) prefillFromUser(session.user)
+    })
+  }, [])
+
+  const prefillFromUser = (u) => {
+    setUser(u)
+    const meta = u.user_metadata || {}
+    const nameParts = (meta.full_name || '').trim().split(' ')
+    setForm((f) => ({
+      ...f,
+      firstName: nameParts[0]                   || f.firstName,
+      lastName:  nameParts.slice(1).join(' ')   || f.lastName,
+      email:     u.email                        || f.email,
+    }))
+  }
+
+  const handleCheckoutLogin = async (e) => {
+    e.preventDefault()
+    setLoginError('')
+    setLoginLoading(true)
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginData.email, password: loginData.password,
+      })
+      if (error) throw error
+      prefillFromUser(data.user)
+      setLoginOpen(false)
+      setLoginData({ email: '', password: '' })
+    } catch (err) {
+      setLoginError(err.message || 'Greška pri prijavi.')
+    } finally {
+      setLoginLoading(false)
+    }
+  }
 
   const set = (key) => (e) => {
     setForm((f) => ({ ...f, [key]: e.target.value }))
@@ -196,6 +240,102 @@ export default function Checkout() {
             {step === 0 && (
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
                 <form onSubmit={handleDelivery} className="space-y-4">
+
+                  {/* ── Login prompt ── */}
+                  {user ? (
+                    <div className="flex items-center gap-3 bg-white border border-[#0F2952]/20 px-5 py-3.5">
+                      <UserCircle size={20} weight="duotone" className="text-[#0F2952] shrink-0" />
+                      <p className="text-[12px] text-gray-600 flex-1">
+                        Prijavljeni ste kao <strong className="text-[#0F2952]">{user.email}</strong>
+                      </p>
+                    </div>
+                  ) : !loginOpen ? (
+                    <div className="flex items-center justify-between bg-white border border-[#0F2952]/20 px-5 py-3.5 gap-4">
+                      <p className="text-[12px] text-gray-600">
+                        Imate nalog?{' '}
+                        <button
+                          type="button"
+                          onClick={() => setLoginOpen(true)}
+                          className="text-[#0F2952] font-bold underline underline-offset-2 hover:no-underline cursor-pointer bg-transparent border-0 p-0"
+                        >
+                          Prijavite se za brži checkout
+                        </button>
+                      </p>
+                      <Link
+                        to="/nalog/registracija"
+                        className="text-[11px] text-gray-400 hover:text-[#0F2952] transition-colors shrink-0"
+                      >
+                        Kreiraj nalog →
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="bg-white border border-[#0F2952]/20 p-5 space-y-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Prijava</h3>
+                        <button
+                          type="button"
+                          onClick={() => { setLoginOpen(false); setLoginError('') }}
+                          className="text-[11px] text-gray-400 hover:text-[#0F2952] cursor-pointer bg-transparent border-0 p-0"
+                        >
+                          Nastavi kao gost →
+                        </button>
+                      </div>
+
+                      {loginError && (
+                        <div className="border border-red-200 bg-red-50 text-red-700 px-4 py-2.5 text-[12px]">
+                          {loginError}
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Email</label>
+                          <div className="relative">
+                            <Envelope size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                              type="email"
+                              className="w-full border border-gray-300 pl-8 pr-3 py-2.5 text-[13px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none focus:border-[#0F2952] transition-colors bg-white"
+                              placeholder="vas@email.com"
+                              value={loginData.email}
+                              onChange={(e) => setLoginData((d) => ({ ...d, email: e.target.value }))}
+                              required
+                              autoComplete="email"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Šifra</label>
+                          <div className="relative">
+                            <LockKey size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                              type="password"
+                              className="w-full border border-gray-300 pl-8 pr-3 py-2.5 text-[13px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none focus:border-[#0F2952] transition-colors bg-white"
+                              placeholder="••••••••"
+                              value={loginData.password}
+                              onChange={(e) => setLoginData((d) => ({ ...d, password: e.target.value }))}
+                              required
+                              autoComplete="current-password"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleCheckoutLogin}
+                          disabled={loginLoading}
+                          className="py-2.5 px-5 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0A1F42] disabled:opacity-50 transition-colors cursor-pointer border-0 whitespace-nowrap"
+                        >
+                          {loginLoading ? 'Prijavljivanje…' : 'Prijavi se'}
+                        </button>
+                      </div>
+
+                      <p className="text-[11px] text-gray-400 pt-1">
+                        Nemate nalog?{' '}
+                        <Link to="/nalog/registracija" className="text-[#0F2952] underline hover:no-underline">
+                          Registrujte se
+                        </Link>
+                      </p>
+                    </div>
+                  )}
                   <div className="bg-white border border-gray-200 p-6 space-y-4">
                     <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Podaci za dostavu</h2>
                     <div className="grid grid-cols-2 gap-4">
