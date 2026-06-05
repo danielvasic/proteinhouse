@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Save } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import ImageUpload from '../../components/admin/ImageUpload'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -113,11 +114,13 @@ export default function BlogEdit() {
                 <Input value={form.author} onChange={set('author')} placeholder="Ime autora" />
               </Field>
             </div>
-            <Field label="URL naslovne slike">
-              <Input value={form.cover_url} onChange={set('cover_url')} placeholder="https://..." />
-              {form.cover_url && (
-                <img src={form.cover_url} alt="" className="mt-2 h-28 rounded-lg object-cover border w-full max-w-sm" onError={(e) => { e.target.style.display = 'none' }} />
-              )}
+            <Field label="Naslovna slika">
+              <ImageUpload
+                value={form.cover_url}
+                onChange={(url) => setForm((f) => ({ ...f, cover_url: url }))}
+                folder="blog"
+                previewH="h-36"
+              />
             </Field>
           </CardContent>
         </Card>

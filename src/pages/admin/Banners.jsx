@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2, Image, Save, GripVertical } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import ImageUpload from '../../components/admin/ImageUpload'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -173,11 +174,13 @@ export default function Banners() {
               <Input value={form.subtitle || ''} onChange={set('subtitle')} placeholder="Iskoristite ljetnu akciju" />
             </div>
             <div className="space-y-1.5">
-              <Label>URL pozadinske slike *</Label>
-              <Input value={form.image_url || ''} onChange={set('image_url')} placeholder="https://..." />
-              {form.image_url && (
-                <img src={form.image_url} alt="" className="mt-2 h-24 w-full rounded-lg object-cover border" onError={(e) => { e.target.style.display = 'none' }} />
-              )}
+              <Label>Pozadinska slika</Label>
+              <ImageUpload
+                value={form.image_url || ''}
+                onChange={(url) => setForm((f) => ({ ...f, image_url: url }))}
+                folder="banners"
+                previewH="h-28"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">

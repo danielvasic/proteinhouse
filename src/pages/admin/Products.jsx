@@ -1,13 +1,130 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { Plus, Pencil, Trash2, Search, Package, Upload, CheckCircle2, XCircle, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react'
+import { supabase, getProductImageUrl, uploadProductImage } from '../../lib/supabase'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
 import { Switch } from '../../components/ui/switch'
 import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
+
+function BatchUploader({ onDone }) {
+  const [open,     setOpen]     = useState(false)
+  const [results,  setResults]  = useState([])  // [{name, status, url, matched}]
+  const [running,  setRunning]  = useState(false)
+  const fileRef = useRef(null)
+
+  const handleFiles = async (e) => {
+    const files = Array.from(e.target.files || [])
+    if (!files.length) return
+    setRunning(true)
+    setResults(files.map((f) => ({ name: f.name, status: 'waiting' })))
+
+    // Load all product slugs once
+    const { data: prods } = await supabase.from('products').select('id, slug')
+    const slugMap = Object.fromEntries((prods ?? []).map((p) => [p.slug, p.id]))
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      setResults((r) => r.map((x, idx) => idx === i ? { ...x, status: 'uploading' } : x))
+
+      const { path, error } = await uploadProductImage(file, file.name.replace(/\.[^.]+$/, ''))
+      if (error) {
+        setResults((r) => r.map((x, idx) => idx === i ? { ...x, status: 'error', error: error.message } : x))
+        continue
+      }
+
+      const { data } = supabase.storage.from('product-images').getPublicUrl(path)
+      const url = data.publicUrl
+
+      // Try to match slug from filename (strip extension, then try substrings)
+      const nameStem = file.name.replace(/\.[^.]+$/, '').toLowerCase()
+      const matchedId = slugMap[nameStem] ??
+        Object.entries(slugMap).find(([slug]) => nameStem.includes(slug) || slug.includes(nameStem))?.[1]
+
+      if (matchedId) {
+        await supabase.from('products').update({ image_path: path, image_url: '' }).eq('id', matchedId)
+        setResults((r) => r.map((x, idx) => idx === i ? { ...x, status: 'ok', url, matched: true } : x))
+      } else {
+        setResults((r) => r.map((x, idx) => idx === i ? { ...x, status: 'ok', url, matched: false } : x))
+      }
+    }
+
+    setRunning(false)
+    e.target.value = ''
+    onDone()
+  }
+
+  const done  = results.filter((r) => r.status === 'ok').length
+  const total = results.length
+
+  return (
+    <Card className="border-dashed border-emerald-200 bg-emerald-50/40">
+      <CardContent className="p-4">
+        <button
+          type="button"
+          className="flex items-center justify-between w-full text-left"
+          onClick={() => setOpen((o) => !o)}
+        >
+          <div className="flex items-center gap-2">
+            <Upload size={16} className="text-emerald-600" />
+            <span className="text-sm font-semibold text-emerald-800">Batch upload slika proizvoda</span>
+            {total > 0 && !running && (
+              <Badge variant="emerald" className="text-xs">{done}/{total} uploadovano</Badge>
+            )}
+          </div>
+          {open ? <ChevronUp size={16} className="text-emerald-600" /> : <ChevronDown size={16} className="text-emerald-600" />}
+        </button>
+
+        {open && (
+          <div className="mt-4 space-y-3">
+            <p className="text-xs text-emerald-700">
+              Odaberi više slika odjednom. Ako ime fajla odgovara slug-u proizvoda (npr. <code className="bg-white px-1 rounded">on-gold-standard-whey-908g.jpg</code>), slika se automatski dodjeljuje proizvodu.
+            </p>
+
+            <div>
+              <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileRef.current?.click()}
+                disabled={running}
+                className="flex items-center gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+              >
+                {running
+                  ? <><RefreshCw size={13} className="animate-spin" /> Uploaduje se…</>
+                  : <><Upload size={13} /> Odaberi slike</>
+                }
+              </Button>
+            </div>
+
+            {results.length > 0 && (
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {results.map((r, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs py-1 border-b border-emerald-100 last:border-0">
+                    {r.status === 'waiting'   && <div className="h-3 w-3 rounded-full bg-gray-300 shrink-0" />}
+                    {r.status === 'uploading' && <RefreshCw size={12} className="animate-spin text-blue-500 shrink-0" />}
+                    {r.status === 'ok'        && <CheckCircle2 size={13} className="text-emerald-600 shrink-0" />}
+                    {r.status === 'error'     && <XCircle size={13} className="text-red-500 shrink-0" />}
+                    <span className="flex-1 truncate text-gray-700">{r.name}</span>
+                    {r.status === 'ok' && (
+                      <span className={`shrink-0 font-medium ${r.matched ? 'text-emerald-600' : 'text-amber-600'}`}>
+                        {r.matched ? 'Dodijeljeno ✓' : 'Uploadovano (ručno dodijeli)'}
+                      </span>
+                    )}
+                    {r.status === 'error' && <span className="text-red-500 shrink-0">{r.error}</span>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
 
 export default function Products() {
   const [products, setProducts] = useState([])
@@ -18,7 +135,7 @@ export default function Products() {
     setLoading(true)
     const { data } = await supabase
       .from('products')
-      .select('id, brand, title, price, old_price, category, is_active, badge, image_url')
+      .select('id, brand, title, price, old_price, category, is_active, badge, image_url, image_path')
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })
     setProducts(data ?? [])
@@ -56,6 +173,8 @@ export default function Products() {
           </Link>
         </Button>
       </div>
+
+      <BatchUploader onDone={load} />
 
       {/* Search */}
       <div className="relative max-w-sm">
@@ -100,8 +219,8 @@ export default function Products() {
                   filtered.map((p) => (
                     <TableRow key={p.id}>
                       <TableCell>
-                        {p.image_url
-                          ? <img src={p.image_url} alt="" className="w-12 h-12 rounded-lg object-cover border" />
+                        {(p.image_path || p.image_url)
+                          ? <img src={getProductImageUrl(p)} alt="" className="w-12 h-12 rounded-lg object-cover border" onError={(e) => { e.target.style.display='none' }} />
                           : <div className="w-12 h-12 rounded-lg border bg-gray-100 flex items-center justify-center text-gray-400 text-xs">?</div>
                         }
                       </TableCell>

@@ -7,6 +7,7 @@ import { Label } from '../../components/ui/label'
 import { Textarea } from '../../components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
+import ImageUpload from '../../components/admin/ImageUpload'
 
 // Predefined editable content sections
 const SECTIONS = {
@@ -26,7 +27,7 @@ const SECTIONS = {
   oNama: {
     label: 'O nama stranica',
     fields: [
-      { key: 'about_hero_image', label: 'Hero slika (URL iz Storage-a)', type: 'text', placeholder: 'https://...supabase.../storage/...' },
+      { key: 'about_hero_image', label: 'Hero slika', type: 'image' },
       { key: 'about_intro',      label: 'Uvodni tekst',                   type: 'textarea', placeholder: 'ProteinHouse je osnovan…' },
       { key: 'about_stat_1_value', label: 'Stat 1 — Vrijednost', type: 'text', placeholder: '10+' },
       { key: 'about_stat_1_label', label: 'Stat 1 — Opis',      type: 'text', placeholder: 'Godina iskustva' },
@@ -94,7 +95,7 @@ export default function SiteContent() {
         <p>Izmjene ovdje se snimaju u bazu. Stranica mora biti ažurirana da ih pokupi (ili koristite SSR s live Supabase podacima).</p>
       </div>
 
-      <Tabs defaultValue="hero">
+      <Tabs defaultValue="promo">
         <TabsList className="flex flex-wrap h-auto gap-1 p-1">
           {Object.entries(SECTIONS).map(([key, { label }]) => (
             <TabsTrigger key={key} value={key} className="text-xs">{label}</TabsTrigger>
@@ -112,7 +113,14 @@ export default function SiteContent() {
                 {section.fields.map((field) => (
                   <div key={field.key} className="space-y-1.5">
                     <Label>{field.label}</Label>
-                    {field.type === 'textarea' ? (
+                    {field.type === 'image' ? (
+                      <ImageUpload
+                        value={content[field.key] ?? ''}
+                        onChange={(url) => setContent((c) => ({ ...c, [field.key]: url }))}
+                        folder="about"
+                        previewH="h-40"
+                      />
+                    ) : field.type === 'textarea' ? (
                       <Textarea
                         value={content[field.key] ?? ''}
                         onChange={(e) => setContent((c) => ({ ...c, [field.key]: e.target.value }))}

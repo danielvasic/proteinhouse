@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2, Tag, Save, X, ChevronRight } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import ImageUpload from '../../components/admin/ImageUpload'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -191,8 +192,13 @@ export default function Categories() {
               <Input value={form.description || ''} onChange={set('description')} placeholder="Kratki opis kategorije" />
             </div>
             <div className="space-y-1.5">
-              <Label>URL slike</Label>
-              <Input value={form.image_url || ''} onChange={set('image_url')} placeholder="https://..." />
+              <Label>Slika kategorije</Label>
+              <ImageUpload
+                value={form.image_url || ''}
+                onChange={(url) => setForm((f) => ({ ...f, image_url: url }))}
+                folder="categories"
+                previewH="h-24"
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Redosljed prikaza</Label>
