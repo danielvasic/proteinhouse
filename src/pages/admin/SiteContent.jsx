@@ -35,6 +35,21 @@ const SECTIONS = {
       { key: 'promo_4_sub',   label: 'Stavka 4 — Opis',   type: 'text', placeholder: 'Pri svakoj narudžbi' },
     ],
   },
+  oNama: {
+    label: 'O nama stranica',
+    fields: [
+      { key: 'about_hero_image', label: 'Hero slika (URL iz Storage-a)', type: 'text', placeholder: 'https://...supabase.../storage/...' },
+      { key: 'about_intro',      label: 'Uvodni tekst',                   type: 'textarea', placeholder: 'ProteinHouse je osnovan…' },
+      { key: 'about_stat_1_value', label: 'Stat 1 — Vrijednost', type: 'text', placeholder: '10+' },
+      { key: 'about_stat_1_label', label: 'Stat 1 — Opis',      type: 'text', placeholder: 'Godina iskustva' },
+      { key: 'about_stat_2_value', label: 'Stat 2 — Vrijednost', type: 'text', placeholder: '50.000+' },
+      { key: 'about_stat_2_label', label: 'Stat 2 — Opis',      type: 'text', placeholder: 'Zadovoljnih kupaca' },
+      { key: 'about_stat_3_value', label: 'Stat 3 — Vrijednost', type: 'text', placeholder: '2.000+' },
+      { key: 'about_stat_3_label', label: 'Stat 3 — Opis',      type: 'text', placeholder: 'Proizvoda u ponudi' },
+      { key: 'about_stat_4_value', label: 'Stat 4 — Vrijednost', type: 'text', placeholder: '80+' },
+      { key: 'about_stat_4_label', label: 'Stat 4 — Opis',      type: 'text', placeholder: 'Brendova' },
+    ],
+  },
   contact: {
     label: 'Kontakt & radno vrijeme',
     fields: [

@@ -6,7 +6,6 @@ import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { products as allProducts } from '../../data/catalog'
 
 // Two carousel sections on the homepage
 const SECTIONS = [
@@ -32,7 +31,7 @@ function ProductRow({ product, onRemove }) {
   return (
     <div className="flex items-center gap-3 px-3 py-2.5 border border-gray-200 bg-white group">
       <GripVertical size={14} className="text-gray-300 shrink-0 cursor-grab" />
-      <img src={product.img} alt={product.title} className="w-10 h-10 object-cover border border-gray-100 shrink-0" />
+      <div className="w-10 h-10 border border-gray-100 bg-gray-50 shrink-0 overflow-hidden">{(product.image_url || product.image_path) && <img src={product.image_url || product.image_path} alt={product.title} className="w-full h-full object-cover" onError={(e)=>e.target.style.display='none'} />}</div>
       <div className="flex-1 min-w-0">
         <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{product.brand}</p>
         <p className="text-sm font-semibold text-gray-800 truncate">{product.title}</p>
@@ -50,6 +49,17 @@ function ProductRow({ product, onRemove }) {
 }
 
 function SectionEditor({ section }) {
+  const [allProducts, setAllProducts] = useState([])
+
+  useEffect(() => {
+    supabase
+      .from('products')
+      .select('id, brand, title, price, image_path, image_url, slug')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .then(({ data }) => setAllProducts(data ?? []))
+  }, [])
+
   const [config, setConfig] = useState({
     title: section.defaultTitle,
     eyebrow: section.defaultEyebrow,
@@ -199,7 +209,7 @@ function SectionEditor({ section }) {
                 className="w-full flex items-center gap-3 px-3 py-2.5 border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-150 cursor-pointer text-left"
                 onClick={() => addProduct(p.id)}
               >
-                <img src={p.img} alt={p.title} className="w-10 h-10 object-cover border border-gray-100 shrink-0" />
+                <div className="w-10 h-10 border border-gray-100 bg-gray-50 shrink-0 overflow-hidden">{(p.image_url || p.image_path) && <img src={p.image_url || p.image_path} alt={p.title} className="w-full h-full object-cover" onError={(e)=>e.target.style.display='none'} />}</div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{p.brand}</p>
                   <p className="text-sm font-semibold text-gray-800 truncate">{p.title}</p>

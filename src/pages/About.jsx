@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import { ShieldCheck, Truck, Star, Users, MapPin, Clock } from '@phosphor-icons/react'
+import { useSiteContent } from '../hooks/useSiteContent'
 
 const STATS = [
   { label: 'Godina iskustva', value: '10+' },
@@ -15,15 +16,23 @@ const VALUES = [
   { Icon: Users,       title: 'Stručnost',    desc: 'Naš tim čine certificirani nutricionisti i fitness treneri koji vam pomažu pri odabiru.' },
 ]
 
-const STORES = [
-  { city: 'Sarajevo',   addr: 'Maršala Tita 28', hours: 'PON–PET 9–17 · SUB 9–14' },
-  { city: 'Mostar',     addr: 'Bulevar 12',       hours: 'PON–PET 9–17 · SUB 9–13' },
-  { city: 'Banja Luka', addr: 'Kralja Petra I 5', hours: 'PON–PET 9–17 · SUB 9–14' },
-]
 
-const HERO = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80&auto=format&fit=crop'
+// Hero slika se konfigurira u admin /sadrzaj → O nama
+// Polje: about_hero_image (URL iz Supabase Storage)
 
 export default function About() {
+  const { data } = useSiteContent(
+    ['about_hero_image', 'store_sarajevo_addr', 'store_sarajevo_hours',
+     'store_mostar_addr', 'store_mostar_hours', 'store_bl_addr', 'store_bl_hours'],
+    {}
+  )
+
+  const STORES = [
+    { city: 'Sarajevo',   addr: data.store_sarajevo_addr || 'Maršala Tita 28', hours: data.store_sarajevo_hours || 'PON–PET 9–17 · SUB 9–14' },
+    { city: 'Mostar',     addr: data.store_mostar_addr   || 'Bulevar 12',       hours: data.store_mostar_hours   || 'PON–PET 9–17 · SUB 9–13' },
+    { city: 'Banja Luka', addr: data.store_bl_addr       || 'Kralja Petra I 5', hours: data.store_bl_hours       || 'PON–PET 9–17 · SUB 9–14' },
+  ]
+
   return (
     <>
       <Helmet>
@@ -37,7 +46,11 @@ export default function About() {
         {/* ── Hero ── */}
         <section
           className="relative flex items-end min-h-[340px] md:min-h-[420px] bg-cover bg-center"
-          style={{ backgroundImage: `linear-gradient(105deg, rgba(10,31,66,0.94) 0%, rgba(10,31,66,0.60) 60%, rgba(10,31,66,0.20) 100%), url('${HERO}')` }}
+          style={{
+            backgroundImage: data.about_hero_image
+              ? `linear-gradient(105deg, rgba(10,31,66,0.94) 0%, rgba(10,31,66,0.60) 60%, rgba(10,31,66,0.20) 100%), url('${data.about_hero_image}')`
+              : 'linear-gradient(135deg, #0A1F42 0%, #0F2952 60%, #1F4399 100%)',
+          }}
         >
           <div className="container pb-12 md:pb-16">
             <div className="flex items-center gap-3 mb-5">

@@ -1,6 +1,25 @@
-import { brands } from '../data/catalog'
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
 
 export default function BrandStrip() {
+  const [brands,  setBrands]  = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase
+      .from('brands')
+      .select('id, name, logo_url')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .then(({ data, error }) => {
+        if (!error && data) setBrands(data)
+        setLoading(false)
+      })
+  }, [])
+
+  // Sakrij sekciju dok nema brendova u bazi
+  if (loading || brands.length === 0) return null
+
   return (
     <section className="py-10 bg-gray-50 border-b border-gray-200">
       <div className="container">
@@ -16,22 +35,24 @@ export default function BrandStrip() {
         </div>
         <div
           className="grid items-center gap-8"
-          style={{ gridTemplateColumns: `repeat(${brands.length}, 1fr)` }}
+          style={{ gridTemplateColumns: `repeat(${Math.min(brands.length, 8)}, 1fr)` }}
         >
           {brands.map((b) => (
             <div
-              key={b.name}
-              className="flex items-center justify-center opacity-40 hover:opacity-75 transition-opacity duration-200"
+              key={b.id}
+              className="flex items-center justify-center opacity-40 hover:opacity-80 transition-opacity duration-200"
               title={b.name}
             >
-              <img
-                src={b.src}
-                alt={b.name}
-                className="max-h-8 w-auto object-contain grayscale"
-                loading="lazy"
-                width={100}
-                height={32}
-              />
+              {b.logo_url ? (
+                <img
+                  src={b.logo_url}
+                  alt={b.name}
+                  className="max-h-10 w-auto object-contain grayscale"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="text-[12px] font-bold text-gray-400 uppercase tracking-wider">{b.name}</span>
+              )}
             </div>
           ))}
         </div>

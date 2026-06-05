@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { Tag, ArrowRight } from '@phosphor-icons/react'
 
 const FALLBACK = {
-  eyebrow:           'Black Friday 2026',
-  title_lines:       'Snaga u/svakoj/mjerici',
-  subtitle:          'Do −70% na izabrane proteinske formule. Besplatna dostava na sve narudžbe preko 100 KM.',
-  cta_primary_text:  'Pogledaj akcije',
-  cta_primary_link:  '/kategorija/akcija',
-  cta_secondary_text: 'Svi proteini',
-  cta_secondary_link: '/kategorija/proteini',
-  image_url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1920&q=85&auto=format&fit=crop',
+  eyebrow:            'ProteinHouse',
+  title_lines:        'Proteini i/suplementi/za pobjednike',
+  subtitle:           'Originalni proizvodi. Brza dostava. Bodovi lojalnosti.',
+  cta_primary_text:   'Pogledaj ponudu',
+  cta_primary_link:   '/kategorija/proteini',
+  cta_secondary_text: '',
+  cta_secondary_link: '',
+  image_url:          '',   // Bez slike dok admin ne uploaduje
 }
 
 const STATS = [
@@ -47,7 +47,9 @@ export default function HeroBanner() {
     <section
       className="relative min-h-[600px] lg:min-h-[680px] flex items-center bg-cover bg-center bg-no-repeat overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(105deg, rgba(10,31,66,0.95) 0%, rgba(10,31,66,0.70) 52%, rgba(10,31,66,0.18) 100%), url('${b.image_url || FALLBACK.image_url}')`,
+        backgroundImage: b.image_url
+          ? `linear-gradient(105deg, rgba(10,31,66,0.95) 0%, rgba(10,31,66,0.70) 52%, rgba(10,31,66,0.18) 100%), url('${b.image_url}')`
+          : 'linear-gradient(135deg, #0A1F42 0%, #0F2952 60%, #1F4399 100%)',
       }}
     >
       <div className="container w-full">

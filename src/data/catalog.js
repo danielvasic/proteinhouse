@@ -1,234 +1,32 @@
-// catalog.js — demo content (replace with Supabase queries in production)
+// catalog.js — Struktura za fallback dok DB nije popunjena
+// Slike su ISKLJUČENE — sve slike idu kroz Supabase Storage
+// Proizvodi dolaze isključivo iz Supabase tabele 'products'
 
 export const categories = [
-  {
-    slug: 'proteini',
-    label: 'PROTEINI',
-    icon: 'Flask',
-    subs: ['Whey', 'Izolat', 'Kazein', 'Veganski', 'Bars', 'Napici'],
-  },
-  {
-    slug: 'performanse',
-    label: 'PERFORMANSE',
-    icon: 'Lightning',
-    subs: ['Kreatin', 'BCAA', 'Aminokiseline', 'Pre-workout', 'Glutamin', 'Energija'],
-  },
-  {
-    slug: 'vitamini',
-    label: 'VITAMINI I ZDRAVLJE',
-    icon: 'Leaf',
-    subs: ['Multivitamini', 'Omega 3', 'Vitamin D', 'Collagen', 'San', 'Imunitet'],
-  },
-  {
-    slug: 'kontrola',
-    label: 'KONTROLA TEŽINE',
-    icon: 'Scales',
-    subs: ['Fat burner', 'CLA', 'L-carnitine'],
-  },
-  {
-    slug: 'hrana',
-    label: 'ZDRAVA HRANA',
-    icon: 'BowlFood',
-    subs: ['Organska hrana', 'Namazi', 'Čokolade'],
-  },
-  {
-    slug: 'oprema',
-    label: 'OPREMA',
-    icon: 'Barbell',
-    subs: ['Šejkeri', 'Pojasevi', 'Bandaže', 'Rukavice', 'Torbe', 'Odjeća'],
-  },
-  { slug: 'gaineri', label: 'GAINERI', icon: 'Stack', subs: [] },
-  { slug: 'akcija', label: 'AKCIJA', icon: 'Tag', subs: [], accent: true },
+  { slug: 'proteini',    label: 'PROTEINI',           icon: 'Flask',    subs: ['Whey', 'Izolat', 'Kazein', 'Veganski proteini', 'Proteinski barovi', 'Napici'] },
+  { slug: 'gaineri',     label: 'GAINERI',             icon: 'Stack',    subs: ['Mass gaineri', 'Lean gaineri', 'Ugljikohidrati'] },
+  { slug: 'kreatini',    label: 'KREATINI',            icon: 'Lightning', subs: ['Kreatin monohidrat', 'Kreatin HCL', 'Kreatin blend'] },
+  { slug: 'aminokiseline', label: 'AMINOKISELINE',     icon: 'Flask',    subs: ['BCAA', 'EAA', 'Glutamin', 'Arginini', 'Beta-alanin'] },
+  { slug: 'pre-workout', label: 'PRE-WORKOUT',         icon: 'Lightning', subs: ['Stimulansi', 'Bez stimulansa', 'Pumpa'] },
+  { slug: 'vitamini',    label: 'VITAMINI I ZDRAVLJE', icon: 'Leaf',     subs: ['Multivitamini', 'Omega 3', 'Vitamin D', 'Magnezij', 'Kolagen'] },
+  { slug: 'mrsavljenje', label: 'MRŠAVLJENJE',         icon: 'Scales',   subs: ['Fat burneri', 'CLA', 'L-karnitin', 'Termogenici'] },
+  { slug: 'hrana',       label: 'ZDRAVA HRANA',        icon: 'BowlFood', subs: ['Proteinski namazi', 'Proteinske čokolade', 'Proteinska kaša'] },
+  { slug: 'oprema',      label: 'OPREMA I DODACI',     icon: 'Barbell',  subs: ['Šejkeri', 'Pojasevi', 'Rukavice', 'Torbe', 'Odjeća'] },
+  { slug: 'akcija',      label: 'AKCIJA',              icon: 'Tag',      subs: [], accent: true },
 ]
 
-export const products = [
-  {
-    id: 'p1',
-    brand: 'OPTIMUM NUTRITION',
-    title: 'GOLD STANDARD 100% WHEY 2004g',
-    price: 209,
-    old: null,
-    img: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=500&q=80&auto=format&fit=crop',
-    badge: null,
-    cat: 'proteini',
-    isNew: false,
-    slug: 'gold-standard-100-whey-2004g',
-    description: 'Premium whey protein s 24g proteina po porciji. Niska razina masti i ugljikohidrata. Brzo se apsorbira, idealan poslije treninga. Originalan proizvod s certifikatom proizvođača.',
-    flavors: ['Chocolate Fudge', 'Vanilla', 'Strawberry', 'Cookies & Cream'],
-    rating: 4.8,
-    reviews: 312,
-  },
-  {
-    id: 'p2',
-    brand: 'OSTROVIT',
-    title: 'CREATINE MONOHYDRATE 500g',
-    price: 38,
-    old: null,
-    img: 'https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?w=500&q=80&auto=format&fit=crop',
-    badge: null,
-    cat: 'performanse',
-    isNew: true,
-    slug: 'creatine-monohydrate-500g',
-    description: 'Čisti kreatin monohidrat mikroniziran za bolju topivost. Povećava snagu, eksplozivnost i volumen mišića.',
-    flavors: ['Bez okusa'],
-    rating: 4.6,
-    reviews: 148,
-  },
-  {
-    id: 'p3',
-    brand: 'BSN',
-    title: 'CREATINE DNA 216g',
-    price: 34.30,
-    old: 49,
-    img: 'https://images.unsplash.com/photo-1599058918144-1ff3f6b8e9b3?w=500&q=80&auto=format&fit=crop',
-    badge: '-30%',
-    cat: 'performanse',
-    isNew: false,
-    slug: 'creatine-dna-216g',
-    description: 'BSN Creatine DNA je ultra-čisti mikroniziran kreatin koji podržava snagu, izdržljivost i oporavak.',
-    flavors: ['Bez okusa'],
-    rating: 4.5,
-    reviews: 89,
-  },
-  {
-    id: 'p4',
-    brand: 'MUSCLETECH',
-    title: 'NITROTECH 100% WHEY GOLD 908g',
-    price: 89,
-    old: null,
-    img: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=500&q=80&auto=format&fit=crop',
-    badge: null,
-    cat: 'proteini',
-    isNew: false,
-    slug: 'nitrotech-100-whey-gold-908g',
-    description: 'Nagrađivani Nitro-Tech whey protein sa 30g proteina, 3g kreatin monohidrata i 6.8g BCAA po porciji.',
-    flavors: ['Chocolate', 'Vanilla', 'Strawberry'],
-    rating: 4.7,
-    reviews: 204,
-  },
-  {
-    id: 'p5',
-    brand: 'ALLNUTRITION',
-    title: 'PRE-WORKOUT EXTREME 400g',
-    price: 79.99,
-    old: 99,
-    img: 'https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?w=500&q=80&auto=format&fit=crop',
-    badge: '-20%',
-    cat: 'performanse',
-    isNew: false,
-    slug: 'pre-workout-extreme-400g',
-    description: 'Snažna pre-workout formula za maksimalan intenzitet treninga. Sadrži kofein, beta-alanin, citrullin i kreatin.',
-    flavors: ['Tropical', 'Berry Blast', 'Watermelon'],
-    rating: 4.4,
-    reviews: 67,
-  },
-  {
-    id: 'p6',
-    brand: 'OSTROVIT',
-    title: 'VITAMIN B12 METHYLCOBALAMIN',
-    price: 18.75,
-    old: 25,
-    img: 'https://images.unsplash.com/photo-1626516907127-3a8a4f4d5638?w=500&q=80&auto=format&fit=crop',
-    badge: '-25%',
-    cat: 'vitamini',
-    isNew: false,
-    slug: 'vitamin-b12-methylcobalamin',
-    description: 'Vitamin B12 u metilkobalaminskom obliku — najbiodostupniji oblik B12. Podržava rad nervnog sistema i energetski metabolizam.',
-    flavors: ['Bez okusa'],
-    rating: 4.9,
-    reviews: 55,
-  },
-  {
-    id: 'p7',
-    brand: 'SWANSON HEALTH',
-    title: 'UBIQUINOL 100mg',
-    price: 56.25,
-    old: 75,
-    img: 'https://images.unsplash.com/photo-1626516907127-3a8a4f4d5638?w=500&q=80&auto=format&fit=crop',
-    badge: '-25%',
-    cat: 'vitamini',
-    isNew: false,
-    slug: 'ubiquinol-100mg',
-    description: 'Ubiquinol (aktivan CoQ10) za kardiovaskularno zdravlje i celularnu energiju. 60 softgel kapsula.',
-    flavors: [],
-    rating: 4.8,
-    reviews: 33,
-  },
-  {
-    id: 'p8',
-    brand: 'PURE GOLD',
-    title: 'BCAA 2:1:1 250g',
-    price: 7.50,
-    old: 25,
-    img: 'https://images.unsplash.com/photo-1599058918144-1ff3f6b8e9b3?w=500&q=80&auto=format&fit=crop',
-    badge: '-70%',
-    cat: 'performanse',
-    isNew: false,
-    slug: 'bcaa-211-250g',
-    description: 'BCAA 2:1:1 omjer leucina, izoleucina i valina. Smanjuje katabolizam, ubrzava oporavak i smanjuje zamor mišića.',
-    flavors: ['Lemon', 'Watermelon', 'Cola'],
-    rating: 4.3,
-    reviews: 121,
-  },
-  {
-    id: 'p9',
-    brand: 'BSN',
-    title: 'TRUE-MASS 1200 4730g',
-    price: 129.50,
-    old: 185,
-    img: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=500&q=80&auto=format&fit=crop',
-    badge: '-30%',
-    cat: 'gaineri',
-    isNew: false,
-    slug: 'true-mass-1200-4730g',
-    description: 'Ultra-premium mass gainer s 1200 kalorija, 50g proteina i 222g ugljikohidrata po porciji. Idealan za ektomorfe.',
-    flavors: ['Chocolate', 'Strawberry', 'Cookies & Cream'],
-    rating: 4.5,
-    reviews: 177,
-  },
-  {
-    id: 'p10',
-    brand: 'APPLIED NUTRITION',
-    title: 'CRITICAL WHEY 132g',
-    price: 21,
-    old: null,
-    img: 'https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?w=500&q=80&auto=format&fit=crop',
-    badge: 'NOVO',
-    cat: 'proteini',
-    isNew: true,
-    slug: 'critical-whey-132g',
-    description: 'Tester pakovanje Critical Whey proteina za upoznavanje s okusom i kvalitetom. Savršen izbor za probe.',
-    flavors: ['Banana', 'Vanilla', 'Chocolate'],
-    rating: 4.6,
-    reviews: 12,
-  },
-]
+// Proizvodi dolaze iz Supabase — ovaj niz je prazan
+// Frontend prikazuje prazno stanje dok se DB ne popuni kroz /admin/proizvodi
+export const products = []
 
-export const brands = [
-  { name: 'Optimum Nutrition', src: 'https://logo.uplead.com/optimumnutrition.com' },
-  { name: 'BSN', src: 'https://logo.uplead.com/bsnonline.net' },
-  { name: 'Scitec', src: 'https://logo.uplead.com/scitecnutrition.com' },
-  { name: 'Applied Nutrition', src: 'https://logo.uplead.com/appliednutrition.uk' },
-  { name: 'MuscleTech', src: 'https://www.google.com/s2/favicons?domain=muscletech.com&sz=128' },
-  { name: 'Ostrovit', src: 'https://www.google.com/s2/favicons?domain=ostrovit.com&sz=128' },
-  { name: 'AllNutrition', src: 'https://www.google.com/s2/favicons?domain=allnutrition.com&sz=128' },
-  { name: 'Nutrend', src: 'https://www.google.com/s2/favicons?domain=nutrend.cz&sz=128' },
-]
-
-export function fmtKM(n) {
-  return n.toFixed(2).replace('.', ',') + ' KM'
-}
-
-export function getProductBySlug(slug) {
-  return products.find((p) => p.slug === slug) || null
-}
-
-export function getProductsByCategory(slug) {
-  if (!slug || slug === 'sve') return products
-  if (slug === 'akcija') return products.filter((p) => p.old)
-  return products.filter((p) => p.cat === slug)
-}
-
-export function getCategoryBySlug(slug) {
-  return categories.find((c) => c.slug === slug) || null
+// Pomoćne funkcije (koriste se u nekim komponentama)
+export const getProductBySlug   = (slug) => null
+export const getProductsByCategory = (cat) => []
+export const getCategoryBySlug  = (slug) => categories.find((c) => c.slug === slug) || null
+export const fmtKM = (n) => {
+  if (n === null || n === undefined) return '—'
+  return new Intl.NumberFormat('bs-BA', { style: 'currency', currency: 'BAM', minimumFractionDigits: 2 })
+    .format(n)
+    .replace('BAM', 'KM')
+    .trim()
 }

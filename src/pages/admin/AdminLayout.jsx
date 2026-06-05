@@ -20,6 +20,7 @@ const NAV = [
   { label: 'Ponude',      to: '/admin/ponude',      icon: Percent },
   { label: 'Hero baneri', to: '/admin/hero-baneri', icon: Image },
   { label: 'Baneri',      to: '/admin/baneri',      icon: Image },
+  { label: 'Brendovi',    to: '/admin/brendovi',    icon: Tag },
   { label: 'Istaknuti',   to: '/admin/istaknuti',   icon: Star },
   { label: 'Vijesti',     to: '/admin/vijesti',     icon: Newspaper },
   { label: 'Navigacija',  to: '/admin/navigacija',  icon: Navigation },
