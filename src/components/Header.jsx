@@ -150,7 +150,7 @@ export default function Header() {
 
         {/* ── Mega menu ── */}
         <div
-          className={`absolute top-full left-0 right-0 bg-white border-t-2 border-[#0A1F42] shadow-[0_16px_32px_-12px_rgba(10,31,66,0.22)] transition-all duration-200 z-40 ${shopOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+          className={`absolute top-full left-0 right-0 bg-white border-t-2 border-[#0A1F42] shadow-[0_16px_32px_-12px_rgba(10,31,66,0.22)] transition-all duration-200 z-40 overflow-y-auto max-h-[80vh] ${shopOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
           onMouseEnter={openMenu}
           onMouseLeave={scheduleClose}
           aria-hidden={!shopOpen}
