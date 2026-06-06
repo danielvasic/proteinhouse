@@ -66,9 +66,9 @@ export default function Blog() {
                 <p className="text-[13px] text-gray-400">Uskoro dolaze novi sadržaji.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
                 {posts.map((post) => (
-                  <article key={post.id} className="bg-white flex flex-col group">
+                  <article key={post.id} className="bg-white border border-gray-200 flex flex-col group hover:shadow-md transition-shadow duration-200">
 
                     {/* Image */}
                     <div className="relative overflow-hidden bg-gray-100" style={{ paddingBottom: '60%' }}>

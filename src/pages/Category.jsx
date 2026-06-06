@@ -101,11 +101,9 @@ export default function Category() {
 
                 {/* Grid */}
                 {sorted.length > 0 ? (
-                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-px bg-gray-200">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
                     {sorted.map((p) => (
-                      <div key={p.id} className="bg-white">
-                        <ProductCard product={p} />
-                      </div>
+                      <ProductCard key={p.id} product={p} />
                     ))}
                   </div>
                 ) : (

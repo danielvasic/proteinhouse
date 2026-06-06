@@ -68,9 +68,9 @@ export default function Novosti() {
                 <p className="text-[13px] text-gray-400">Uskoro dolaze novosti.</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-px bg-gray-200">
+              <div className="flex flex-col gap-4">
                 {news.map((item) => (
-                  <div key={item.id} className="bg-white p-7 md:p-8">
+                  <div key={item.id} className="bg-white border border-gray-200 p-7 md:p-8">
                     <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">
                       {formatDate(item.published_at)}
                     </p>

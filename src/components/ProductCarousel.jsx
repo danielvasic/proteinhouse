@@ -70,13 +70,11 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
             {pages.map((slice, i) => (
               <div
                 key={i}
-                className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200"
+                className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5"
                 style={{ width: `${100 / total}%` }}
               >
                 {slice.map((p) => (
-                  <div key={p.id} className="bg-white">
-                    <ProductCard product={p} />
-                  </div>
+                  <ProductCard key={p.id} product={p} />
                 ))}
               </div>
             ))}

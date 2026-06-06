@@ -155,7 +155,7 @@ export default function Header() {
           onMouseLeave={scheduleClose}
           aria-hidden={!shopOpen}
         >
-          <div className="mx-auto w-full max-w-[1280px] px-8 md:px-12 lg:px-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-10 lg:gap-x-14 gap-y-10 py-12 pb-14">
+          <div className="mx-auto w-full max-w-[1280px] px-8 md:px-12 lg:px-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-10 lg:gap-x-14 gap-y-8 py-8 pb-10">
             {categories.map((c) => {
               const Icon = CAT_ICONS[c.slug] || Tag
               return (
