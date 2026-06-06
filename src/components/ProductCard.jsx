@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
+import { hasAnyStock } from '../hooks/useProducts'
 
 function stickerTilt(id) {
   const seed = String(id)
@@ -16,8 +17,9 @@ export default function ProductCard({ product }) {
   const [hover, setHover] = useState(false)
 
   const { id, slug, brand, title, price, old, img, badge } = product
-  const isDiscount = badge && badge.startsWith('-')
-  const tilt = useMemo(() => stickerTilt(id), [id])
+  const isDiscount   = badge && badge.startsWith('-')
+  const tilt         = useMemo(() => stickerTilt(id), [id])
+  const inStock      = hasAnyStock(product)
 
   return (
     <article
@@ -46,6 +48,13 @@ export default function ProductCard({ product }) {
           style={{ transform: `rotate(${tilt * 0.5}deg)` }}
         >
           {badge}
+        </div>
+      )}
+
+      {/* Out of stock overlay */}
+      {!inStock && (
+        <div className="absolute top-3 right-3 z-10 px-2 py-0.5 bg-gray-800/80 text-white text-[10px] font-bold tracking-[0.1em] uppercase">
+          Nema na stanju
         </div>
       )}
 
@@ -84,12 +93,17 @@ export default function ProductCard({ product }) {
             )}
           </div>
           <button
-            className="w-full py-2.5 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.1em] uppercase bg-transparent hover:bg-[#0F2952] hover:text-white transition-all duration-150 cursor-pointer"
-            onClick={(e) => { e.stopPropagation(); addItem(product) }}
+            className={`w-full py-2.5 text-[11px] font-bold tracking-[0.1em] uppercase transition-all duration-150 ${
+              inStock
+                ? 'border border-[#0F2952] text-[#0F2952] bg-transparent hover:bg-[#0F2952] hover:text-white cursor-pointer'
+                : 'border border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed'
+            }`}
+            onClick={(e) => { e.stopPropagation(); if (inStock) addItem(product) }}
             aria-label={`Dodaj ${title} u korpu`}
+            disabled={!inStock}
             style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
           >
-            Dodaj u korpu
+            {inStock ? 'Dodaj u korpu' : 'Nema na stanju'}
           </button>
         </div>
       </div>

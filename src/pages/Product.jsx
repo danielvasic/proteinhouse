@@ -7,7 +7,7 @@ import {
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { getCategoryBySlug, fmtKM } from '../data/catalog'
-import { useProduct } from '../hooks/useProducts'
+import { useProduct, getVariantStock } from '../hooks/useProducts'
 
 function StarRating({ rating }) {
   return (
@@ -60,6 +60,11 @@ export default function Product() {
   // Set defaults when product loads
   if (product && flavor === null && product.flavors?.length) setFlavor(product.flavors[0])
   if (product && size   === null && product.sizes?.length)   setSize(product.sizes[0])
+
+  // Compute current variant stock
+  const currentStock = product ? getVariantStock(product, flavor, size) : 0
+  const outOfStock   = currentStock === 0
+  const lowStock     = currentStock > 0 && currentStock <= 5
 
   if (loading) {
     return (
@@ -179,8 +184,26 @@ export default function Product() {
 
                 {/* Stock */}
                 <div className="flex items-center gap-2 mb-5 pb-5 border-b border-gray-100">
-                  <div className="w-2 h-2 rounded-full bg-[#0F2952]" />
-                  <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-500">Na stanju · Isporuka 1–3 dana</span>
+                  {outOfStock ? (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-red-500" />
+                      <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-red-500">Nema na stanju</span>
+                    </>
+                  ) : lowStock ? (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-amber-500" />
+                      <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-amber-600">
+                        Malo na stanju · još {currentStock} kom
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-500">
+                        Na stanju · Isporuka 1–3 dana
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 {/* Description */}
@@ -204,18 +227,20 @@ export default function Product() {
 
                 {/* Qty + Add to cart */}
                 <div className="flex gap-3 mb-6">
-                  <div className="flex items-center border border-gray-300">
+                  <div className={`flex items-center border ${outOfStock ? 'border-gray-200 opacity-40' : 'border-gray-300'}`}>
                     <button
-                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0F2952] transition-colors cursor-pointer bg-transparent border-0"
+                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0F2952] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
                       onClick={() => setQty((q) => Math.max(1, q - 1))}
+                      disabled={outOfStock}
                       aria-label="Smanji količinu"
                     >
                       <Minus size={14} weight="bold" />
                     </button>
                     <span className="w-10 text-center text-[13px] font-bold text-[#0F2952]">{qty}</span>
                     <button
-                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0F2952] transition-colors cursor-pointer bg-transparent border-0"
-                      onClick={() => setQty((q) => q + 1)}
+                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0F2952] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
+                      onClick={() => setQty((q) => Math.min(currentStock || 99, q + 1))}
+                      disabled={outOfStock}
                       aria-label="Povećaj količinu"
                     >
                       <Plus size={14} weight="bold" />
@@ -223,10 +248,16 @@ export default function Product() {
                   </div>
 
                   <button
-                    className="flex-1 flex items-center justify-center gap-2.5 py-3 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0A1F42] transition-colors duration-150 cursor-pointer border-0"
+                    className={`flex-1 flex items-center justify-center gap-2.5 py-3 text-[11px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 border-0 ${
+                      outOfStock
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-[#0F2952] text-white hover:bg-[#0A1F42] cursor-pointer'
+                    }`}
                     onClick={handleAdd}
+                    disabled={outOfStock}
                   >
-                    <ShoppingBag size={16} weight="fill" /> Dodaj u korpu
+                    <ShoppingBag size={16} weight="fill" />
+                    {outOfStock ? 'Nema na stanju' : 'Dodaj u korpu'}
                   </button>
 
                   <button

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Save, Plus, X, Upload, Image as ImageIcon, RefreshCw } from 'lucide-react'
 import { supabase, getProductImageUrl, uploadProductImage } from '../../lib/supabase'
@@ -15,6 +15,7 @@ const EMPTY = {
   brand: '', title: '', slug: '', price: '', old_price: '',
   description: '', category: 'proteini', image_url: '', image_path: '',
   badge: '', is_active: true, flavors: [], sizes: [], sort_order: 0,
+  stock: 0, stock_variants: {},
 }
 
 function slugify(str) {
@@ -79,6 +80,106 @@ function TagEditor({ label, hint, placeholder, value, onChange }) {
   )
 }
 
+/** Stock editor — generated from flavors × sizes combinations */
+function StockTable({ flavors, sizes, stockVariants, stock, onChangeVariants, onChangeStock }) {
+  const hasVariants = flavors.length > 0 || sizes.length > 0
+
+  const combinations = useMemo(() => {
+    if (flavors.length && sizes.length)
+      return flavors.flatMap((f) => sizes.map((s) => ({ key: `${f}|${s}`, label: `${f} · ${s}` })))
+    if (flavors.length) return flavors.map((f) => ({ key: f, label: f }))
+    if (sizes.length)   return sizes.map((s)   => ({ key: s, label: s }))
+    return []
+  }, [flavors, sizes])
+
+  const getEntry = (key) => stockVariants[key] || { qty: 0, sku: '' }
+
+  const update = (key, field, value) =>
+    onChangeVariants({
+      ...stockVariants,
+      [key]: { ...getEntry(key), [field]: field === 'qty' ? (parseInt(value) || 0) : value },
+    })
+
+  if (!hasVariants) {
+    return (
+      <div className="space-y-1.5">
+        <Label>Ukupno na lageru (kom)</Label>
+        <div className="flex items-center gap-3">
+          <Input
+            type="number" min="0" value={stock}
+            onChange={(e) => onChangeStock(parseInt(e.target.value) || 0)}
+            className="max-w-[120px]"
+          />
+          <span className={`text-xs font-semibold ${stock > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+            {stock > 0 ? `${stock} kom na stanju` : 'Nema na stanju'}
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  if (combinations.length === 0) return null
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-medium text-gray-700">
+        Stanje na lageru po varijantama
+        <span className="ml-2 text-xs text-muted-foreground font-normal">
+          ({combinations.length} {combinations.length === 1 ? 'varijanta' : 'varijanti'})
+        </span>
+      </p>
+      <div className="border border-gray-200 overflow-hidden rounded-sm">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500">Varijanta</th>
+              <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 w-36">Stanje (kom)</th>
+              <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 w-48">SKU / ERP šifra</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {combinations.map(({ key, label }) => {
+              const entry = getEntry(key)
+              return (
+                <tr key={key} className={entry.qty === 0 ? 'bg-red-50/50' : ''}>
+                  <td className="px-3 py-2 text-sm font-medium text-gray-700">{label}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number" min="0" value={entry.qty}
+                        onChange={(e) => update(key, 'qty', e.target.value)}
+                        className="w-20 h-8 text-sm"
+                      />
+                      {entry.qty === 0 && (
+                        <span className="text-[10px] text-red-500 font-bold whitespace-nowrap">NEMA</span>
+                      )}
+                      {entry.qty > 0 && entry.qty <= 5 && (
+                        <span className="text-[10px] text-amber-600 font-bold whitespace-nowrap">MALO</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input
+                      value={entry.sku}
+                      onChange={(e) => update(key, 'sku', e.target.value)}
+                      placeholder="npr. ON-GSW-CH-1KG"
+                      className="h-8 text-xs font-mono"
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        SKU šifra se koristi za sinhronizaciju sa ERP sustavom.
+        Redovi označeni crveno nemaju zaliha.
+      </p>
+    </div>
+  )
+}
+
 export default function ProductEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -97,11 +198,13 @@ export default function ProductEdit() {
       if (data) setForm({
         ...EMPTY,
         ...data,
-        old_price:  data.old_price  ?? '',
-        flavors:    data.flavors    ?? [],
-        sizes:      data.sizes      ?? [],
-        image_path: data.image_path ?? '',
-        image_url:  data.image_url  ?? '',
+        old_price:      data.old_price      ?? '',
+        flavors:        data.flavors        ?? [],
+        sizes:          data.sizes          ?? [],
+        image_path:     data.image_path     ?? '',
+        image_url:      data.image_url      ?? '',
+        stock:          data.stock          ?? 0,
+        stock_variants: data.stock_variants ?? {},
       })
       setLoading(false)
     })
@@ -322,30 +425,40 @@ export default function ProductEdit() {
           </CardContent>
         </Card>
 
-        {/* ── Okusi + Težine ── */}
+        {/* ── Varijante + Stanje ── */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Varijante</CardTitle>
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Varijante i stanje na lageru</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Okusi</p>
-              <TagEditor
-                value={form.flavors}
-                onChange={(v) => setForm((f) => ({ ...f, flavors: v }))}
-                placeholder="npr. Chocolate Fudge, Vanilla…"
-                hint="Enter za dodavanje"
-              />
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">Okusi</p>
+                <TagEditor
+                  value={form.flavors}
+                  onChange={(v) => setForm((f) => ({ ...f, flavors: v }))}
+                  placeholder="npr. Chocolate Fudge, Vanilla…"
+                  hint="Enter za dodavanje"
+                />
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">Težine / Veličine</p>
+                <TagEditor
+                  value={form.sizes}
+                  onChange={(v) => setForm((f) => ({ ...f, sizes: v }))}
+                  placeholder="npr. 500g, 1kg, 2kg, 5kg…"
+                  hint="Enter za dodavanje"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Težine / Veličine</p>
-              <TagEditor
-                value={form.sizes}
-                onChange={(v) => setForm((f) => ({ ...f, sizes: v }))}
-                placeholder="npr. 500g, 1kg, 2kg, 5kg…"
-                hint="Enter za dodavanje"
-              />
-            </div>
+            <StockTable
+              flavors={form.flavors}
+              sizes={form.sizes}
+              stockVariants={form.stock_variants}
+              stock={form.stock}
+              onChangeVariants={(sv) => setForm((f) => ({ ...f, stock_variants: sv }))}
+              onChangeStock={(s) => setForm((f) => ({ ...f, stock: s }))}
+            />
           </CardContent>
         </Card>
 

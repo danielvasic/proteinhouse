@@ -15,21 +15,42 @@ import { supabase, getProductImageUrl } from '../lib/supabase'
 /** Normalise a DB row */
 function norm(p) {
   return {
-    id:          p.id,
-    brand:       p.brand,
-    title:       p.title,
-    slug:        p.slug,
-    price:       Number(p.price),
-    old:         p.old_price ? Number(p.old_price) : null,
-    img:         getProductImageUrl(p),
-    badge:       p.badge  || null,
-    cat:         p.category ?? p.cat,
-    description: p.description || '',
-    flavors:     Array.isArray(p.flavors) ? p.flavors : [],
-    sizes:       Array.isArray(p.sizes)   ? p.sizes   : [],
-    rating:      p.rating  ?? null,
-    reviews:     p.reviews ?? 0,
+    id:             p.id,
+    brand:          p.brand,
+    title:          p.title,
+    slug:           p.slug,
+    price:          Number(p.price),
+    old:            p.old_price ? Number(p.old_price) : null,
+    img:            getProductImageUrl(p),
+    badge:          p.badge  || null,
+    cat:            p.category ?? p.cat,
+    description:    p.description || '',
+    flavors:        Array.isArray(p.flavors) ? p.flavors : [],
+    sizes:          Array.isArray(p.sizes)   ? p.sizes   : [],
+    rating:         p.rating  ?? null,
+    reviews:        p.reviews ?? 0,
+    stock:          p.stock          ?? 0,
+    stock_variants: p.stock_variants ?? {},
   }
+}
+
+/** Get stock for a specific variant combination */
+export function getVariantStock(product, flavor, size) {
+  const hasVariants = product.flavors?.length > 0 || product.sizes?.length > 0
+  if (!hasVariants) return product.stock ?? 0
+  const key = flavor && size ? `${flavor}|${size}`
+            : flavor         ? flavor
+            : size           ? size
+            : ''
+  if (!key) return product.stock ?? 0
+  return product.stock_variants?.[key]?.qty ?? 0
+}
+
+/** True if any variant (or simple stock) is > 0 */
+export function hasAnyStock(product) {
+  const hasVariants = product.flavors?.length > 0 || product.sizes?.length > 0
+  if (!hasVariants) return (product.stock ?? 0) > 0
+  return Object.values(product.stock_variants ?? {}).some((v) => (v?.qty ?? 0) > 0)
 }
 
 /** All active products from DB */
