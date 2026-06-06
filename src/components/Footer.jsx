@@ -159,7 +159,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/8">
-        <div className="container flex flex-col sm:flex-row items-center justify-between gap-2 py-5">
+        <div className="container flex flex-col sm:flex-row items-center justify-between gap-2 py-5 pb-8 md:pb-10">
           <span className="text-[11px] text-white/30">
             © {new Date().getFullYear()} ProteinHouse d.o.o. Sva prava zadržana.
           </span>
