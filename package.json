@@ -10,7 +10,9 @@
     "build:server": "vite build --outDir dist/server --ssr src/entry-server.jsx",
     "build:netlify": "npm run build && node scripts/gen-fn.js",
     "preview": "cross-env NODE_ENV=production node server.js",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "fetch-images": "node scripts/fetch-missing-images.mjs",
+    "fetch-images:dry": "node scripts/fetch-missing-images.mjs --dry-run"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
@@ -43,7 +45,10 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.5.0",
+    "axios": "^1.17.0",
+    "cheerio": "^1.2.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
