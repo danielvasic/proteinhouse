@@ -37,6 +37,7 @@ const DEFAULT_COLUMNS = {
     {
       heading: 'PRODAVNICA',
       links: [
+        { label: 'Praćenje pošiljke',  to: '/pracenje' },
         { label: 'Kako kupiti',        to: '/kako-kupiti' },
         { label: 'Dostava',            to: '/dostava' },
         { label: 'Dodatni popust',     to: '/popust' },

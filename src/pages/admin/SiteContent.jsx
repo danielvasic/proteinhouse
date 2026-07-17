@@ -11,6 +11,25 @@ import ImageUpload from '../../components/admin/ImageUpload'
 
 // Predefined editable content sections
 const SECTIONS = {
+  newsBar: {
+    label: 'News bar',
+    fields: [
+      {
+        key: 'news_bar_messages',
+        label: 'Poruke (jedna po redu — rotiraju se svakih 8 sekundi)',
+        type: 'textarea',
+        placeholder: 'BESPLATNA DOSTAVA ZA NARUDŽBE PREKO 100 KM\n100% SIGURNA KUPOVINA\n…',
+      },
+    ],
+  },
+  lifetime: {
+    label: 'Lifetime banner',
+    fields: [
+      { key: 'lifetime_banner_text', label: 'Tekst (prazno = banner isključen)', type: 'text', placeholder: '−10% NA PRVU NARUDŽBU' },
+      { key: 'lifetime_banner_sub',  label: 'Podnaslov',                         type: 'text', placeholder: 'Kod: PRVIH10' },
+      { key: 'lifetime_banner_link', label: 'Link',                              type: 'text', placeholder: '/kategorija/akcija' },
+    ],
+  },
   promo: {
     label: 'Promo traka',
     fields: [

@@ -12,12 +12,27 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase, getProductImageUrl } from '../lib/supabase'
 
+/**
+ * Ako naziv počinje imenom brenda, skini ga iz prikaza — brend se prikazuje
+ * zasebno pa se ne ponavlja ("mars" pravilo iz redizajn dokumenta).
+ */
+function displayTitle(brand, title) {
+  if (!brand || !title) return title
+  const b = brand.trim()
+  const t = title.trim()
+  if (t.toLowerCase().startsWith(b.toLowerCase())) {
+    const stripped = t.slice(b.length).replace(/^[\s\-–—:,·]+/, '')
+    if (stripped) return stripped
+  }
+  return t
+}
+
 /** Normalise a DB row */
 function norm(p) {
   return {
     id:             p.id,
     brand:          p.brand,
-    title:          p.title,
+    title:          displayTitle(p.brand, p.title),
     slug:           p.slug,
     price:          Number(p.price),
     old:            p.old_price ? Number(p.old_price) : null,
@@ -28,10 +43,28 @@ function norm(p) {
     flavors:        Array.isArray(p.flavors) ? p.flavors : [],
     sizes:          Array.isArray(p.sizes)   ? p.sizes   : [],
     rating:         p.rating  ?? null,
-    reviews:        p.reviews ?? 0,
+    reviews:        p.reviews ?? p.review_count ?? 0,
     stock:          p.stock          ?? 0,
     stock_variants: p.stock_variants ?? {},
+    tags:           Array.isArray(p.tags) ? p.tags : [],
+    sales:          p.sales_count ?? 0,
+    usage:          p.usage_instructions || '',
+    composition:    p.composition || '',
+    nutrition:      p.nutrition_info || '',
   }
+}
+
+/**
+ * Bestselleri — ručno tagovani ('bestseller') idu prvi, ostatak po broju
+ * prodaja (sales_count iz narudžbi). Koristi se na homepage-u i u searchu.
+ */
+export function rankBestsellers(products, limit = 4) {
+  const tagged = products.filter((p) => p.tags.includes('bestseller'))
+  const rest   = products
+    .filter((p) => !p.tags.includes('bestseller'))
+    .slice()
+    .sort((a, b) => b.sales - a.sales)
+  return [...tagged, ...rest].slice(0, limit)
 }
 
 /** Get stock for a specific variant combination */

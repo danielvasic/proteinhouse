@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useState } from 'react'
+import { trackEvent } from '../lib/analytics'
 
 const CartContext = createContext(null)
 
@@ -97,6 +98,13 @@ export function CartProvider({ children }) {
     addItem: (product) => {
       dispatch({ type: 'ADD', payload: product })
       dispatch({ type: 'OPEN_DRAWER' })
+      trackEvent('add_to_cart', {
+        ecommerce: {
+          currency: 'BAM',
+          value: product.price,
+          items: [{ item_id: product.id, item_name: product.title, item_brand: product.brand, price: product.price, quantity: 1 }],
+        },
+      })
     },
     removeItem: (index) => dispatch({ type: 'REMOVE', index }),
     setQty: (index, qty) => dispatch({ type: 'SET_QTY', index, qty }),

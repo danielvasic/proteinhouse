@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import {
-  Phone, Envelope, Clock, Truck, MagnifyingGlass, User, Heart,
-  ShoppingBag, Storefront, Barbell, Target, Newspaper, Info, MapPin,
+  Phone, Envelope, Clock, Truck, User, Heart,
+  ShoppingCart, Storefront, Barbell, Target, Newspaper, Info, MapPin,
   CaretDown, CaretRight, Flask, Lightning, Leaf, Scales, BowlFood,
   Stack, Tag, List, X,
 } from '@phosphor-icons/react'
 import Logo from './Logo'
+import NewsBar from './NewsBar'
+import SearchBox from './SearchBox'
 import { useCart } from '../store/CartContext'
 import { useCategories } from '../hooks/useCategories'
 import { useSiteContent } from '../hooks/useSiteContent'
@@ -49,7 +51,6 @@ export default function Header() {
   const { totalItems, openDrawer } = useCart()
   const [shopOpen,   setShopOpen]   = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [searchVal,  setSearchVal]  = useState('')
   const closeTimer = useRef(null)
 
   // Dynamic data from DB
@@ -69,6 +70,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
 
+      {/* ── News bar (rotirajuće poruke) ── */}
+      <NewsBar />
+
       {/* ── Utility strip ── */}
       <div className="bg-[#0A1F42] text-white hidden md:block">
         <div className="container">
@@ -87,22 +91,9 @@ export default function Header() {
           <div className="flex items-center gap-5 py-3 md:py-4">
             <Logo size="md" onClick={() => navigate('/')} />
 
-            <form
-              className="flex-1 max-w-[460px] hidden sm:flex items-center gap-2 h-10 px-3.5 bg-gray-50 border border-gray-200 focus-within:border-[#0F2952] focus-within:bg-white transition-all duration-150"
-              onSubmit={(e) => {
-                e.preventDefault()
-                if (searchVal.trim()) navigate(`/pretraga?q=${encodeURIComponent(searchVal)}`)
-              }}
-            >
-              <MagnifyingGlass size={15} className="text-gray-400 shrink-0" />
-              <input
-                className="bg-transparent flex-1 outline-none text-sm text-gray-900 placeholder:text-gray-400"
-                value={searchVal}
-                onChange={(e) => setSearchVal(e.target.value)}
-                placeholder="Pretraži proizvode, brendove…"
-                aria-label="Pretraga"
-              />
-            </form>
+            <div className="flex-1 hidden sm:flex">
+              <SearchBox />
+            </div>
 
             <div className="ml-auto flex items-center gap-0.5">
               <Link to="/nalog" className={`${iconBtnCls} hidden md:flex`} aria-label="Nalog">
@@ -112,7 +103,7 @@ export default function Header() {
                 <Heart size={20} />
               </button>
               <button className={iconBtnCls} aria-label="Korpa" onClick={openDrawer}>
-                <ShoppingBag size={20} />
+                <ShoppingCart size={20} />
                 {totalItems > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-[#0F2952] text-white text-[9px] font-bold flex items-center justify-center">
                     {totalItems}
@@ -127,6 +118,11 @@ export default function Header() {
                 {mobileOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
               </button>
             </div>
+          </div>
+
+          {/* ── Mobile search (uvijek vidljiv, odmah nudi prijedloge) ── */}
+          <div className="sm:hidden pb-3">
+            <SearchBox />
           </div>
         </div>
       </div>

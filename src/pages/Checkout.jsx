@@ -5,6 +5,7 @@ import { House, CaretRight, Check, Truck, ShieldCheck, UserCircle, LockKey, Enve
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { supabase } from '../lib/supabase'
+import { trackEvent } from '../lib/analytics'
 
 const STEPS = ['Dostava', 'Pregled', 'Potvrda']
 
@@ -201,6 +202,15 @@ export default function Checkout() {
       }
       const { error } = await supabase.from('orders').insert(payload)
       if (error) throw error
+      trackEvent('purchase', {
+        ecommerce: {
+          transaction_id: orderNumber,
+          currency: 'BAM',
+          value: total,
+          shipping,
+          items: items.map((i) => ({ item_id: i.id, item_name: i.title, item_brand: i.brand, price: i.price, quantity: i.qty })),
+        },
+      })
       setOrderNum(orderNumber)
       clearCart?.()
       setStep(2)
@@ -470,12 +480,20 @@ export default function Checkout() {
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Ukupno</span><span className="font-bold text-[#0F2952]">{fmtKM(total)}</span></div>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Plaćanje</span><span>Pouzećem</span></div>
                 </div>
-                <Link
-                  to="/"
-                  className="inline-block px-8 py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0A1F42] transition-colors"
-                >
-                  Nastavi kupovinu →
-                </Link>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Link
+                    to={`/pracenje?narudzba=${encodeURIComponent(orderNum)}`}
+                    className="inline-block px-8 py-4 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0F2952] hover:text-white transition-colors"
+                  >
+                    Prati pošiljku
+                  </Link>
+                  <Link
+                    to="/"
+                    className="inline-block px-8 py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0A1F42] transition-colors"
+                  >
+                    Nastavi kupovinu →
+                  </Link>
+                </div>
               </div>
             )}
           </div>

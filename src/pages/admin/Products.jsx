@@ -135,7 +135,7 @@ export default function Products() {
     setLoading(true)
     const { data } = await supabase
       .from('products')
-      .select('id, brand, title, price, old_price, category, is_active, badge, image_url, image_path')
+      .select('id, brand, title, internal_title, price, old_price, category, is_active, badge, image_url, image_path')
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })
     setProducts(data ?? [])
@@ -156,7 +156,7 @@ export default function Products() {
   }
 
   const filtered = products.filter((p) =>
-    `${p.brand} ${p.title} ${p.category}`.toLowerCase().includes(search.toLowerCase())
+    `${p.brand} ${p.title} ${p.internal_title ?? ''} ${p.category}`.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -227,6 +227,7 @@ export default function Products() {
                       <TableCell>
                         <p className="text-xs text-muted-foreground font-medium">{p.brand}</p>
                         <p className="font-semibold text-sm leading-tight mt-0.5">{p.title}</p>
+                        {p.internal_title && <p className="text-[11px] text-muted-foreground font-mono mt-0.5">ERP: {p.internal_title}</p>}
                         {p.badge && <Badge variant="warning" className="mt-1 text-[10px]">{p.badge}</Badge>}
                       </TableCell>
                       <TableCell>

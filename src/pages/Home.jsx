@@ -2,11 +2,13 @@ import { useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 import HeroBanner from '../components/HeroBanner'
 import PromoStrip from '../components/PromoStrip'
+import QuickCategories from '../components/QuickCategories'
+import GoalsSection from '../components/GoalsSection'
+import ProductGrid from '../components/ProductGrid'
 import CategoryStrip from '../components/CategoryStrip'
-import ProductCarousel from '../components/ProductCarousel'
 import BrandStrip from '../components/BrandStrip'
 import { useSiteContent } from '../hooks/useSiteContent'
-import { useAllProducts } from '../hooks/useProducts'
+import { useAllProducts, rankBestsellers } from '../hooks/useProducts'
 
 const CONTENT_KEYS = [
   'carousel_new_arrivals_ids',    'carousel_new_arrivals_title',    'carousel_new_arrivals_eyebrow',    'carousel_new_arrivals_slug',
@@ -14,36 +16,38 @@ const CONTENT_KEYS = [
 ]
 
 const CONTENT_DEFAULTS = {
-  carousel_new_arrivals_title:   'NAJNOVIJI PROIZVODI',
+  carousel_new_arrivals_title:   'NOVI PROIZVODI',
   carousel_new_arrivals_eyebrow: 'Tek pristigli',
   carousel_new_arrivals_slug:    'proteini',
-  carousel_bestsellers_title:    'NAJPRODAVANIJI PROIZVODI',
-  carousel_bestsellers_eyebrow:  'Top proizvodi ove sedmice',
+  carousel_bestsellers_title:    'BESTSELLERI',
+  carousel_bestsellers_eyebrow:  'Najprodavanije ove sedmice',
   carousel_bestsellers_slug:     'akcija',
-  // IDs intentionally NOT defaulted — if admin hasn't picked, we use DB order
+  // IDs intentionally NOT defaulted — if admin hasn't picked, we use automatic ranking
 }
 
 export default function Home() {
   const { data }               = useSiteContent(CONTENT_KEYS, CONTENT_DEFAULTS)
   const { products, loading }  = useAllProducts()
 
-  // If admin has explicitly selected product IDs → use those (in order)
-  // Otherwise → fall back to first 8 / next 8 from DB by sort_order
-  const newest = useMemo(() => {
-    const ids = Array.isArray(data.carousel_new_arrivals_ids) && data.carousel_new_arrivals_ids.length > 0
-      ? data.carousel_new_arrivals_ids
-      : null
-    if (ids) return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean)
-    return products.slice(0, 8)
-  }, [data.carousel_new_arrivals_ids, products])
-
+  // Bestselleri: admin-odabrani IDs > tag 'bestseller' > najviše prodaja (sales_count)
   const bestsellers = useMemo(() => {
     const ids = Array.isArray(data.carousel_bestsellers_ids) && data.carousel_bestsellers_ids.length > 0
       ? data.carousel_bestsellers_ids
       : null
-    if (ids) return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean)
-    return products.slice(0, 8)   // same pool, admin differentiates via selection
+    if (ids) return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean).slice(0, 4)
+    return rankBestsellers(products, 4)
   }, [data.carousel_bestsellers_ids, products])
+
+  // Novi proizvodi: admin-odabrani IDs > tag 'new' / badge NOVO > redoslijed iz DB
+  const newest = useMemo(() => {
+    const ids = Array.isArray(data.carousel_new_arrivals_ids) && data.carousel_new_arrivals_ids.length > 0
+      ? data.carousel_new_arrivals_ids
+      : null
+    if (ids) return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean).slice(0, 4)
+    const tagged = products.filter((p) => p.tags.includes('new') || p.badge === 'NOVO')
+    const rest   = products.filter((p) => !tagged.includes(p))
+    return [...tagged, ...rest].slice(0, 4)
+  }, [data.carousel_new_arrivals_ids, products])
 
   return (
     <>
@@ -57,24 +61,26 @@ export default function Home() {
 
       <main>
         <HeroBanner />
-        <PromoStrip />
-        <CategoryStrip />
-        {(newest.length > 0 || !loading) && (
-          <ProductCarousel
-            title={data.carousel_new_arrivals_title}
-            eyebrow={data.carousel_new_arrivals_eyebrow}
-            products={newest}
-            categorySlug={data.carousel_new_arrivals_slug}
-          />
-        )}
+        <QuickCategories />
         {(bestsellers.length > 0 || !loading) && (
-          <ProductCarousel
+          <ProductGrid
             title={data.carousel_bestsellers_title}
             eyebrow={data.carousel_bestsellers_eyebrow}
             products={bestsellers}
             categorySlug={data.carousel_bestsellers_slug}
           />
         )}
+        <GoalsSection />
+        {(newest.length > 0 || !loading) && (
+          <ProductGrid
+            title={data.carousel_new_arrivals_title}
+            eyebrow={data.carousel_new_arrivals_eyebrow}
+            products={newest}
+            categorySlug={data.carousel_new_arrivals_slug}
+          />
+        )}
+        <CategoryStrip />
+        <PromoStrip />
         <BrandStrip />
       </main>
     </>

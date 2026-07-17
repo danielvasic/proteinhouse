@@ -3,6 +3,9 @@ import { Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import CartDrawer from './components/CartDrawer'
+import CookieConsent from './components/CookieConsent'
+import PromoPopup from './components/PromoPopup'
+import LifetimeBanner from './components/LifetimeBanner'
 import { AdminProvider } from './store/AdminContext'
 
 // Eager — above-the-fold critical pages
@@ -18,6 +21,7 @@ const About   = lazy(() => import('./pages/About'))
 const Search   = lazy(() => import('./pages/Search'))
 const Novosti   = lazy(() => import('./pages/Novosti'))
 const Checkout  = lazy(() => import('./pages/Checkout'))
+const Tracking  = lazy(() => import('./pages/Tracking'))
 
 // Lazy — admin (own chunk, never loaded for regular visitors)
 const AdminLogin   = lazy(() => import('./pages/admin/AdminLogin'))
@@ -117,11 +121,15 @@ function ShopLayout() {
           <Route path="/pretraga"             element={<Search />} />
           <Route path="/novosti"              element={<Novosti />} />
           <Route path="/checkout"             element={<Checkout />} />
+          <Route path="/pracenje"             element={<Tracking />} />
           <Route path="*"                     element={<NotFound />} />
         </Routes>
       </Suspense>
       <Footer />
       <CartDrawer />
+      <LifetimeBanner />
+      <PromoPopup />
+      <CookieConsent />
     </>
   )
 }

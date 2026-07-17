@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
   Star, Truck, ShieldCheck, Heart, Minus, Plus,
-  ShoppingBag, House, CaretRight,
+  ShoppingCart, House, CaretRight,
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { getCategoryBySlug, fmtKM } from '../data/catalog'
 import { useProduct, getVariantStock } from '../hooks/useProducts'
+import ReviewSection from '../components/ReviewSection'
 
 function StarRating({ rating }) {
   return (
@@ -56,6 +57,19 @@ export default function Product() {
   const [qty,    setQty]    = useState(1)
   const [flavor, setFlavor] = useState(null)
   const [size,   setSize]   = useState(null)
+
+  // Floating "kupi" traka — prati te dok skrolaš (Ostrovit stil)
+  const buyRef = useRef(null)
+  const [floatBar, setFloatBar] = useState(false)
+  useEffect(() => {
+    if (!buyRef.current || typeof IntersectionObserver === 'undefined') return undefined
+    const obs = new IntersectionObserver(
+      ([entry]) => setFloatBar(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+      { threshold: 0 }
+    )
+    obs.observe(buyRef.current)
+    return () => obs.disconnect()
+  }, [product])
 
   // Set defaults when product loads
   if (product && flavor === null && product.flavors?.length) setFlavor(product.flavors[0])
@@ -226,7 +240,7 @@ export default function Product() {
                 />
 
                 {/* Qty + Add to cart */}
-                <div className="flex gap-3 mb-6">
+                <div className="flex gap-3 mb-6" ref={buyRef}>
                   <div className={`flex items-center border ${outOfStock ? 'border-gray-200 opacity-40' : 'border-gray-300'}`}>
                     <button
                       className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0F2952] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
@@ -256,7 +270,7 @@ export default function Product() {
                     onClick={handleAdd}
                     disabled={outOfStock}
                   >
-                    <ShoppingBag size={16} weight="fill" />
+                    <ShoppingCart size={16} weight="fill" />
                     {outOfStock ? 'Nema na stanju' : 'Dodaj u korpu'}
                   </button>
 
@@ -289,7 +303,78 @@ export default function Product() {
           </div>
         </section>
 
+        {/* ── Detaljan opis — tabovi (Ostrovit stil) ── */}
+        <DescriptionTabs product={product} />
+
+        {/* ── Recenzije — samo verificirani kupci ── */}
+        <ReviewSection product={product} />
+
+        {/* ── Floating kupi traka ── */}
+        <div
+          className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-8px_24px_-8px_rgba(10,31,66,0.18)] transition-transform duration-200 ${floatBar ? 'translate-y-0' : 'translate-y-full'}`}
+          aria-hidden={!floatBar}
+        >
+          <div className="container flex items-center gap-3 py-2.5">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-[#0F2952] truncate m-0">{product.brand} · {product.title}</p>
+              <p className="text-[15px] font-bold text-[#0F2952] m-0" style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}>
+                {fmtKM(product.price)}
+                {product.old && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>{fmtKM(product.old)}</span>}
+              </p>
+            </div>
+            <button
+              className={`shrink-0 flex items-center gap-2 px-6 py-3 text-[11px] font-bold tracking-[0.1em] uppercase border-0 ${
+                outOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0F2952] text-white hover:bg-[#0A1F42] cursor-pointer'
+              }`}
+              onClick={handleAdd}
+              disabled={outOfStock}
+            >
+              <ShoppingCart size={15} weight="fill" />
+              {outOfStock ? 'Nema na stanju' : 'Dodaj u korpu'}
+            </button>
+          </div>
+        </div>
+
       </main>
     </>
+  )
+}
+
+/** Tabovi: Opis / Način upotrebe / Sastav / Nutritivne vrijednosti */
+function DescriptionTabs({ product }) {
+  const tabs = [
+    { key: 'opis',      label: 'Opis',                    content: product.description },
+    { key: 'upotreba',  label: 'Način upotrebe',          content: product.usage },
+    { key: 'sastav',    label: 'Sastav',                  content: product.composition },
+    { key: 'nutritivne',label: 'Nutritivne vrijednosti',  content: product.nutrition },
+  ].filter((t) => t.content)
+  const [active, setActive] = useState(tabs[0]?.key)
+
+  if (tabs.length === 0) return null
+  const current = tabs.find((t) => t.key === active) || tabs[0]
+
+  return (
+    <section className="py-10 bg-white border-t border-gray-200" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+      <div className="container max-w-[860px]">
+        <div className="flex border-b border-gray-200 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              className={`shrink-0 px-5 py-3 text-[11px] font-bold tracking-[0.1em] uppercase bg-transparent border-0 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
+                t.key === current.key
+                  ? 'border-[#0F2952] text-[#0F2952]'
+                  : 'border-transparent text-gray-400 hover:text-[#0F2952]'
+              }`}
+              onClick={() => setActive(t.key)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="pt-6 text-[13px] text-gray-600 leading-relaxed whitespace-pre-line">
+          {current.content}
+        </div>
+      </div>
+    </section>
   )
 }
