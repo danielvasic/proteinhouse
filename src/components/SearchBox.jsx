@@ -193,8 +193,11 @@ export default function SearchBox({ onNavigate }) {
         </button>
 
         {open && (
-          <div className="fixed inset-0 z-[100] bg-black/60 flex flex-col p-3 pt-4" style={{ fontFamily: FONT }}>
-            <div className="bg-white rounded-2xl flex flex-col min-h-0 max-h-[82vh] overflow-hidden shadow-2xl">
+          <div
+            className="fixed inset-x-0 top-0 z-[100] bg-black/60 flex flex-col p-3 pt-4"
+            style={{ fontFamily: FONT, height: '100dvh', paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
+          >
+            <div className="bg-white rounded-2xl flex flex-col min-h-0 overflow-hidden shadow-2xl">
               <form className="flex items-center gap-2.5 px-4 py-3.5 border-b border-gray-100" onSubmit={submit}>
                 <MagnifyingGlass size={18} className="text-gray-500 shrink-0" />
                 <input
@@ -217,7 +220,7 @@ export default function SearchBox({ onNavigate }) {
 
             <button
               type="button"
-              className="mx-auto mt-5 w-14 h-14 rounded-full bg-white border-0 flex items-center justify-center shadow-xl cursor-pointer shrink-0"
+              className="mx-auto mt-4 mb-1 w-14 h-14 rounded-full bg-white border-0 flex items-center justify-center shadow-xl cursor-pointer shrink-0"
               onClick={close}
               aria-label="Zatvori pretragu"
             >

@@ -30,9 +30,12 @@ export default function CookieConsent() {
       role="dialog"
       aria-label="Postavke kolačića"
     >
-      <div className="container py-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <p className="text-[12px] text-gray-600 leading-snug m-0 flex-1">
+      <div
+        className="container py-5"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <p className="text-[13px] text-gray-600 leading-relaxed m-0 flex-1">
             Koristimo kolačiće za bolje iskustvo kupovine i analitiku.{' '}
             <button
               className="inline-flex items-center gap-0.5 text-[#0F2952] font-semibold underline underline-offset-2 bg-transparent border-0 p-0 cursor-pointer"
@@ -41,15 +44,15 @@ export default function CookieConsent() {
               Više informacija {more ? <CaretUp size={10} /> : <CaretDown size={10} />}
             </button>
           </p>
-          <div className="flex gap-2 shrink-0">
+          <div className="flex gap-3 shrink-0">
             <button
-              className="flex-1 sm:flex-none px-5 py-2.5 border border-gray-300 text-gray-500 bg-transparent text-[11px] font-bold tracking-[0.1em] uppercase hover:border-gray-400 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-gray-500 bg-transparent text-[11px] font-bold tracking-[0.1em] uppercase hover:border-gray-400 transition-colors cursor-pointer"
               onClick={() => decide('declined')}
             >
               Odbij
             </button>
             <button
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-[#0F2952] text-white border-0 text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0A1F42] transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-7 py-3 bg-[#0F2952] text-white border-0 text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0A1F42] transition-colors cursor-pointer"
               onClick={() => decide('accepted')}
             >
               Prihvati

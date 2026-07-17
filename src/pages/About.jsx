@@ -78,10 +78,7 @@ export default function About() {
         {stats.length > 0 && (
           <section className="bg-[#0F2952] py-12 md:py-16">
             <div className="container">
-              <div
-                className="grid gap-px bg-white/10"
-                style={{ gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)` }}
-              >
+              <div className={`grid grid-cols-2 gap-px bg-white/10 ${{ 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' }[stats.length] || 'md:grid-cols-4'}`}>
                 {stats.map((s) => (
                   <div key={s.label} className="bg-[#0F2952] flex flex-col items-center justify-center py-10 px-6 text-center">
                     <span
