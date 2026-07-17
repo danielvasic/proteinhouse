@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MagnifyingGlass, X, ArrowRight } from '@phosphor-icons/react'
-import { useAllProducts, rankBestsellers } from '../hooks/useProducts'
+import { useAllProducts, rankBestsellers, hasAnyStock } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
 import { fmtKM } from '../data/catalog'
 
@@ -22,10 +22,13 @@ function useIsMobile() {
 /** Prijedlozi: bez kucanja popularni proizvodi + top kategorije,
  *  s kucanjem pogođeni proizvodi + kategorije pogodaka s brojem. */
 function useSuggestions(query) {
-  const { products }   = useAllProducts()
-  const { categories } = useCategories()
+  const { products: all } = useAllProducts()
+  const { categories }    = useCategories()
   const q     = query.trim().toLowerCase()
   const typed = q.length >= 2
+
+  // Prijedlozi nude samo ono što ima na stanju
+  const products = useMemo(() => all.filter(hasAnyStock), [all])
 
   const matches = useMemo(() => {
     if (!typed) return []

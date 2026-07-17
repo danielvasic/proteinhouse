@@ -12,12 +12,27 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase, getProductImageUrl } from '../lib/supabase'
 
+/**
+ * Ako naziv počinje imenom brenda, skini ga iz prikaza — brend se prikazuje
+ * zasebno pa se ne ponavlja ("mars" pravilo iz redizajn dokumenta).
+ */
+function displayTitle(brand, title) {
+  if (!brand || !title) return title
+  const b = brand.trim()
+  const t = title.trim()
+  if (t.toLowerCase().startsWith(b.toLowerCase())) {
+    const stripped = t.slice(b.length).replace(/^[\s\-–—:,·]+/, '')
+    if (stripped) return stripped
+  }
+  return t
+}
+
 /** Normalise a DB row */
 function norm(p) {
   return {
     id:             p.id,
     brand:          p.brand,
-    title:          p.title,
+    title:          displayTitle(p.brand, p.title),
     slug:           p.slug,
     price:          Number(p.price),
     old:            p.old_price ? Number(p.old_price) : null,

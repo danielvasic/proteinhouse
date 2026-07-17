@@ -62,7 +62,6 @@ export default function Home() {
       <main>
         <HeroBanner />
         <QuickCategories />
-        <PromoStrip />
         {(bestsellers.length > 0 || !loading) && (
           <ProductGrid
             title={data.carousel_bestsellers_title}
@@ -81,6 +80,7 @@ export default function Home() {
           />
         )}
         <CategoryStrip />
+        <PromoStrip />
         <BrandStrip />
       </main>
     </>
