@@ -28,10 +28,28 @@ function norm(p) {
     flavors:        Array.isArray(p.flavors) ? p.flavors : [],
     sizes:          Array.isArray(p.sizes)   ? p.sizes   : [],
     rating:         p.rating  ?? null,
-    reviews:        p.reviews ?? 0,
+    reviews:        p.reviews ?? p.review_count ?? 0,
     stock:          p.stock          ?? 0,
     stock_variants: p.stock_variants ?? {},
+    tags:           Array.isArray(p.tags) ? p.tags : [],
+    sales:          p.sales_count ?? 0,
+    usage:          p.usage_instructions || '',
+    composition:    p.composition || '',
+    nutrition:      p.nutrition_info || '',
   }
+}
+
+/**
+ * Bestselleri — ručno tagovani ('bestseller') idu prvi, ostatak po broju
+ * prodaja (sales_count iz narudžbi). Koristi se na homepage-u i u searchu.
+ */
+export function rankBestsellers(products, limit = 4) {
+  const tagged = products.filter((p) => p.tags.includes('bestseller'))
+  const rest   = products
+    .filter((p) => !p.tags.includes('bestseller'))
+    .slice()
+    .sort((a, b) => b.sales - a.sales)
+  return [...tagged, ...rest].slice(0, limit)
 }
 
 /** Get stock for a specific variant combination */

@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { hasAnyStock } from '../hooks/useProducts'
+
+const TAG_LABELS = { bestseller: 'BEST BUY', new: 'NOVO', gainer: 'GAINER' }
 
 function stickerTilt(id) {
   const seed = String(id)
@@ -16,10 +19,11 @@ export default function ProductCard({ product }) {
   const { addItem } = useCart()
   const [hover, setHover] = useState(false)
 
-  const { id, slug, brand, title, price, old, img, badge } = product
+  const { id, slug, brand, title, price, old, img, badge, rating, reviews, tags = [] } = product
   const isDiscount   = badge && badge.startsWith('-')
   const tilt         = useMemo(() => stickerTilt(id), [id])
   const inStock      = hasAnyStock(product)
+  const tagChip      = tags.map((t) => TAG_LABELS[t] || t.toUpperCase()).find((t) => t !== badge)
 
   return (
     <article
@@ -51,6 +55,13 @@ export default function ProductCard({ product }) {
         </div>
       )}
 
+      {/* Tag chip (bestseller, new, gainer…) */}
+      {tagChip && (
+        <div className={`absolute left-3 z-10 px-2 py-0.5 bg-[#0F2952] text-white text-[9px] font-bold tracking-[0.1em] uppercase ${badge ? 'top-[68px]' : 'top-3'}`}>
+          {tagChip}
+        </div>
+      )}
+
       {/* Out of stock overlay */}
       {!inStock && (
         <div className="absolute top-3 right-3 z-10 px-2 py-0.5 bg-gray-800/80 text-white text-[10px] font-bold tracking-[0.1em] uppercase">
@@ -58,12 +69,12 @@ export default function ProductCard({ product }) {
         </div>
       )}
 
-      {/* Image */}
-      <div className="relative bg-gray-50 overflow-hidden" style={{ paddingBottom: '72%' }}>
+      {/* Image — bijela, čista podloga (Elit stil) */}
+      <div className="relative bg-white overflow-hidden" style={{ paddingBottom: '72%' }}>
         <img
           src={img}
           alt={title}
-          className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ${hover ? 'scale-105' : 'scale-100'}`}
+          className={`absolute inset-0 w-full h-full object-contain p-3 transition-transform duration-500 ${hover ? 'scale-105' : 'scale-100'}`}
           loading="lazy"
           width={300}
           height={216}
@@ -79,11 +90,26 @@ export default function ProductCard({ product }) {
           {brand}
         </p>
         <p
-          className="text-[13px] font-semibold text-[#0F2952] leading-snug line-clamp-2 mb-3"
+          className="text-[13px] font-semibold text-[#0F2952] leading-snug line-clamp-2 mb-2"
           style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
         >
           {title}
         </p>
+
+        {/* Zvjezdice — samo verificirane recenzije kupaca */}
+        {reviews > 0 && rating > 0 && (
+          <div className="flex items-center gap-1 mb-2" aria-label={`Ocjena ${rating} od 5`}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                size={11}
+                weight={i < Math.round(rating) ? 'fill' : 'regular'}
+                color={i < Math.round(rating) ? '#0F2952' : '#D1D5DB'}
+              />
+            ))}
+            <span className="text-[10px] text-gray-400 ml-0.5">({reviews})</span>
+          </div>
+        )}
 
         <div className="mt-auto">
           <div className="flex items-baseline gap-2 mb-3">

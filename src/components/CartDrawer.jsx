@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShoppingBag, X } from '@phosphor-icons/react'
+import { ShoppingCart, X } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 
@@ -60,7 +60,7 @@ export default function CartDrawer() {
         <div className="flex-1 overflow-y-auto">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-center py-16 px-6">
-              <ShoppingBag size={44} color="#D1D5DB" weight="thin" />
+              <ShoppingCart size={44} color="#D1D5DB" weight="thin" />
               <div>
                 <p className="text-[13px] font-semibold text-[#0F2952] mb-1">Korpa je prazna</p>
                 <p className="text-[12px] text-gray-400">Dodajte proizvode iz naše ponude</p>

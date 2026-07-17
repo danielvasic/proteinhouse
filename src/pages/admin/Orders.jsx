@@ -9,11 +9,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
 import { cn } from '../../lib/utils'
 
-const STATUSES = ['nova', 'potvrđena', 'isporučena', 'otkazana']
+// Statusi praćenja pošiljke: nova (zaprimljena) → u_obradi → poslano → isporučena
+const STATUSES = ['nova', 'u_obradi', 'poslano', 'isporučena', 'otkazana']
 
 const STATUS_BADGE = {
   'nova':       'info',
-  'potvrđena':  'warning',
+  'u_obradi':   'warning',
+  'poslano':    'secondary',
   'isporučena': 'emerald',
   'otkazana':   'destructive',
 }

@@ -16,6 +16,8 @@ const EMPTY = {
   description: '', category: 'proteini', image_url: '', image_path: '',
   badge: '', is_active: true, flavors: [], sizes: [], sort_order: 0,
   stock: 0, stock_variants: {},
+  internal_title: '', tags: [],
+  usage_instructions: '', composition: '', nutrition_info: '',
 }
 
 function slugify(str) {
@@ -205,6 +207,11 @@ export default function ProductEdit() {
         image_url:      data.image_url      ?? '',
         stock:          data.stock          ?? 0,
         stock_variants: data.stock_variants ?? {},
+        internal_title:     data.internal_title     ?? '',
+        tags:               data.tags               ?? [],
+        usage_instructions: data.usage_instructions ?? '',
+        composition:        data.composition        ?? '',
+        nutrition_info:     data.nutrition_info     ?? '',
       })
       setLoading(false)
     })
@@ -300,8 +307,11 @@ export default function ProductEdit() {
             <Field label="Brend *">
               <Input value={form.brand} onChange={set('brand')} required placeholder="npr. OPTIMUM NUTRITION" />
             </Field>
-            <Field label="Naziv *">
+            <Field label="Naziv (za kupce) *" hint="Prikazuje se na shopu — piši puno ime brenda (Optimum Nutrition, ne ON)">
               <Input value={form.title} onChange={set('title')} required placeholder="npr. Gold Standard Whey 2kg" />
+            </Field>
+            <Field label="Interni naziv (ERP)" hint="Za lakše praćenje u sistemu — kupci ga ne vide">
+              <Input value={form.internal_title} onChange={set('internal_title')} placeholder="npr. ON GSW 2KG CHOC" />
             </Field>
             <Field label="Slug (URL) *" hint="Auto-generisan iz naziva">
               <Input value={form.slug} onChange={set('slug')} required placeholder="gold-standard-whey-2kg" />
@@ -337,6 +347,30 @@ export default function ProductEdit() {
             <Field label="Redosljed prikaza">
               <Input type="number" value={form.sort_order} onChange={set('sort_order')} />
             </Field>
+            <div className="md:col-span-2 flex items-center justify-between border rounded-lg px-4 py-3 bg-gray-50">
+              <div>
+                <p className="font-medium text-sm">⭐ Bestseller</p>
+                <p className="text-xs text-muted-foreground">
+                  Ručno gurni proizvod među bestsellere na početnoj (inače se rangira automatski po prodaji)
+                </p>
+              </div>
+              <Switch
+                checked={form.tags.includes('bestseller')}
+                onCheckedChange={(v) => setForm((f) => ({
+                  ...f,
+                  tags: v ? [...new Set([...f.tags, 'bestseller'])] : f.tags.filter((t) => t !== 'bestseller'),
+                }))}
+              />
+            </div>
+            <div className="md:col-span-2 space-y-2">
+              <p className="text-sm font-medium text-gray-700">Tagovi</p>
+              <TagEditor
+                value={form.tags}
+                onChange={(v) => setForm((f) => ({ ...f, tags: v }))}
+                placeholder="npr. new, gainer, best buy…"
+                hint="Enter za dodavanje — prikazuju se kao oznake na kartici proizvoda"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -415,13 +449,24 @@ export default function ProductEdit() {
           </CardContent>
         </Card>
 
-        {/* ── Opis ── */}
+        {/* ── Opis (tabovi na stranici proizvoda) ── */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Opis</CardTitle>
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Opis proizvoda</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Textarea value={form.description} onChange={set('description')} rows={4} placeholder="Kratak opis proizvoda…" />
+          <CardContent className="space-y-4">
+            <Field label="Opis">
+              <Textarea value={form.description} onChange={set('description')} rows={4} placeholder="Kratak opis proizvoda…" />
+            </Field>
+            <Field label="Način upotrebe" hint="Prikazuje se kao poseban tab (Ostrovit stil)">
+              <Textarea value={form.usage_instructions} onChange={set('usage_instructions')} rows={3} placeholder="npr. Pomiješajte 1 mjericu (30g) s 250ml vode…" />
+            </Field>
+            <Field label="Sastav">
+              <Textarea value={form.composition} onChange={set('composition')} rows={3} placeholder="Sastojci proizvoda…" />
+            </Field>
+            <Field label="Nutritivne vrijednosti">
+              <Textarea value={form.nutrition_info} onChange={set('nutrition_info')} rows={4} placeholder="Na 100g / po porciji…" />
+            </Field>
           </CardContent>
         </Card>
 
