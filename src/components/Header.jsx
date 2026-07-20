@@ -151,24 +151,25 @@ export default function Header() {
           onMouseLeave={scheduleClose}
           aria-hidden={!shopOpen}
         >
-          <div className="mx-auto w-full max-w-[1280px] px-8 md:px-12 lg:px-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-10 lg:gap-x-14 gap-y-8 py-8 pb-10">
+          <div className="mx-auto w-full max-w-[1280px] px-8 md:px-10 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-7 gap-y-5 py-5">
             {categories.map((c) => {
               const Icon = CAT_ICONS[c.slug] || Tag
+              const subs = c.subs?.slice(0, 5) ?? []
               return (
                 <div key={c.slug}>
                   <button
-                    className="flex items-center gap-1.5 w-full text-left pb-3.5 mb-5 border-b border-gray-200 font-bold text-[13px] tracking-[0.06em] uppercase bg-transparent border-x-0 border-t-0 cursor-pointer transition-colors duration-150 text-[#0F2952] hover:text-[#0A1F42]"
+                    className="flex items-center gap-1.5 w-full text-left pb-2 mb-2.5 border-b border-gray-200 font-bold text-[12px] tracking-[0.05em] uppercase bg-transparent border-x-0 border-t-0 cursor-pointer transition-colors duration-150 text-[#0F2952] hover:text-[#0A1F42]"
                     style={{ fontFamily: 'Oswald, Impact, sans-serif' }}
                     onClick={() => { navigate(`/kategorija/${c.slug}`); setShopOpen(false) }}
                   >
-                    <Icon size={13} weight="bold" /> {c.label}
+                    <Icon size={12} weight="bold" /> {c.label}
                   </button>
-                  {c.subs?.length > 0 && (
-                    <ul className="flex flex-col gap-2.5 p-0 m-0 list-none">
-                      {c.subs.map((s) => (
+                  {subs.length > 0 && (
+                    <ul className="flex flex-col gap-1.5 p-0 m-0 list-none">
+                      {subs.map((s) => (
                         <li
                           key={s}
-                          className="text-[12px] text-gray-500 cursor-pointer hover:text-[#0F2952] transition-colors duration-150 leading-snug"
+                          className="text-[11.5px] text-gray-500 cursor-pointer hover:text-[#0F2952] transition-colors duration-150 leading-snug"
                           onClick={() => { navigate(`/kategorija/${c.slug}`); setShopOpen(false) }}
                           role="button" tabIndex={0}
                           onKeyDown={(e) => e.key === 'Enter' && navigate(`/kategorija/${c.slug}`)}
@@ -176,6 +177,16 @@ export default function Header() {
                           {s}
                         </li>
                       ))}
+                      {c.subs.length > 5 && (
+                        <li
+                          className="text-[11px] font-semibold text-[#0F2952] cursor-pointer hover:underline leading-snug"
+                          onClick={() => { navigate(`/kategorija/${c.slug}`); setShopOpen(false) }}
+                          role="button" tabIndex={0}
+                          onKeyDown={(e) => e.key === 'Enter' && navigate(`/kategorija/${c.slug}`)}
+                        >
+                          Sve →
+                        </li>
+                      )}
                     </ul>
                   )}
                 </div>
@@ -184,7 +195,7 @@ export default function Header() {
           </div>
 
           <div className="bg-gray-50 border-t border-gray-200">
-            <div className="mx-auto w-full max-w-[1280px] px-8 md:px-12 lg:px-16 flex items-center gap-2.5 py-5 flex-wrap">
+            <div className="mx-auto w-full max-w-[1280px] px-8 md:px-10 flex items-center gap-2.5 py-3 flex-wrap">
               <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400">BRZI PREČAC:</span>
               {[
                 { label: 'AKCIJA −70%', to: '/kategorija/akcija', Icon: Tag },

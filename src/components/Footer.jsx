@@ -86,7 +86,7 @@ export default function Footer() {
       style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
     >
       <div className="container">
-        <div className={`grid grid-cols-2 ${mdGridCls} gap-8 py-14 md:py-16`}>
+        <div className={`grid grid-cols-2 ${mdGridCls} gap-x-8 gap-y-8 py-10 md:py-12`}>
 
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
@@ -125,11 +125,11 @@ export default function Footer() {
           {cols.map((col, ci) => (
             <div key={col.heading || ci}>
               {col.heading && (
-                <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 mb-5">
+                <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 mb-3.5">
                   {col.heading}
                 </h4>
               )}
-              <ul className="flex flex-col gap-3 list-none p-0 m-0">
+              <ul className="flex flex-col gap-2 list-none p-0 m-0">
                 {(col.links ?? []).map((l, li) => (
                   <li key={l.label || li}>
                     {l.to?.startsWith('http') ? (
@@ -160,7 +160,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/8">
-        <div className="container flex flex-col sm:flex-row items-center justify-between gap-2 py-5 pb-8 md:pb-10">
+        <div className="container flex flex-col sm:flex-row items-center justify-between gap-2 py-4 pb-6">
           <span className="text-[11px] text-white/30">
             © {new Date().getFullYear()} ProteinHouse d.o.o. Sva prava zadržana.
           </span>

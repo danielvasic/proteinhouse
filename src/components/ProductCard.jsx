@@ -3,9 +3,26 @@ import { useNavigate } from 'react-router-dom'
 import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
-import { hasAnyStock } from '../hooks/useProducts'
+import { hasAnyStock, getVariantStock } from '../hooks/useProducts'
 
 const TAG_LABELS = { bestseller: 'BEST BUY', new: 'NOVO', gainer: 'GAINER' }
+
+/** Kompaktan select za varijante na kartici (okus / gramaža) */
+function VariantSelect({ label, options, value, onChange }) {
+  if (!options || options.length === 0) return null
+  return (
+    <select
+      className="flex-1 min-w-0 h-9 px-2 border border-gray-200 bg-gray-50 text-[11px] font-semibold text-[#0F2952] cursor-pointer focus:outline-none focus:border-[#0F2952] transition-colors"
+      value={value ?? ''}
+      onChange={(e) => onChange(e.target.value)}
+      onClick={(e) => e.stopPropagation()}
+      aria-label={label}
+      style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+    >
+      {options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+    </select>
+  )
+}
 
 function stickerTilt(id) {
   const seed = String(id)
@@ -19,11 +36,18 @@ export default function ProductCard({ product }) {
   const { addItem } = useCart()
   const [hover, setHover] = useState(false)
 
-  const { id, slug, brand, title, price, old, img, badge, rating, reviews, tags = [] } = product
+  const { id, slug, brand, title, price, old, img, badge, rating, reviews, tags = [], flavors = [], sizes = [] } = product
   const isDiscount   = badge && badge.startsWith('-')
   const tilt         = useMemo(() => stickerTilt(id), [id])
   const inStock      = hasAnyStock(product)
   const tagChip      = tags.map((t) => TAG_LABELS[t] || t.toUpperCase()).find((t) => t !== badge)
+
+  // Izbor okusa/gramaže direktno na kartici — default prva opcija
+  const [flavor, setFlavor] = useState(flavors[0] ?? null)
+  const [size,   setSize]   = useState(sizes[0] ?? null)
+  const hasVariants   = flavors.length > 0 || sizes.length > 0
+  const variantStock  = hasVariants ? getVariantStock(product, flavor, size) : (product.stock ?? 0)
+  const canAdd        = inStock && (!hasVariants || variantStock > 0)
 
   return (
     <article
@@ -70,19 +94,19 @@ export default function ProductCard({ product }) {
       )}
 
       {/* Image — bijela, čista podloga (Elit stil) */}
-      <div className="relative bg-white overflow-hidden" style={{ paddingBottom: '72%' }}>
+      <div className="relative bg-white overflow-hidden" style={{ paddingBottom: '78%' }}>
         <img
           src={img}
           alt={title}
-          className={`absolute inset-0 w-full h-full object-contain p-3 transition-transform duration-500 ${hover ? 'scale-105' : 'scale-100'}`}
+          className={`absolute inset-0 w-full h-full object-contain p-5 transition-transform duration-500 ${hover ? 'scale-105' : 'scale-100'}`}
           loading="lazy"
           width={300}
-          height={216}
+          height={234}
         />
       </div>
 
       {/* Body */}
-      <div className="flex flex-col flex-1 p-4">
+      <div className="flex flex-col flex-1 p-4 md:p-5 pt-3">
         <p
           className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-1"
           style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
@@ -112,24 +136,32 @@ export default function ProductCard({ product }) {
         )}
 
         <div className="mt-auto">
+          {/* Varijante — odmah na kartici */}
+          {hasVariants && (
+            <div className="flex gap-2 mb-3" onClick={(e) => e.stopPropagation()}>
+              <VariantSelect label="Okus"    options={flavors} value={flavor} onChange={setFlavor} />
+              <VariantSelect label="Gramaža" options={sizes}   value={size}   onChange={setSize} />
+            </div>
+          )}
+
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-base font-extrabold text-[#0F2952]">{fmtKM(price)}</span>
+            <span className="text-[17px] font-extrabold text-[#0F2952]">{fmtKM(price)}</span>
             {old && (
               <span className="text-xs text-gray-400 line-through font-normal">{fmtKM(old)}</span>
             )}
           </div>
           <button
-            className={`w-full py-2.5 text-[11px] font-bold tracking-[0.1em] uppercase transition-all duration-150 ${
-              inStock
+            className={`w-full py-3 text-[11px] font-bold tracking-[0.1em] uppercase transition-all duration-150 ${
+              canAdd
                 ? 'border border-[#0F2952] text-[#0F2952] bg-transparent hover:bg-[#0F2952] hover:text-white cursor-pointer'
                 : 'border border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed'
             }`}
-            onClick={(e) => { e.stopPropagation(); if (inStock) addItem(product) }}
+            onClick={(e) => { e.stopPropagation(); if (canAdd) addItem({ ...product, selectedFlavor: flavor, selectedSize: size }) }}
             aria-label={`Dodaj ${title} u korpu`}
-            disabled={!inStock}
+            disabled={!canAdd}
             style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
           >
-            {inStock ? 'Dodaj u korpu' : 'Nema na stanju'}
+            {canAdd ? 'Dodaj u korpu' : 'Nema na stanju'}
           </button>
         </div>
       </div>
