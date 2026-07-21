@@ -78,32 +78,31 @@ const BRAND_PREFIX = ['ON', 'OST', 'BSN', 'BF', 'SW', 'MUTANT', 'PG', 'AN', 'MT'
 
 const UNIT_RE = /^(g|kg|ml|l|caps|tabs|serv|servings|softgels)$/i
 
-/** "ON GOLD WHEY 30 g double rich chocolate" → { base: "Gold Whey 30g", flavor: "Double Rich Chocolate" } */
+const ACRONYMS = new Set(['BCAA', 'EAA', 'CLA', 'ZMA', 'HMB', 'NO', 'L-CARNITINE'])
+const titleCase = (s) => s.replace(/\S+/g, (w) => {
+  if (ACRONYMS.has(w.toUpperCase().replace(/[^A-Z-]/g, ''))) return w.toUpperCase()
+  return /^[\d.,]/.test(w) ? w : w[0].toUpperCase() + w.slice(1).toLowerCase()
+})
+
+/**
+ * "ON GOLD WHEY 30 g double rich chocolate"
+ *   → { base: "Gold Whey", size: "30g", flavor: "Double Rich Chocolate" }
+ * Base je BEZ gramaze i okusa — po njemu se agregiraju varijante.
+ */
 function parseName(naziv, brand) {
-  let tokens = naziv.trim().split(/\s+/)
-  if (BRAND_PREFIX.includes(tokens[0]) || tokens[0].toLowerCase() === brand.split(' ')[0].toLowerCase()) {
-    tokens = tokens.slice(1)
+  let t = naziv.trim().split(/\s+/)
+  if (BRAND_PREFIX.includes(t[0]) || t[0].toLowerCase() === brand.split(' ')[0].toLowerCase()) t = t.slice(1)
+  let si = -1
+  for (let i = 0; i < t.length - 1; i++) {
+    if (/^[\d.,]+$/.test(t[i]) && UNIT_RE.test(t[i + 1])) { si = i; break }
   }
-  // nadji zadnji unit token — sve poslije njega je okus
-  let unitIdx = -1
-  for (let i = tokens.length - 1; i > 0; i--) {
-    if (UNIT_RE.test(tokens[i]) && /^[\d.,]+$/.test(tokens[i - 1] ?? '')) { unitIdx = i; break }
-    if (UNIT_RE.test(tokens[i]) && !UNIT_RE.test(tokens[i - 1] ?? '')) { unitIdx = i }
-  }
-  let base = tokens, flavor = null
-  if (unitIdx >= 0 && unitIdx < tokens.length - 1) {
-    base   = tokens.slice(0, unitIdx + 1)
-    flavor = tokens.slice(unitIdx + 1).join(' ')
-  }
-  // "30 g" → "30g", Title Case (akronimi ostaju velikim slovima)
-  const ACRONYMS = new Set(['BCAA', 'EAA', 'CLA', 'ZMA', 'HMB', 'NO', 'L-CARNITINE'])
-  const titleCase = (s) => s.replace(/\S+/g, (w) => {
-    if (ACRONYMS.has(w.toUpperCase().replace(/[^A-Z-]/g, ''))) return w.toUpperCase()
-    return /^[\d.,]/.test(w) ? w : w[0].toUpperCase() + w.slice(1).toLowerCase()
-  })
+  if (si < 0) return { base: titleCase(t.join(' ')), size: null, flavor: null }
+  const unit = t[si + 1].toLowerCase()
+  const size = /^(g|kg|ml|l)$/.test(unit) ? t[si] + unit : `${t[si]} ${unit}`
   return {
-    base:   titleCase(base.join(' ').replace(/([\d.,]+)\s+(g|kg|ml|l)\b/gi, '$1$2')),
-    flavor: flavor ? titleCase(flavor) : null,
+    base:   titleCase(t.slice(0, si).join(' ')),
+    size,
+    flavor: si + 2 < t.length ? titleCase(t.slice(si + 2).join(' ')) : null,
   }
 }
 
@@ -136,63 +135,88 @@ async function main() {
   const raw = SIFRE.map((s) => all.find((x) => x.sifraArtikla === s)).filter(Boolean)
   console.log(`   ${raw.length}/${SIFRE.length} artikala pronadjeno`)
 
-  // ── Spoji okuse istog proizvoda u jedan (flavors + stock_variants) ────────
+  // ── Agregiraj varijante (okus + gramaza) istog proizvoda u jedan ──────────
   const groups = new Map()
   for (const a of raw) {
     const brand = a.nazivProizvodjaca || 'ProteinHouse'
-    const { base, flavor } = parseName(a.nazivArtikla, brand)
-    const key = `${brand}|${base}`
-    if (!groups.has(key)) groups.set(key, { brand, base, variants: [] })
-    groups.get(key).variants.push({ ...a, flavor })
+    const parsed = parseName(a.nazivArtikla, brand)
+    const key = `${brand}|${parsed.base}`
+    if (!groups.has(key)) groups.set(key, { brand, base: parsed.base, variants: [] })
+    groups.get(key).variants.push({ ...a, ...parsed })
   }
 
+  const QTY = 25   // testno stanje po varijanti
   const products = []
   let sort = 1
   for (const { brand, base, variants } of groups.values()) {
-    const first    = variants[0]
-    const price    = first.cijenaHH > 0 && first.cijenaHH < first.cijena ? first.cijenaHH : first.cijena
-    const oldPrice = first.cijenaHH > 0 && first.cijenaHH < first.cijena ? first.cijena : null
+    // najjeftinija varijanta odredjuje cijenu/popust
+    const priced = variants
+      .map((v) => ({ v, p: v.cijenaHH > 0 && v.cijenaHH < v.cijena ? v.cijenaHH : v.cijena }))
+      .sort((a, b) => a.p - b.p)
+    const cheap    = priced[0].v
+    const price    = priced[0].p
+    const oldPrice = cheap.cijenaHH > 0 && cheap.cijenaHH < cheap.cijena ? cheap.cijena : null
     const badge    = oldPrice ? `-${Math.round((1 - price / oldPrice) * 100)}%` : null
-    const flavors  = variants.map((v) => v.flavor).filter(Boolean)
-    const { description, usage } = splitUsage(stripHtml(first.opisArtikla))
+    const flavors  = [...new Set(variants.map((v) => v.flavor).filter(Boolean))]
+    const sizes    = [...new Set(variants.map((v) => v.size).filter(Boolean))]
+    const { description, usage } = splitUsage(stripHtml(variants[0].opisArtikla))
     const tags = []
     if (variants.some((v) => v.isTopProizvod)) tags.push('bestseller')
     if (variants.some((v) => v.isNoviProizvod)) tags.push('new')
 
+    // stock_variants: puna matrica okus × gramaza (kljuc "okus|gramaza" kao u appu)
+    const skuFor = (f, s) => (
+      variants.find((v) => v.flavor === f && v.size === s) ||
+      variants.find((v) => v.flavor === f) ||
+      variants.find((v) => v.size === s) ||
+      variants[0]
+    ).sifraArtikla
     const stockVariants = {}
-    if (flavors.length > 0) {
-      variants.forEach((v) => { if (v.flavor) stockVariants[v.flavor] = { qty: 25, sku: v.sifraArtikla } })
+    let stock = 0
+    if (flavors.length && sizes.length) {
+      flavors.forEach((f) => sizes.forEach((s) => { stockVariants[`${f}|${s}`] = { qty: QTY, sku: skuFor(f, s) } }))
+    } else if (flavors.length) {
+      flavors.forEach((f) => { stockVariants[f] = { qty: QTY, sku: skuFor(f, null) } })
+    } else if (sizes.length > 1) {
+      sizes.forEach((s) => { stockVariants[s] = { qty: QTY, sku: skuFor(null, s) } })
+    } else {
+      stock = QTY
     }
+    // jedina gramaza bez okusa → gramaza ide u naziv, bez selecta
+    const single = sizes.length === 1 && flavors.length === 0
+    const title  = single ? `${base} ${sizes[0]}` : base
+    const sizesOut = single ? [] : sizes
 
     products.push({
       brand,
-      title:          base,
+      title,
       slug:           slugify(`${brand} ${base}`),
       price,
       old_price:      oldPrice,
       badge,
-      category:       CAT_MAP[first.nazivGrupe] || 'proteini',
+      category:       CAT_MAP[variants[0].nazivGrupe] || 'proteini',
       description,
       usage_instructions: usage,
       flavors,
-      sizes:          [],
-      stock:          flavors.length > 0 ? 0 : 25,
+      sizes:          sizesOut,
+      stock,
       stock_variants: stockVariants,
-      internal_title: first.nazivArtikla,
-      erp_sku:        first.sifraArtikla,
+      internal_title: variants[0].nazivArtikla,
+      erp_sku:        variants[0].sifraArtikla,
       tags,
       rating:         0,
       is_active:      true,
       sort_order:     sort++,
-      _slikaPath:     first.slikaPath,
+      _slikaPath:     variants[0].slikaPath,
     })
   }
 
-  console.log(`\n📦  ${products.length} proizvoda nakon spajanja okusa:\n`)
+  console.log(`\n📦  ${products.length} proizvoda nakon agregacije (okus × gramaza):\n`)
   products.forEach((p) => console.log(
     `   ${p.brand.padEnd(18)} ${p.title.padEnd(34)} ${String(p.price).padStart(7)} KM` +
     (p.old_price ? ` (bilo ${p.old_price})` : '') +
-    (p.flavors.length ? `  okusi: ${p.flavors.join(', ')}` : '')
+    (p.flavors.length ? `  okusi: ${p.flavors.join('/')}` : '') +
+    (p.sizes.length ? `  gramaze: ${p.sizes.join('/')}` : '')
   ))
 
   if (DRY) { console.log('\n🏁  Dry-run — nista nije pisano.'); return }

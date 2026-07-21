@@ -5,7 +5,7 @@ import ProductCard from './ProductCard'
 /**
  * Sekcija proizvoda u gridu: 2 pokraj 2 na mobilnom (2+2), max 4 proizvoda.
  */
-export default function ProductGrid({ title, eyebrow, products, categorySlug, max = 4 }) {
+export default function ProductGrid({ title, eyebrow, products, categorySlug, max = 4, bestseller = false }) {
   const items = products.slice(0, max)
   if (items.length === 0) return null
 
@@ -35,7 +35,7 @@ export default function ProductGrid({ title, eyebrow, products, categorySlug, ma
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-5">
-          {items.map((p) => <ProductCard key={p.id} product={p} />)}
+          {items.map((p) => <ProductCard key={p.id} product={p} bestseller={bestseller} />)}
         </div>
 
         {categorySlug && (

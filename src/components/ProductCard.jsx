@@ -5,7 +5,7 @@ import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { hasAnyStock, getVariantStock } from '../hooks/useProducts'
 
-const TAG_LABELS = { bestseller: 'BEST BUY', new: 'NOVO', gainer: 'GAINER' }
+const TAG_LABELS = { bestseller: 'BESTSELLER', new: 'NOVO', gainer: 'GAINER' }
 
 /** Kompaktan select za varijante na kartici (okus / gramaža) */
 function VariantSelect({ label, options, value, onChange }) {
@@ -31,7 +31,7 @@ function stickerTilt(id) {
   return ((seed % 11) - 5) - 4
 }
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, bestseller = false }) {
   const navigate = useNavigate()
   const { addItem } = useCart()
   const [hover, setHover] = useState(false)
@@ -40,7 +40,9 @@ export default function ProductCard({ product }) {
   const isDiscount   = badge && badge.startsWith('-')
   const tilt         = useMemo(() => stickerTilt(id), [id])
   const inStock      = hasAnyStock(product)
-  const tagChip      = tags.map((t) => TAG_LABELS[t] || t.toUpperCase()).find((t) => t !== badge)
+  const tagChip      = (bestseller && !tags.includes('bestseller'))
+    ? TAG_LABELS.bestseller
+    : tags.map((t) => TAG_LABELS[t] || t.toUpperCase()).find((t) => t !== badge)
 
   // Izbor okusa/gramaže direktno na kartici — default prva opcija
   const [flavor, setFlavor] = useState(flavors[0] ?? null)
