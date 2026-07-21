@@ -37,6 +37,29 @@ loadEnv()
 const API   = 'https://proteinhouse-api.work/api/Artikli/GetAllProducts'
 const IMG   = 'https://weberp-api.com/images/'
 
+// Slike sa starog sajta su samo 255px — za ove slugove koristimo sluzbene
+// hi-res packshotove proizvodjaca (provjereni direktni URL-ovi, 800–4200px).
+const IMAGE_OVERRIDES = {
+  'optimum-nutrition-gold-whey':            'https://cdn.shopify.com/s/files/1/0794/9991/9627/files/GSW_DRC_5lb_FOP.png?v=1776173227',
+  'optimum-nutrition-creatine-monohydrate': 'https://www.optimumnutrition.com/cdn/shop/files/on-1153060_Image_01.png?v=1769135392&width=2048',
+  'optimum-nutrition-serious-mass':         'https://cdn.shopify.com/s/files/1/0794/9991/9627/files/on-1157561_Image_01.png?v=1766414389',
+  'optimum-nutrition-amino-energy':         'https://cdn.shopify.com/s/files/1/0794/9991/9627/files/on-1102190_Image_01.jpg?v=1761050776',
+  'optimum-nutrition-optimen-90-tabs':      'https://cdn.shopify.com/s/files/1/0794/9991/9627/files/on-1102278_Image_01.png?v=1755783158',
+  'optimum-nutrition-optiwomen-60-caps':    'https://cdn.shopify.com/s/files/1/0794/9991/9627/files/on-1102279_Image_01.png?v=1755783173',
+  'mutant-whey':                            'https://cdn.shopify.com/s/files/1/0080/8740/4641/files/31052USMUTANTWHEYTripleChocolateFlavor5LB_2.27KG_v2.00_NS-L3.png?v=1749755931',
+  'mutant-madness':                         'https://cdn.shopify.com/s/files/1/0080/8740/4641/files/33501USMUTANTMADNESSFruitPunchFlavor270g_9.52oz_v2.01_NS-L3.png?v=1757090105',
+  'bsn-syntha-6':                           'https://cdn.shopify.com/s/files/1/0904/1251/5715/files/bsn-1047945_Image_01.png?v=1761239460',
+  'bsn-no-xplode':                          'https://cdn.shopify.com/s/files/1/0904/1251/5715/files/bsn-1096504_Image_01.png?v=1764947558',
+  'body-fit-clean-protein-bar':             'https://cdn.shopify.com/s/files/1/0931/6660/0521/files/1157290_Image_01.png?v=1764077235',
+  'ostrovit-whey':                          'https://ostrovit.com/hpeciai/65e81809c14c0b2707159b07fa30430b/eng_pl_OstroVit-100-Whey-Protein-700-g-27121_1.png',
+  'ostrovit-creatine-monohydrate':          'https://ostrovit.com/hpeciai/712052150763865ea840dd673e5a186d/eng_pl_OstroVit-Creatine-Monohydrate-300-g-16609_1.png',
+  'ostrovit-bcaa-8-1-1':                    'https://ostrovit.com/hpeciai/7b7938a0628a54ff404576f2dee00197/eng_pl_OstroVit-BCAA-8-1-1-200-g-14632_1.png',
+  'ostrovit-tyrosine-orange-210g':          'https://ostrovit.com/eng_pl_OstroVit-Tyrosine-210-g-7456_4.png',
+  'ostrovit-cla-green-tea-l-carnitine-90-tabs': 'https://ostrovit.com/eng_pl_OstroVit-CLA-Green-Tea-L-carnitine-90-capsules-19134_1.png',
+  'ostrovit-fat-burner-for-women-60-caps':  'https://ostrovit.com/eng_pl_OstroVit-Fat-Burner-for-women-60-capsules-23724_2.png',
+  // ostrovit-dextrose-500g: 500g vise ne postoji na ostrovit.com — ostaje weberp slika
+}
+
 // ── Kurirani izbor: ERP sifre sa starog sajta (25 artikala → ~20 proizvoda) ──
 const SIFRE = [
   '4472', '4474',        // ON Gold Whey 30 g (2 okusa)
@@ -229,17 +252,19 @@ async function main() {
   for (const p of products) {
     const { _slikaPath, ...row } = p
 
-    // 1) slika: download s weberp-api → upload u nas storage
+    // 1) slika: hi-res override (proizvodjac) ili weberp → upload u nas storage
+    const imgUrl = IMAGE_OVERRIDES[row.slug] || IMG + _slikaPath
     let imagePath = null
     try {
-      const imgRes = await fetch(IMG + _slikaPath)
+      const imgRes = await fetch(imgUrl)
       if (imgRes.ok) {
         const buf  = Buffer.from(await imgRes.arrayBuffer())
-        const ext  = _slikaPath.split('.').pop().toLowerCase()
+        const type = imgRes.headers.get('content-type')?.split(';')[0] || 'image/png'
+        const ext  = type === 'image/jpeg' ? 'jpg' : type.split('/')[1] || 'png'
         imagePath  = `${row.slug}.${ext}`
         const { error } = await supabase.storage
           .from('product-images')
-          .upload(imagePath, buf, { upsert: true, contentType: ext === 'png' ? 'image/png' : 'image/jpeg' })
+          .upload(imagePath, buf, { upsert: true, contentType: type })
         if (error) { console.warn(`   ⚠ upload slike ${row.slug}: ${error.message}`); imagePath = null }
       }
     } catch (e) { console.warn(`   ⚠ slika ${row.slug}: ${e.message}`) }
@@ -247,7 +272,7 @@ async function main() {
     // 2) upsert proizvoda (po slugu)
     const { error } = await supabase
       .from('products')
-      .upsert({ ...row, image_path: imagePath, image_url: imagePath ? null : IMG + _slikaPath }, { onConflict: 'slug' })
+      .upsert({ ...row, image_path: imagePath, image_url: imagePath ? null : imgUrl }, { onConflict: 'slug' })
     console.log(error ? `   ❌ ${row.slug}: ${error.message}` : `   ✓ ${row.slug}${imagePath ? ' (slika u storage)' : ''}`)
   }
 
