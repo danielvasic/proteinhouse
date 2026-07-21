@@ -22,6 +22,12 @@ const SECTIONS = {
       },
     ],
   },
+  goals: {
+    label: 'Kupovina po ciljevima',
+    fields: [
+      { key: 'goals_bg_image', label: 'Pozadinska slika sekcije (preporuka: tamna gym fotka, min 1600px širine)', type: 'image' },
+    ],
+  },
   lifetime: {
     label: 'Lifetime banner',
     fields: [
