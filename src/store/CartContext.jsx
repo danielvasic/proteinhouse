@@ -7,7 +7,11 @@ const CartContext = createContext(null)
 function cartReducer(state, action) {
   switch (action.type) {
     case 'ADD': {
-      const idx = state.items.findIndex((x) => x.id === action.payload.id)
+      const idx = state.items.findIndex((x) =>
+        x.id === action.payload.id &&
+        (x.selectedFlavor ?? null) === (action.payload.selectedFlavor ?? null) &&
+        (x.selectedSize   ?? null) === (action.payload.selectedSize   ?? null)
+      )
       if (idx >= 0) {
         return {
           ...state,

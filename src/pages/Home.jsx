@@ -68,6 +68,7 @@ export default function Home() {
             eyebrow={data.carousel_bestsellers_eyebrow}
             products={bestsellers}
             categorySlug={data.carousel_bestsellers_slug}
+            bestseller
           />
         )}
         <GoalsSection />
