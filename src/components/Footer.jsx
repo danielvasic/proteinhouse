@@ -1,7 +1,47 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { InstagramLogo, FacebookLogo, YoutubeLogo, TiktokLogo, Phone, Envelope, MapPin, Clock } from '@phosphor-icons/react'
+import { InstagramLogo, FacebookLogo, YoutubeLogo, TiktokLogo, Phone, Envelope, MapPin, Clock, CaretDown } from '@phosphor-icons/react'
 import Logo from './Logo'
 import { useSiteContent } from '../hooks/useSiteContent'
+
+/** Kolona linkova — na mobilnom collapsable (accordion), na desktopu uvijek otvorena */
+function FooterColumn({ col }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="col-span-2 md:col-span-1 border-b border-white/10 md:border-0 pb-4 md:pb-0">
+      <button
+        type="button"
+        className="w-full flex items-center justify-between bg-transparent border-0 p-0 cursor-pointer md:cursor-default text-left"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 m-0 md:mb-5">
+          {col.heading}
+        </h4>
+        <CaretDown
+          size={14}
+          className={`md:hidden text-white/40 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      <ul className={`${open ? 'flex' : 'hidden'} md:flex flex-col gap-3 list-none p-0 m-0 mt-4 md:mt-0`}>
+        {(col.links ?? []).map((l, li) => (
+          <li key={l.label || li}>
+            {l.to?.startsWith('http') ? (
+              <a href={l.to} target="_blank" rel="noopener noreferrer"
+                 className="text-[13px] text-white/55 hover:text-white transition-colors duration-150">
+                {l.label}
+              </a>
+            ) : (
+              <Link to={l.to || '/'} className="text-[13px] text-white/55 hover:text-white transition-colors duration-150">
+                {l.label}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 // Icon map for social networks (key must match .network in DB)
 const SOCIAL_ICONS = {
@@ -89,7 +129,7 @@ export default function Footer() {
       style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
     >
       <div className="container">
-        <div className={`grid grid-cols-2 ${mdGridCls} gap-x-10 gap-y-10 py-14 md:py-16`}>
+        <div className={`grid grid-cols-2 ${mdGridCls} gap-x-10 gap-y-6 md:gap-y-10 py-10 md:py-16`}>
 
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
@@ -152,39 +192,8 @@ export default function Footer() {
             )}
           </div>
 
-          {/* Link columns */}
-          {cols.map((col, ci) => (
-            <div key={col.heading || ci}>
-              {col.heading && (
-                <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 mb-5">
-                  {col.heading}
-                </h4>
-              )}
-              <ul className="flex flex-col gap-3 list-none p-0 m-0">
-                {(col.links ?? []).map((l, li) => (
-                  <li key={l.label || li}>
-                    {l.to?.startsWith('http') ? (
-                      <a
-                        href={l.to}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[13px] text-white/55 hover:text-white transition-colors duration-150"
-                      >
-                        {l.label}
-                      </a>
-                    ) : (
-                      <Link
-                        to={l.to || '/'}
-                        className="text-[13px] text-white/55 hover:text-white transition-colors duration-150"
-                      >
-                        {l.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Link columns — na mobilnom accordion */}
+          {cols.map((col, ci) => <FooterColumn key={col.heading || ci} col={col} />)}
 
         </div>
       </div>

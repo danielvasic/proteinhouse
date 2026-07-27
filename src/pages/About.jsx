@@ -44,14 +44,15 @@ export default function About() {
 
         {/* ── Hero ── */}
         <section
-          className="relative flex items-end min-h-[340px] md:min-h-[420px] bg-cover bg-center"
+          className="relative flex items-end min-h-[340px] md:min-h-[420px] bg-cover bg-center overflow-hidden"
           style={{
             backgroundImage: data.about_hero_image
               ? `linear-gradient(105deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.60) 60%, rgba(10,14,23,0.20) 100%), url('${data.about_hero_image}')`
               : 'linear-gradient(135deg, #0A0E17 0%, #0145F2 60%, #0136C4 100%)',
           }}
         >
-          <div className="container pb-12 md:pb-16">
+          <div className="absolute inset-0 ph-pattern opacity-[0.05] pointer-events-none" />
+          <div className="container pb-12 md:pb-16 relative">
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-white/35" />
               <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/55">Naša priča</span>
@@ -76,8 +77,9 @@ export default function About() {
 
         {/* ── Stats (samo ako postoje u bazi) ── */}
         {stats.length > 0 && (
-          <section className="bg-[#0145F2] py-12 md:py-16">
-            <div className="container">
+          <section className="relative bg-[#0145F2] py-12 md:py-16 overflow-hidden">
+            <div className="absolute inset-0 ph-pattern opacity-[0.06] pointer-events-none z-10" />
+            <div className="container relative">
               <div className={`grid grid-cols-2 gap-px bg-white/10 ${{ 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' }[stats.length] || 'md:grid-cols-4'}`}>
                 {stats.map((s) => (
                   <div key={s.label} className="bg-[#0145F2] flex flex-col items-center justify-center py-10 px-6 text-center">

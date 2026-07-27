@@ -29,13 +29,14 @@ export default function GoalsSection() {
 
   return (
     <section
-      className="py-12 md:py-16 bg-[#0A0E17] bg-cover bg-center"
+      className="relative py-12 md:py-16 bg-[#0A0E17] bg-cover bg-center overflow-hidden"
       style={{
         fontFamily: 'Inter, system-ui, sans-serif',
         backgroundImage: `linear-gradient(100deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.82) 55%, rgba(10,14,23,0.60) 100%), url('${bgImage}')`,
       }}
     >
-      <div className="container">
+      <div className="absolute inset-0 ph-pattern opacity-[0.04] pointer-events-none" />
+      <div className="container relative">
         <div className="flex items-end justify-between mb-6 md:mb-8">
           <div>
             <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/60 mb-1.5 m-0">Pronađi svoje</p>

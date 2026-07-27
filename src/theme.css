@@ -201,11 +201,14 @@ img {
 @media (min-width: 768px)  { .container { padding-left: 32px; padding-right: 32px; } }
 @media (min-width: 1280px) { .container { padding-left: 40px; padding-right: 40px; } }
 
-/* Brand pattern — spojeni puni trokuti koji se ponavljaju (brand book):
+/* Brand pattern — puni trokuti spojeni rubovima u kontinuirane nizove,
+   cijeli pattern nakrivljen (brand book):
    <div class="absolute inset-0 ph-pattern opacity-[0.06] pointer-events-none" /> */
 .ph-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='52'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M1 2 L17 13 L1 24 Z'/%3E%3Cpath d='M19 2 L35 13 L19 24 Z'/%3E%3Cpath d='M10 28 L26 39 L10 50 Z'/%3E%3Cpath d='M-8 28 L8 39 L-8 50 Z'/%3E%3Cpath d='M28 28 L44 39 L28 50 Z'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 36px 52px;
+  /* Nepravilni geometrijski mozaik — trokuti raznih veličina/rotacija i
+     paralelogrami, razbacani (ne uniformno) pa se tile ne primjećuje */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M6 4 L46 4 L6 44 Z'/%3E%3Cpath d='M70 18 L92 18 L81 0 Z'/%3E%3Cpath d='M120 6 L160 6 L140 40 Z'/%3E%3Cpath d='M186 10 L226 10 L214 34 L174 34 Z'/%3E%3Cpath d='M52 62 L52 102 L16 82 Z'/%3E%3Cpath d='M96 54 L140 54 L96 98 Z'/%3E%3Cpath d='M166 58 L188 92 L144 92 Z'/%3E%3Cpath d='M206 60 L234 88 L206 116 Z'/%3E%3Cpath d='M8 116 L48 156 L8 156 Z'/%3E%3Cpath d='M76 122 L108 122 L92 150 Z'/%3E%3Cpath d='M130 116 L166 116 L154 148 L118 148 Z'/%3E%3Cpath d='M192 126 L228 144 L192 156 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 240px 160px;
 }
 
 /* Focus visible ring */
