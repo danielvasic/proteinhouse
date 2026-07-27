@@ -18,7 +18,7 @@ function StarRating({ rating }) {
           key={i}
           size={14}
           weight={i < Math.floor(rating) ? 'fill' : 'regular'}
-          color={i < Math.floor(rating) ? '#0F2952' : '#D1D5DB'}
+          color={i < Math.floor(rating) ? '#0145F2' : '#D1D5DB'}
         />
       ))}
     </div>
@@ -36,8 +36,8 @@ function VariantSelector({ label, options, value, onChange }) {
             key={opt}
             className={`px-3 py-2 text-[11px] font-bold tracking-[0.06em] border transition-all duration-150 cursor-pointer ${
               opt === value
-                ? 'border-[#0F2952] bg-[#0F2952] text-white'
-                : 'border-gray-300 text-gray-600 bg-transparent hover:border-[#0F2952] hover:text-[#0F2952]'
+                ? 'border-[#0145F2] bg-[#0145F2] text-white'
+                : 'border-gray-300 text-gray-600 bg-transparent hover:border-[#0145F2] hover:text-[#0145F2]'
             }`}
             onClick={() => onChange(opt)}
           >
@@ -82,19 +82,19 @@ export default function Product() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
-        <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#0F2952] animate-spin" />
+      <div className="flex items-center justify-center py-24" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#0145F2] animate-spin" />
       </div>
     )
   }
 
   if (!product) {
     return (
-      <div className="container py-24 text-center" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
-        <h1 className="text-2xl font-bold text-[#0F2952] mb-4" style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}>
+      <div className="container py-24 text-center" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        <h1 className="text-2xl font-bold text-[#0A0E17] mb-4" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
           Proizvod nije pronađen
         </h1>
-        <Link to="/" className="text-[13px] text-gray-500 underline hover:text-[#0F2952]">← Nazad na početnu</Link>
+        <Link to="/" className="text-[13px] text-gray-500 underline hover:text-[#0145F2]">← Nazad na početnu</Link>
       </div>
     )
   }
@@ -122,34 +122,35 @@ export default function Product() {
         })}</script>
       </Helmet>
 
-      <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
         {/* ── Breadcrumb ── */}
         <div className="border-b border-gray-200 bg-white">
-          <div className="container py-5">
+          <div className="container py-6">
             <nav className="flex items-center gap-2 text-[11px] text-gray-400" aria-label="Breadcrumb">
-              <Link to="/" className="flex items-center gap-1 hover:text-[#0F2952] transition-colors">
+              <Link to="/" className="flex items-center gap-1 hover:text-[#0145F2] transition-colors">
                 <House size={12} weight="fill" /> Početna
               </Link>
               <CaretRight size={11} className="opacity-40" />
-              <Link to={`/kategorija/${product.cat}`} className="hover:text-[#0F2952] transition-colors">
+              <Link to={`/kategorija/${product.cat}`} className="hover:text-[#0145F2] transition-colors">
                 {category?.label || product.cat}
               </Link>
               <CaretRight size={11} className="opacity-40" />
-              <span className="text-[#0F2952] font-semibold truncate max-w-[200px]">{product.brand}</span>
+              <span className="text-[#0A0E17] font-semibold truncate max-w-[200px]">{product.brand}</span>
             </nav>
           </div>
         </div>
 
         {/* ── Product layout ── */}
-        <section className="py-12 md:py-16 bg-gray-50">
+        <section className="py-12 md:py-16 bg-[#F2F4F7]">
           <div className="container">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
 
-              {/* Image */}
-              <div className="relative bg-white flex items-center justify-center p-10 md:p-14">
+              {/* Hero kartica — slika + najrelevantnije brojke (Ostrovit stil, editabilno u adminu) */}
+              <div className="relative bg-[#0145F2] rounded-[28px] flex flex-col items-center p-7 md:p-10 overflow-hidden">
+                <div className="absolute inset-0 ph-pattern opacity-[0.07] pointer-events-none" />
                 {isDiscount && (
-                  <div className="absolute top-5 left-5 w-[52px] h-[52px] rounded-full bg-[#0F2952] flex items-center justify-center">
+                  <div className="absolute top-5 left-5 w-[52px] h-[52px] rounded-full bg-[#0A0E17] flex items-center justify-center z-10">
                     <span className="text-white text-[11px] font-extrabold text-center leading-tight">{product.badge}</span>
                   </div>
                 )}
@@ -157,24 +158,41 @@ export default function Product() {
                   <img
                     src={product.img}
                     alt={product.title}
-                    className="w-full max-w-[400px] object-contain"
+                    className="relative w-full max-w-[360px] object-contain drop-shadow-[0_24px_32px_rgba(0,0,0,0.25)]"
                     width={600}
                     height={540}
                   />
                 ) : (
-                  <div className="w-full max-w-[400px] aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-sm">
+                  <div className="w-full max-w-[360px] aspect-square bg-white/10 rounded-2xl flex items-center justify-center text-white/50 text-sm">
                     Nema slike
+                  </div>
+                )}
+
+                {product.heroStats.length > 0 && (
+                  <div className={`relative grid gap-3 w-full mt-8 md:mt-10 text-center text-white ${product.heroStats.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                    {product.heroStats.slice(0, 3).map((s, i) => (
+                      <div key={i}>
+                        <p
+                          className="text-4xl md:text-6xl font-extrabold leading-none m-0"
+                          style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                        >
+                          {s.value}
+                        </p>
+                        <p className="text-[11px] md:text-[14px] font-bold uppercase tracking-[0.12em] text-white/60 mt-2 m-0">{s.label}</p>
+                        {s.sub && <p className="text-[11px] md:text-[13px] font-semibold mt-0.5 m-0">{s.sub}</p>}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* Info */}
-              <div className="bg-white p-8 md:p-12 flex flex-col">
+              <div className="bg-white rounded-[28px] border border-gray-200 p-7 md:p-10 flex flex-col">
 
                 <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-2">{product.brand}</p>
                 <h1
-                  className="text-2xl md:text-3xl font-bold text-[#0F2952] uppercase leading-tight mb-4"
-                  style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  className="text-2xl md:text-3xl font-bold text-[#0A0E17] uppercase leading-tight mb-4"
+                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                 >
                   {product.title}
                 </h1>
@@ -188,7 +206,7 @@ export default function Product() {
 
                 {/* Price */}
                 <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-3xl font-bold text-[#0F2952]" style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}>
+                  <span className="text-3xl font-bold text-[#0A0E17]" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
                     {fmtKM(product.price)}
                   </span>
                   {product.old && (
@@ -243,16 +261,16 @@ export default function Product() {
                 <div className="flex gap-3 mb-6" ref={buyRef}>
                   <div className={`flex items-center border ${outOfStock ? 'border-gray-200 opacity-40' : 'border-gray-300'}`}>
                     <button
-                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0F2952] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
+                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-[#F2F4F7] hover:text-[#0145F2] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
                       onClick={() => setQty((q) => Math.max(1, q - 1))}
                       disabled={outOfStock}
                       aria-label="Smanji količinu"
                     >
                       <Minus size={14} weight="bold" />
                     </button>
-                    <span className="w-10 text-center text-[13px] font-bold text-[#0F2952]">{qty}</span>
+                    <span className="w-10 text-center text-[13px] font-bold text-[#0A0E17]">{qty}</span>
                     <button
-                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0F2952] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
+                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-[#F2F4F7] hover:text-[#0145F2] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
                       onClick={() => setQty((q) => Math.min(currentStock || 99, q + 1))}
                       disabled={outOfStock}
                       aria-label="Povećaj količinu"
@@ -265,7 +283,7 @@ export default function Product() {
                     className={`flex-1 flex items-center justify-center gap-2.5 py-3 text-[11px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 border-0 ${
                       outOfStock
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-[#0F2952] text-white hover:bg-[#0A1F42] cursor-pointer'
+                        : 'bg-[#0145F2] text-white hover:bg-[#0136C4] cursor-pointer'
                     }`}
                     onClick={handleAdd}
                     disabled={outOfStock}
@@ -275,7 +293,7 @@ export default function Product() {
                   </button>
 
                   <button
-                    className="w-12 h-12 flex items-center justify-center border border-gray-300 text-gray-400 hover:border-[#0F2952] hover:text-[#0F2952] transition-all duration-150 cursor-pointer bg-transparent"
+                    className="w-12 h-12 flex items-center justify-center border border-gray-300 text-gray-400 hover:border-[#0145F2] hover:text-[#0145F2] transition-all duration-150 cursor-pointer bg-transparent"
                     aria-label="Dodaj na wishlist"
                   >
                     <Heart size={18} />
@@ -288,10 +306,10 @@ export default function Product() {
                     { Icon: Truck,       title: 'Besplatna dostava', sub: 'Preko 100 KM' },
                     { Icon: ShieldCheck, title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
                   ].map(({ Icon, title, sub }) => (
-                    <div key={title} className="flex items-center gap-3 bg-gray-50 px-4 py-3">
-                      <Icon size={18} weight="duotone" color="#0F2952" className="shrink-0 opacity-70" />
+                    <div key={title} className="flex items-center gap-3 bg-[#F2F4F7] px-4 py-3">
+                      <Icon size={18} weight="duotone" color="#0145F2" className="shrink-0 opacity-70" />
                       <div>
-                        <p className="text-[11px] font-bold text-[#0F2952]">{title}</p>
+                        <p className="text-[11px] font-bold text-[#0A0E17]">{title}</p>
                         <p className="text-[10px] text-gray-400">{sub}</p>
                       </div>
                     </div>
@@ -311,20 +329,20 @@ export default function Product() {
 
         {/* ── Floating kupi traka ── */}
         <div
-          className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-8px_24px_-8px_rgba(10,31,66,0.18)] transition-transform duration-200 ${floatBar ? 'translate-y-0' : 'translate-y-full'}`}
+          className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-8px_24px_-8px_rgba(10,14,23,0.18)] transition-transform duration-200 ${floatBar ? 'translate-y-0' : 'translate-y-full'}`}
           aria-hidden={!floatBar}
         >
           <div className="container flex items-center gap-3 py-2.5">
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold text-[#0F2952] truncate m-0">{product.brand} · {product.title}</p>
-              <p className="text-[15px] font-bold text-[#0F2952] m-0" style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}>
+              <p className="text-[11px] font-semibold text-[#0A0E17] truncate m-0">{product.brand} · {product.title}</p>
+              <p className="text-[15px] font-bold text-[#0A0E17] m-0" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
                 {fmtKM(product.price)}
-                {product.old && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>{fmtKM(product.old)}</span>}
+                {product.old && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{fmtKM(product.old)}</span>}
               </p>
             </div>
             <button
               className={`shrink-0 flex items-center gap-2 px-6 py-3 text-[11px] font-bold tracking-[0.1em] uppercase border-0 ${
-                outOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0F2952] text-white hover:bg-[#0A1F42] cursor-pointer'
+                outOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0145F2] text-white hover:bg-[#0136C4] cursor-pointer'
               }`}
               onClick={handleAdd}
               disabled={outOfStock}
@@ -354,7 +372,7 @@ function DescriptionTabs({ product }) {
   const current = tabs.find((t) => t.key === active) || tabs[0]
 
   return (
-    <section className="py-12 bg-white border-t border-gray-200" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+    <section className="py-12 bg-white border-t border-gray-200" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div className="container max-w-[860px]">
         <div className="flex border-b border-gray-200 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((t) => (
@@ -362,8 +380,8 @@ function DescriptionTabs({ product }) {
               key={t.key}
               className={`shrink-0 px-5 py-3 text-[11px] font-bold tracking-[0.1em] uppercase bg-transparent border-0 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
                 t.key === current.key
-                  ? 'border-[#0F2952] text-[#0F2952]'
-                  : 'border-transparent text-gray-400 hover:text-[#0F2952]'
+                  ? 'border-[#0145F2] text-[#0A0E17]'
+                  : 'border-transparent text-gray-400 hover:text-[#0145F2]'
               }`}
               onClick={() => setActive(t.key)}
             >

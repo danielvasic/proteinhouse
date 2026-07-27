@@ -3,7 +3,7 @@
    Ported from colors_and_type.css (design handoff)
    ===================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Oswald:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Exo+2:ital,wght@0,500;0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -11,10 +11,10 @@
 
 :root {
   /* --- Brand colours --- */
-  --ph-navy-900: #0A1F42;
-  --ph-navy-800: #0e2a6b;
-  --ph-navy-700: #0F2952;   /* PRIMARY */
-  --ph-navy-600: #1F4399;
+  --ph-navy-900: #0A0E17;   /* brand dark */
+  --ph-navy-800: #0136C4;
+  --ph-navy-700: #0145F2;   /* PRIMARY — brand blue */
+  --ph-navy-600: #2F63F5;
   --ph-navy-500: #3d63c4;
   --ph-navy-mid: #1D3A6A;   /* Footer borders */
   --ph-navy-100: #e3eaf7;
@@ -77,8 +77,8 @@
   --ph-border-strong: var(--ph-gray-900);
 
   /* Typography */
-  --ph-font-display: 'Oswald', 'Bebas Neue', 'Impact', system-ui, sans-serif;
-  --ph-font-body:    'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --ph-font-display: 'Exo 2', 'Arial Narrow', system-ui, sans-serif;
+  --ph-font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
   /* Type scale */
   --ph-text-3xs: 10px;
@@ -190,13 +190,26 @@ img {
 /* ===========================
    Utility / Layout helpers
    =========================== */
+/* VAŽNO: samo padding-left/right (ne shorthand!) — inače gazi Tailwind py-* utilitije
+   jer se theme.css učitava poslije Tailwinda, a specifičnost je ista. */
 .container {
   max-width: var(--ph-container-max);
   margin: 0 auto;
-  padding: 0 var(--ph-container-gutter);
+  padding-left: var(--ph-container-gutter);
+  padding-right: var(--ph-container-gutter);
 }
-@media (min-width: 768px)  { .container { padding: 0 32px; } }
-@media (min-width: 1280px) { .container { padding: 0 40px; } }
+@media (min-width: 768px)  { .container { padding-left: 32px; padding-right: 32px; } }
+@media (min-width: 1280px) { .container { padding-left: 40px; padding-right: 40px; } }
+
+/* Brand pattern — puni trokuti spojeni rubovima u kontinuirane nizove,
+   cijeli pattern nakrivljen (brand book):
+   <div class="absolute inset-0 ph-pattern opacity-[0.06] pointer-events-none" /> */
+.ph-pattern {
+  /* Nepravilni geometrijski mozaik — trokuti raznih veličina/rotacija i
+     paralelogrami, razbacani (ne uniformno) pa se tile ne primjećuje */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M6 4 L46 4 L6 44 Z'/%3E%3Cpath d='M70 18 L92 18 L81 0 Z'/%3E%3Cpath d='M120 6 L160 6 L140 40 Z'/%3E%3Cpath d='M186 10 L226 10 L214 34 L174 34 Z'/%3E%3Cpath d='M52 62 L52 102 L16 82 Z'/%3E%3Cpath d='M96 54 L140 54 L96 98 Z'/%3E%3Cpath d='M166 58 L188 92 L144 92 Z'/%3E%3Cpath d='M206 60 L234 88 L206 116 Z'/%3E%3Cpath d='M8 116 L48 156 L8 156 Z'/%3E%3Cpath d='M76 122 L108 122 L92 150 Z'/%3E%3Cpath d='M130 116 L166 116 L154 148 L118 148 Z'/%3E%3Cpath d='M192 126 L228 144 L192 156 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 240px 160px;
+}
 
 /* Focus visible ring */
 :focus-visible {

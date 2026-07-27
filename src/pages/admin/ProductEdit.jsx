@@ -18,6 +18,7 @@ const EMPTY = {
   stock: 0, stock_variants: {},
   internal_title: '', tags: [],
   usage_instructions: '', composition: '', nutrition_info: '',
+  hero_stats: [],
 }
 
 function slugify(str) {
@@ -212,6 +213,7 @@ export default function ProductEdit() {
         usage_instructions: data.usage_instructions ?? '',
         composition:        data.composition        ?? '',
         nutrition_info:     data.nutrition_info     ?? '',
+        hero_stats:         Array.isArray(data.hero_stats) ? data.hero_stats : [],
       })
       setLoading(false)
     })
@@ -254,6 +256,7 @@ export default function ProductEdit() {
         price:      parseFloat(form.price),
         old_price:  form.old_price ? parseFloat(form.old_price) : null,
         sort_order: parseInt(form.sort_order) || 0,
+        hero_stats: (form.hero_stats || []).filter((s) => s?.value?.trim()),
         updated_at: new Date().toISOString(),
       }
       if (isNew) {
@@ -446,6 +449,49 @@ export default function ProductEdit() {
                 )}
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Hero sekcija (plava kartica uz sliku) ── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Hero sekcija</CardTitle>
+            <p className="text-xs text-muted-foreground font-normal mt-1">
+              Do 3 najrelevantnije brojke uz sliku proizvoda (npr. 60 · kapsula · po pakovanju). Prazna vrijednost = slot se ne prikazuje.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="grid grid-cols-[80px_1fr_1fr] gap-3">
+                <Input
+                  placeholder={['60', '30', '2'][i]}
+                  value={form.hero_stats?.[i]?.value ?? ''}
+                  onChange={(e) => setForm((f) => {
+                    const hs = [...(f.hero_stats || [])]
+                    hs[i] = { ...hs[i], value: e.target.value }
+                    return { ...f, hero_stats: hs }
+                  })}
+                />
+                <Input
+                  placeholder={['kapsula', 'porcija', 'kapsule'][i]}
+                  value={form.hero_stats?.[i]?.label ?? ''}
+                  onChange={(e) => setForm((f) => {
+                    const hs = [...(f.hero_stats || [])]
+                    hs[i] = { ...hs[i], label: e.target.value }
+                    return { ...f, hero_stats: hs }
+                  })}
+                />
+                <Input
+                  placeholder={['po pakovanju', 'po pakovanju', '1 porcija = 2 kapsule'][i]}
+                  value={form.hero_stats?.[i]?.sub ?? ''}
+                  onChange={(e) => setForm((f) => {
+                    const hs = [...(f.hero_stats || [])]
+                    hs[i] = { ...hs[i], sub: e.target.value }
+                    return { ...f, hero_stats: hs }
+                  })}
+                />
+              </div>
+            ))}
           </CardContent>
         </Card>
 

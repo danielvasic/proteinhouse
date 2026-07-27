@@ -7,15 +7,17 @@ import './globals.css'
 import './theme.css'
 import { supabase, getProductImageUrl } from './lib/supabase'
 
-const SITE_URL      = 'https://proteinhouse.ba'
-const OG_DEFAULT_IMG = `${SITE_URL}/og-image.jpg`
+const SITE_URL = 'https://proteinhouse.ba'   // canonical uvijek na glavnu domenu
+// OG slika se gradi iz domene sa koje je stranica zatrazena (origin) —
+// radi na deploy previewu, new.proteinhouse.ba i produkciji bez izmjena.
+const ogDefaultImg = (origin) => `${origin || 'https://new.proteinhouse.ba'}/og-image.png`
 
 // ─── Pre-fetch page-specific meta from Supabase ────────────────────────────
 // renderToString is synchronous — useProduct/useCategories hooks can't fetch
 // data during render. We resolve what we need BEFORE calling renderToString
 // so that crawlers (Google, Twitter, Facebook, LinkedIn) get correct tags.
 
-async function prefetchMeta(url) {
+async function prefetchMeta(url, origin) {
   const path = url.split('?')[0].split('#')[0]
 
   // ── /proizvod/:slug ────────────────────────────────────────────────────
@@ -34,7 +36,7 @@ async function prefetchMeta(url) {
       const rawDesc = data.description
         || `Kupite ${name} na ProteinHouse. Originalni suplement, brza dostava po BiH.`
       const description = rawDesc.length > 155 ? rawDesc.slice(0, 152) + '…' : rawDesc
-      const image   = getProductImageUrl(data) || OG_DEFAULT_IMG
+      const image   = getProductImageUrl(data) || ogDefaultImg(origin)
       const canonical = `${SITE_URL}${path}`
 
       return {
@@ -89,8 +91,8 @@ function esc(s) {
     .replace(/"/g, '&quot;')
 }
 
-function buildHead({ title, description, image, canonical, schema }) {
-  const img = image || OG_DEFAULT_IMG
+function buildHead({ title, description, image, canonical, schema }, origin) {
+  const img = image || ogDefaultImg(origin)
   const tags = [
     `<title data-rh="true">${esc(title)}</title>`,
     `<meta data-rh="true" name="description"         content="${esc(description)}" />`,
@@ -114,11 +116,11 @@ function buildHead({ title, description, image, canonical, schema }) {
 }
 
 // ─── Main SSR render ───────────────────────────────────────────────────────
-export async function render(url) {
+export async function render(url, origin) {
   const helmetContext = {}
 
   // Pre-fetch before renderToString (data hooks can't run async during render)
-  const pageMeta = await prefetchMeta(url).catch(() => null)
+  const pageMeta = await prefetchMeta(url, origin).catch(() => null)
 
   const html = renderToString(
     <HelmetProvider context={helmetContext}>
@@ -133,7 +135,7 @@ export async function render(url) {
   let head
   if (pageMeta) {
     // Dynamic page: use pre-fetched meta (Helmet had no data during renderToString)
-    head = buildHead(pageMeta)
+    head = buildHead(pageMeta, origin)
   } else {
     // Static page (About, Contact, Blog…): Helmet collected tags synchronously
     const { helmet } = helmetContext

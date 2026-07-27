@@ -31,7 +31,7 @@ export default function CategoryStrip() {
           <div className="h-px flex-1 bg-gray-200" />
           <span
             className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400"
-            style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
             Istraži kolekcije
           </span>
@@ -45,8 +45,8 @@ export default function CategoryStrip() {
               className="relative flex flex-col justify-end min-h-[260px] md:min-h-[300px] overflow-hidden cursor-pointer group bg-cover bg-center"
               style={{
                 backgroundImage: b.image_url
-                  ? `linear-gradient(180deg, rgba(10,31,66,0.20) 0%, rgba(10,31,66,0.88) 100%), url('${b.image_url}')`
-                  : 'linear-gradient(180deg, #1a2f5a 0%, #0A1F42 100%)',
+                  ? `linear-gradient(180deg, rgba(10,14,23,0.20) 0%, rgba(10,14,23,0.88) 100%), url('${b.image_url}')`
+                  : 'linear-gradient(180deg, #1a2f5a 0%, #0A0E17 100%)',
               }}
               onClick={() => b.cta_link && navigate(b.cta_link)}
               role="button"
@@ -56,7 +56,7 @@ export default function CategoryStrip() {
               {b.tag && (
                 <span
                   className="absolute top-4 left-4 px-2.5 py-1 border border-white/50 text-white text-[10px] font-bold tracking-[0.14em] uppercase"
-                  style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+                  style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                 >
                   {b.tag}
                 </span>
@@ -65,7 +65,7 @@ export default function CategoryStrip() {
               <div className="p-5 transition-transform duration-300 group-hover:-translate-y-1">
                 <h3
                   className="text-2xl md:text-3xl font-bold text-white leading-tight mb-1 uppercase"
-                  style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                 >
                   {b.title}
                 </h3>

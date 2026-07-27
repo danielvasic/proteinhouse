@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OG generator</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#333}
+  canvas{width:600px;display:block;margin:20px auto;outline:1px solid #666}
+  /* ?flat=1 → canvas 1:1 preko cijelog prozora (za headless screenshot) */
+  body.flat{background:transparent}
+  body.flat canvas{width:1200px;margin:0;outline:none}
+</style>
+<script>if (location.search.includes('flat')) document.addEventListener('DOMContentLoaded', () => document.body.classList.add('flat'))</script>
+</head>
+<body>
+<canvas id="c" width="1200" height="630"></canvas>
+<script>
+async function draw() {
+  await document.fonts.load('400 96px "Archivo Black"');
+  await document.fonts.load('700 30px "Inter"');
+  await document.fonts.ready;
+  const x = document.getElementById('c').getContext('2d');
+
+  // Pozadina
+  x.fillStyle = '#0A0E17';
+  x.fillRect(0, 0, 1200, 630);
+
+  // Mozaik trokuti — simetrično raspoređeni, suptilni
+  const tri = (pts, fill, op) => { x.globalAlpha = op; x.fillStyle = fill;
+    x.beginPath(); x.moveTo(pts[0], pts[1]); x.lineTo(pts[2], pts[3]); x.lineTo(pts[4], pts[5]); x.closePath(); x.fill(); x.globalAlpha = 1; };
+  tri([70,70, 190,70, 70,190],      '#FFFFFF', 0.05);
+  tri([1130,70, 1010,70, 1130,190], '#FFFFFF', 0.05);
+  tri([70,560, 190,560, 70,440],    '#FFFFFF', 0.05);
+  tri([1130,560, 1010,560, 1130,440],'#FFFFFF', 0.05);
+  tri([240,120, 300,120, 240,180],  '#0145F2', 0.35);
+  tri([960,510, 900,510, 960,450],  '#0145F2', 0.35);
+
+  // Logo box — centriran
+  const bw = 460, bh = 212, bx = (1200 - bw) / 2, by = 130;
+  x.fillStyle = '#0145F2'; x.strokeStyle = '#FFFFFF'; x.lineWidth = 10;
+  x.beginPath(); x.roundRect(bx, by, bw, bh, 24); x.fill(); x.stroke();
+
+  // PROTEIN — Archivo Black, skaliran da stane u 400px
+  let fs = 100;
+  x.font = `400 ${fs}px "Archivo Black"`;
+  while (x.measureText('PROTEIN').width > 396 && fs > 40) { fs--; x.font = `400 ${fs}px "Archivo Black"`; }
+  x.fillStyle = '#FFFFFF'; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  x.fillText('PROTEIN', 600, by + 108);
+
+  // HOUSE — bijela traka + plava razmaknuta slova
+  const sw = 400, sh = 46, sx = 600 - sw / 2, sy = by + 130;
+  x.fillStyle = '#FFFFFF';
+  x.beginPath(); x.roundRect(sx, sy, sw, sh, 8); x.fill();
+  x.fillStyle = '#0145F2'; x.font = '700 28px "Inter"';
+  x.letterSpacing = '26px';
+  x.fillText('HOUSE', 600 + 13, sy + 33);   // +13 = pola letter-spacinga (kompenzacija zadnjeg razmaka)
+  x.letterSpacing = '0px';
+
+  // Tagline + domena
+  x.fillStyle = 'rgba(255,255,255,0.92)'; x.font = '700 34px "Inter"';
+  x.fillText('Suplementi i sportska prehrana', 600, 470);
+  x.fillStyle = 'rgba(255,255,255,0.45)'; x.font = '400 25px "Inter"';
+  x.fillText('proteinhouse.ba', 600, 518);
+
+  window.__og = document.getElementById('c').toDataURL('image/png');
+  window.__ogReady = true;
+}
+draw();
+</script>
+</body>
+</html>

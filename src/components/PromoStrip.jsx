@@ -38,11 +38,11 @@ export default function PromoStrip() {
               key={title}
               className="flex items-center gap-3.5 py-4 px-4 md:px-6 first:pl-0 last:pr-0"
             >
-              <Icon size={20} weight="duotone" color="#0F2952" className="shrink-0 opacity-75" />
+              <Icon size={20} weight="duotone" color="#0145F2" className="shrink-0 opacity-75" />
               <div>
                 <p
-                  className="text-[12px] font-bold text-[#0F2952] leading-tight"
-                  style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+                  className="text-[12px] font-bold text-[#0A0E17] leading-tight"
+                  style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                 >
                   {title}
                 </p>

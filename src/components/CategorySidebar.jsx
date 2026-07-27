@@ -15,7 +15,7 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
   const boxTitle = 'text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-4'
 
   return (
-    <aside className="flex flex-col gap-6 min-w-[200px]" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+    <aside className="flex flex-col gap-6 min-w-[200px]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
       {/* Categories */}
       <div className="border border-gray-200 bg-white p-5">
@@ -26,15 +26,15 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
               key={c.slug}
               className={`px-0 py-2 border-b border-gray-100 last:border-0 text-[12px] cursor-pointer transition-colors duration-150 font-medium ${
                 c.slug === activeSlug
-                  ? 'text-[#0F2952] font-bold'
-                  : 'text-gray-500 hover:text-[#0F2952]'
+                  ? 'text-[#0A0E17] font-bold'
+                  : 'text-gray-500 hover:text-[#0145F2]'
               }`}
               onClick={() => navigate(`/kategorija/${c.slug}`)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && navigate(`/kategorija/${c.slug}`)}
             >
-              {c.slug === activeSlug && <span className="inline-block w-1.5 h-1.5 bg-[#0F2952] mr-2 mb-px" />}
+              {c.slug === activeSlug && <span className="inline-block w-1.5 h-1.5 bg-[#0145F2] mr-2 mb-px" />}
               {c.label}
             </li>
           ))}
@@ -50,15 +50,15 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
           max={300}
           value={priceMax}
           onChange={(e) => setPriceMax(Number(e.target.value))}
-          className="w-full accent-[#0F2952] cursor-pointer"
+          className="w-full accent-[#0145F2] cursor-pointer"
           aria-label="Maksimalna cijena"
         />
         <div className="flex items-center justify-between mt-2 mb-4">
           <span className="text-[11px] text-gray-400">0 KM</span>
-          <span className="text-[12px] font-bold text-[#0F2952]">{priceMax} KM</span>
+          <span className="text-[12px] font-bold text-[#0A0E17]">{priceMax} KM</span>
         </div>
         <button
-          className="w-full py-2.5 border border-[#0F2952] text-[#0F2952] text-[10px] font-bold tracking-[0.12em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
+          className="w-full py-2.5 border border-[#0145F2] text-[#0A0E17] text-[10px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
           onClick={() => onPriceFilter?.(priceMax)}
         >
           Primijeni
@@ -76,9 +76,9 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
                   type="checkbox"
                   checked={selectedBrands.includes(b)}
                   onChange={() => toggleBrand(b)}
-                  className="w-4 h-4 accent-[#0F2952] cursor-pointer"
+                  className="w-4 h-4 accent-[#0145F2] cursor-pointer"
                 />
-                <span className={`text-[12px] transition-colors duration-150 ${selectedBrands.includes(b) ? 'text-[#0F2952] font-semibold' : 'text-gray-600 group-hover:text-[#0F2952]'}`}>
+                <span className={`text-[12px] transition-colors duration-150 ${selectedBrands.includes(b) ? 'text-[#0A0E17] font-semibold' : 'text-gray-600 group-hover:text-[#0145F2]'}`}>
                   {b}
                 </span>
               </label>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 150" font-family="'Archivo Black', 'Arial Black', sans-serif">
+  <!-- ProteinHouse logo — reversed: deblji bijeli rub za tamne podloge. -->
+  <rect x="4" y="4" width="332" height="142" rx="14" fill="#0145F2" stroke="#FFFFFF" stroke-width="8"/>
+  <text x="170" y="86" textLength="292" lengthAdjust="spacingAndGlyphs"
+        font-size="66" fill="#FFFFFF" text-anchor="middle">PROTEIN</text>
+  <rect x="24" y="102" width="292" height="30" rx="4" fill="#FFFFFF"/>
+  <text x="170" y="124" textLength="252" lengthAdjust="spacing"
+        font-size="19" font-weight="700" fill="#0145F2" text-anchor="middle"
+        font-family="Inter, Arial, sans-serif">HOUSE</text>
+</svg>

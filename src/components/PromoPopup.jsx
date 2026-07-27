@@ -46,19 +46,19 @@ export default function PromoPopup() {
   return (
     <div
       className="fixed inset-0 z-[95] flex items-center justify-center p-5"
-      style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
       role="dialog"
       aria-modal="true"
       aria-label={promo.title}
     >
-      <div className="absolute inset-0 bg-[#0A1F42]/60" onClick={close} style={{ animation: 'fadeIn 200ms ease' }} />
+      <div className="absolute inset-0 bg-[#0A0E17]/60" onClick={close} style={{ animation: 'fadeIn 200ms ease' }} />
 
       <div
         className="relative w-full max-w-[420px] bg-white shadow-2xl overflow-hidden"
         style={{ animation: 'popupIn 260ms cubic-bezier(0.34, 1.3, 0.64, 1)' }}
       >
         <button
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-white/90 border-0 text-[#0F2952] cursor-pointer hover:bg-white transition-colors"
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-white/90 border-0 text-[#0A0E17] cursor-pointer hover:bg-white transition-colors"
           onClick={close}
           aria-label="Zatvori"
         >
@@ -74,13 +74,13 @@ export default function PromoPopup() {
 
         <div className="p-6 text-center">
           {(promo.badge || promo.discount_percent) && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 bg-[#0F2952] text-white text-[10px] font-bold tracking-[0.14em] uppercase">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 bg-[#0145F2] text-white text-[10px] font-bold tracking-[0.14em] uppercase">
               <Tag size={11} weight="fill" /> {promo.badge || `−${promo.discount_percent}%`}
             </span>
           )}
           <h3
-            className="text-2xl font-bold text-[#0F2952] uppercase leading-tight mb-2"
-            style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+            className="text-2xl font-bold text-[#0A0E17] uppercase leading-tight mb-2"
+            style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
           >
             {promo.title}
           </h3>
@@ -89,11 +89,11 @@ export default function PromoPopup() {
           )}
           {promo.promo_code && (
             <p className="mb-4 text-[12px] text-gray-500">
-              Kod: <strong className="px-2 py-1 bg-gray-100 border border-dashed border-gray-300 text-[#0F2952] font-mono tracking-wider">{promo.promo_code}</strong>
+              Kod: <strong className="px-2 py-1 bg-gray-100 border border-dashed border-gray-300 text-[#0A0E17] font-mono tracking-wider">{promo.promo_code}</strong>
             </p>
           )}
           <button
-            className="w-full py-3.5 bg-[#0F2952] text-white border-0 text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0A1F42] transition-colors cursor-pointer"
+            className="w-full py-3.5 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer"
             onClick={() => { close(); navigate(promo.link || '/kategorija/akcija') }}
           >
             Iskoristi ponudu →

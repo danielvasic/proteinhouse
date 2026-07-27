@@ -4,7 +4,7 @@ import { Phone, Envelope, MapPin, Clock } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
 import { useStores } from '../hooks/useStores'
 
-const inputCls = 'w-full border border-gray-300 px-4 py-3.5 text-[13px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none focus:border-[#0F2952] transition-colors duration-150 bg-white'
+const inputCls = 'w-full border border-gray-300 px-4 py-3.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
@@ -44,7 +44,7 @@ export default function Contact() {
         <link rel="canonical" href="https://proteinhouse.ba/kontakt" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
         {/* ── Page header ── */}
         <section className="border-b border-gray-200 bg-white">
@@ -54,8 +54,8 @@ export default function Contact() {
               <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Stupite u kontakt</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-[#0F2952] uppercase"
-              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+              className="text-4xl md:text-5xl font-bold text-[#0A0E17] uppercase"
+              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
               Kontakt
             </h1>
@@ -63,15 +63,15 @@ export default function Contact() {
         </section>
 
         {/* ── Content ── */}
-        <section className="py-12 md:py-16 bg-gray-50">
+        <section className="py-12 md:py-16 bg-[#F2F4F7]">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200">
 
               {/* Info */}
               <div className="bg-white p-8 md:p-12">
                 <h2
-                  className="text-xl font-bold text-[#0F2952] uppercase mb-2"
-                  style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  className="text-xl font-bold text-[#0A0E17] uppercase mb-2"
+                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                 >
                   Informacije
                 </h2>
@@ -84,11 +84,11 @@ export default function Contact() {
                   {INFO.map(({ Icon, label, text }) => (
                     <div key={label} className="flex items-start gap-4">
                       <div className="w-9 h-9 border border-gray-200 flex items-center justify-center shrink-0">
-                        <Icon size={16} weight="duotone" color="#0F2952" />
+                        <Icon size={16} weight="duotone" color="#0145F2" />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-0.5">{label}</p>
-                        <p className="text-[13px] text-[#0F2952] font-medium">{text}</p>
+                        <p className="text-[13px] text-[#0A0E17] font-medium">{text}</p>
                       </div>
                     </div>
                   ))}
@@ -98,14 +98,14 @@ export default function Contact() {
               {/* Form */}
               <div className="bg-white p-8 md:p-12">
                 <h2
-                  className="text-xl font-bold text-[#0F2952] uppercase mb-8"
-                  style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  className="text-xl font-bold text-[#0A0E17] uppercase mb-8"
+                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                 >
                   Pošalji poruku
                 </h2>
 
                 {sent ? (
-                  <div className="border border-[#0F2952] bg-[#0F2952] text-white px-5 py-4 text-[13px] font-medium">
+                  <div className="border border-[#0145F2] bg-[#0145F2] text-white px-5 py-4 text-[13px] font-medium">
                     ✓ Poruka je uspješno poslana! Javit ćemo vam se uskoro.
                   </div>
                 ) : (
@@ -144,7 +144,7 @@ export default function Contact() {
                     </div>
                     <button
                       type="submit"
-                      className="mt-2 w-full py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0A1F42] transition-colors duration-150 cursor-pointer border-0"
+                      className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] transition-colors duration-150 cursor-pointer border-0"
                     >
                       Pošalji poruku
                     </button>

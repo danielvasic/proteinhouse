@@ -33,8 +33,9 @@ export const handler = async (event) => {
   try {
     const qs = event.rawQuery ? '?' + event.rawQuery : ''
     const url = event.path + qs
+    const origin = event.headers?.host ? 'https://' + event.headers.host : undefined
 
-    const { html, head } = await render(url)
+    const { html, head } = await render(url, origin)
 
     const body = TEMPLATE
       .replace('<!--app-head-->', head ?? '')

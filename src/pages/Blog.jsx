@@ -33,7 +33,7 @@ export default function Blog() {
         <link rel="canonical" href="https://proteinhouse.ba/blog" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
         {/* ── Page header ── */}
         <section className="border-b border-gray-200 bg-white">
@@ -43,8 +43,8 @@ export default function Blog() {
               <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Savjeti i vijesti</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-[#0F2952] uppercase"
-              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+              className="text-4xl md:text-5xl font-bold text-[#0A0E17] uppercase"
+              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
               Blog
             </h1>
@@ -52,15 +52,15 @@ export default function Blog() {
         </section>
 
         {/* ── Posts ── */}
-        <section className="py-12 md:py-16 bg-gray-50 min-h-[400px]">
+        <section className="py-12 md:py-16 bg-[#F2F4F7] min-h-[400px]">
           <div className="container">
             {loading ? (
               <div className="flex justify-center py-20">
-                <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#0F2952] animate-spin" />
+                <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#0145F2] animate-spin" />
               </div>
             ) : posts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-                <p className="text-[15px] font-bold text-[#0F2952] uppercase" style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}>
+                <p className="text-[15px] font-bold text-[#0A0E17] uppercase" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
                   Nema objavljenih postova
                 </p>
                 <p className="text-[13px] text-gray-400">Uskoro dolaze novi sadržaji.</p>
@@ -93,8 +93,8 @@ export default function Blog() {
                         {post.author && <> · {post.author}</>}
                       </p>
                       <h2
-                        className="text-[18px] font-bold text-[#0F2952] leading-snug mb-3 uppercase"
-                        style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                        className="text-[18px] font-bold text-[#0A0E17] leading-snug mb-3 uppercase"
+                        style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                       >
                         {post.title}
                       </h2>
@@ -103,7 +103,7 @@ export default function Blog() {
                       )}
                       <Link
                         to={`/blog/${post.slug}`}
-                        className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0F2952] border-b border-[#0F2952] pb-px w-fit hover:opacity-60 transition-opacity duration-150"
+                        className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0A0E17] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity duration-150"
                       >
                         Pročitaj više <ArrowRight size={12} weight="bold" />
                       </Link>

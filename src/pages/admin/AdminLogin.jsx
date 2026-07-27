@@ -33,7 +33,7 @@ export default function AdminLogin() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: '#0F2952', fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+      style={{ background: '#0145F2', fontFamily: 'Inter, system-ui, sans-serif' }}
     >
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}

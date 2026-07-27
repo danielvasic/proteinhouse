@@ -21,13 +21,13 @@ export default function BrandStrip() {
   if (loading || brands.length === 0) return null
 
   return (
-    <section className="py-12 bg-gray-50 border-b border-gray-200">
+    <section className="py-12 bg-[#F2F4F7] border-b border-gray-200">
       <div className="container">
         <div className="flex items-center gap-4 mb-7">
           <div className="h-px flex-1 bg-gray-200" />
           <p
             className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400"
-            style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
             Naši brendovi
           </p>
