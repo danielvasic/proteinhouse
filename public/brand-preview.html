@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ProteinHouse — Brand redizajn preview</title>
-<link rel="icon" href="/brand/favicon-p.svg">
+<link rel="icon" href="/brand/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Exo+2:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --blue:  #0145F2;
@@ -27,15 +27,14 @@
   .card.dark { background: var(--dark); }
   .label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8a93a3; margin-bottom: 14px; }
 
-  /* Logo (HTML/CSS verzija — ovako će izgledati u headeru) */
-  .logo { display: inline-block; text-align: center; }
-  .logo .p { display: block; background: var(--blue); color: var(--white); font-family: 'Exo 2', sans-serif; font-weight: 800; font-size: 44px; line-height: 1; letter-spacing: 0.01em; padding: 10px 18px 12px; }
-  .logo .h { display: block; font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 0.62em; margin-top: 7px; margin-right: -0.62em; color: var(--dark); }
-  .logo.rev { background: var(--blue); padding: 14px 18px 12px; }
-  .logo.rev .p { padding: 0 0 10px; }
-  .logo.rev .h { color: var(--white); margin-top: 0; }
-  .logo.sm .p { font-size: 26px; padding: 6px 10px 8px; }
-  .logo.sm .h { font-size: 10px; margin-top: 4px; }
+  /* Logo (HTML/CSS verzija — kompaktan, sve u jednom boxu kao original) */
+  .logo { display: inline-block; background: var(--blue); border-radius: 12px; padding: 8px 12px 10px; text-align: center; }
+  .logo.bordered { box-shadow: 0 0 0 4px var(--white); }
+  .logo .p { display: block; color: var(--white); font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 40px; line-height: 1.05; letter-spacing: 0.01em; }
+  .logo .h { display: block; background: var(--white); color: var(--blue); font-family: Inter, sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.6em; padding: 4px 0 4px 0.6em; border-radius: 3px; margin-top: 5px; }
+  .logo.sm { border-radius: 8px; padding: 5px 8px 7px; }
+  .logo.sm .p { font-size: 22px; }
+  .logo.sm .h { font-size: 8px; padding: 3px 0 3px 0.6em; margin-top: 3px; }
 
   .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .sw { border: 1px solid #e3e7ee; }
@@ -81,8 +80,8 @@
       &nbsp;&nbsp;&nbsp;<span class="logo sm"><span class="p">PROTEIN</span><span class="h">HOUSE</span></span>
     </div>
     <div class="card dark">
-      <p class="label">Reversed (tamna podloga)</p>
-      <span class="logo rev"><span class="p">PROTEIN</span><span class="h">HOUSE</span></span>
+      <p class="label">Na tamnoj podlozi (bijeli rub)</p>
+      <span class="logo bordered"><span class="p">PROTEIN</span><span class="h">HOUSE</span></span>
     </div>
     <div class="card">
       <p class="label">SVG fajl: /brand/logo.svg</p>
@@ -102,15 +101,14 @@
     <div class="sw"><div class="c" style="background:#FFFFFF; border-bottom:1px solid #e3e7ee"></div><div class="t">#FFFFFF<small>Kartice, površine</small></div></div>
   </div>
 
-  <h2>Favicon</h2>
+  <h2>Favicon — izabrano: dvije trake</h2>
   <div class="card">
     <div class="favrow">
-      <div class="fav"><img src="/brand/favicon-p.svg" width="64" height="64" alt="P favicon"><div class="s">P · 64px</div></div>
-      <div class="fav"><img src="/brand/favicon-p.svg" width="32" height="32" alt=""><div class="s">32px</div></div>
-      <div class="fav"><img src="/brand/favicon-p.svg" width="16" height="16" alt=""><div class="s">16px</div></div>
-      <div class="fav" style="margin-left:24px"><img src="/brand/favicon-ph.svg" width="64" height="64" alt="PH favicon"><div class="s">PH · 64px</div></div>
-      <div class="fav"><img src="/brand/favicon-ph.svg" width="32" height="32" alt=""><div class="s">32px</div></div>
-      <div class="fav"><img src="/brand/favicon-ph.svg" width="16" height="16" alt=""><div class="s">16px</div></div>
+      <div class="fav"><img src="/brand/favicon.svg" width="64" height="64" alt="Favicon"><div class="s"><b>= · 64px</b></div></div>
+      <div class="fav"><img src="/brand/favicon.svg" width="32" height="32" alt=""><div class="s">32px</div></div>
+      <div class="fav"><img src="/brand/favicon.svg" width="16" height="16" alt=""><div class="s">16px</div></div>
+      <div class="fav" style="margin-left:32px;opacity:.45"><img src="/brand/favicon-p.svg" width="40" height="40" alt=""><div class="s">alt: P</div></div>
+      <div class="fav" style="opacity:.45"><img src="/brand/favicon-ph.svg" width="40" height="40" alt=""><div class="s">alt: PH</div></div>
     </div>
   </div>
 
