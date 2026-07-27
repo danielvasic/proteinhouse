@@ -85,8 +85,8 @@ export default function Footer() {
 
   return (
     <footer
-      className="bg-[#0A1F42] text-white"
-      style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+      className="bg-[#0A0E17] text-white"
+      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
     >
       <div className="container">
         <div className={`grid grid-cols-2 ${mdGridCls} gap-x-10 gap-y-10 py-14 md:py-16`}>

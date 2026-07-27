@@ -40,15 +40,15 @@ export default function About() {
         <link rel="canonical" href="https://proteinhouse.ba/o-nama" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
         {/* ── Hero ── */}
         <section
           className="relative flex items-end min-h-[340px] md:min-h-[420px] bg-cover bg-center"
           style={{
             backgroundImage: data.about_hero_image
-              ? `linear-gradient(105deg, rgba(10,31,66,0.94) 0%, rgba(10,31,66,0.60) 60%, rgba(10,31,66,0.20) 100%), url('${data.about_hero_image}')`
-              : 'linear-gradient(135deg, #0A1F42 0%, #0F2952 60%, #1F4399 100%)',
+              ? `linear-gradient(105deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.60) 60%, rgba(10,14,23,0.20) 100%), url('${data.about_hero_image}')`
+              : 'linear-gradient(135deg, #0A0E17 0%, #0145F2 60%, #0136C4 100%)',
           }}
         >
           <div className="container pb-12 md:pb-16">
@@ -58,7 +58,7 @@ export default function About() {
             </div>
             <h1
               className="text-4xl md:text-5xl font-bold text-white uppercase leading-tight"
-              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
               O nama
             </h1>
@@ -76,14 +76,14 @@ export default function About() {
 
         {/* ── Stats (samo ako postoje u bazi) ── */}
         {stats.length > 0 && (
-          <section className="bg-[#0F2952] py-12 md:py-16">
+          <section className="bg-[#0145F2] py-12 md:py-16">
             <div className="container">
               <div className={`grid grid-cols-2 gap-px bg-white/10 ${{ 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' }[stats.length] || 'md:grid-cols-4'}`}>
                 {stats.map((s) => (
-                  <div key={s.label} className="bg-[#0F2952] flex flex-col items-center justify-center py-10 px-6 text-center">
+                  <div key={s.label} className="bg-[#0145F2] flex flex-col items-center justify-center py-10 px-6 text-center">
                     <span
                       className="text-4xl md:text-5xl font-bold text-white leading-none mb-2"
-                      style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                      style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                     >
                       {s.value}
                     </span>
@@ -106,10 +106,10 @@ export default function About() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-gray-200">
               {VALUES.map(({ Icon, title, desc }) => (
                 <div key={title} className="bg-white p-8">
-                  <Icon size={26} weight="duotone" color="#0F2952" className="mb-5 opacity-70" />
+                  <Icon size={26} weight="duotone" color="#0145F2" className="mb-5 opacity-70" />
                   <h3
-                    className="text-[15px] font-bold text-[#0F2952] mb-3 uppercase"
-                    style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                    className="text-[15px] font-bold text-[#0A0E17] mb-3 uppercase"
+                    style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                   >
                     {title}
                   </h3>
@@ -122,7 +122,7 @@ export default function About() {
 
         {/* ── Poslovnice (samo ako postoje u bazi) ── */}
         {!storesLoading && stores.length > 0 && (
-          <section className="py-14 md:py-20 bg-gray-50">
+          <section className="py-14 md:py-20 bg-[#F2F4F7]">
             <div className="container">
               <div className="flex items-center gap-4 mb-10">
                 <div className="h-px flex-1 bg-gray-200" />
@@ -138,8 +138,8 @@ export default function About() {
                 {stores.map((s) => (
                   <div key={s.id} className="bg-white p-8">
                     <h3
-                      className="text-xl font-bold text-[#0F2952] mb-5 uppercase"
-                      style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                      className="text-xl font-bold text-[#0A0E17] mb-5 uppercase"
+                      style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                     >
                       {s.city}
                     </h3>
@@ -173,7 +173,7 @@ export default function About() {
                           href={s.map_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0F2952] border-b border-[#0F2952] pb-px w-fit hover:opacity-60 transition-opacity mt-1"
+                          className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0A0E17] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity mt-1"
                         >
                           <MapPin size={11} /> Prikaži na mapi
                         </a>

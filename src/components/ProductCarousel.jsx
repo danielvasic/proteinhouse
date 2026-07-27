@@ -20,10 +20,10 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
   const total = pages.length
   const go = (dir) => setPage((p) => (p + dir + total) % total)
 
-  const arrowCls = 'w-9 h-9 flex items-center justify-center border border-gray-300 bg-white text-[#0F2952] hover:bg-[#0F2952] hover:text-white hover:border-[#0F2952] transition-all duration-150 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer'
+  const arrowCls = 'w-9 h-9 flex items-center justify-center border border-gray-300 bg-white text-[#0A0E17] hover:bg-[#0145F2] hover:text-white hover:border-[#0145F2] transition-all duration-150 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer'
 
   return (
-    <section className="py-12 md:py-14" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+    <section className="py-12 md:py-14" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div className="container">
 
         {/* Section header */}
@@ -33,8 +33,8 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
               <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400 mb-2">{eyebrow}</p>
             )}
             <h2
-              className="text-2xl md:text-3xl font-bold text-[#0F2952] leading-tight uppercase"
-              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+              className="text-2xl md:text-3xl font-bold text-[#0A0E17] leading-tight uppercase"
+              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
               {title}
             </h2>
@@ -49,7 +49,7 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
             </button>
             {categorySlug && (
               <button
-                className="hidden sm:flex items-center gap-2 px-5 py-2.5 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150 cursor-pointer ml-1"
+                className="hidden sm:flex items-center gap-2 px-5 py-2.5 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer ml-1"
                 onClick={() => navigate(`/kategorija/${categorySlug}`)}
               >
                 Pogledaj sve →
@@ -87,7 +87,7 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
             {pages.map((_, i) => (
               <button
                 key={i}
-                className={`h-[3px] transition-all duration-200 cursor-pointer border-0 ${i === page ? 'w-8 bg-[#0F2952]' : 'w-3 bg-gray-300 hover:bg-gray-400'}`}
+                className={`h-[3px] transition-all duration-200 cursor-pointer border-0 ${i === page ? 'w-8 bg-[#0145F2]' : 'w-3 bg-gray-300 hover:bg-gray-400'}`}
                 onClick={() => setPage(i)}
                 aria-label={`Stranica ${i + 1}`}
                 aria-selected={i === page}

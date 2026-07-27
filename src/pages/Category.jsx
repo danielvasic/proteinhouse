@@ -45,23 +45,23 @@ export default function Category() {
         <link rel="canonical" href={`https://proteinhouse.ba/kategorija/${slug}`} />
       </Helmet>
 
-      <main style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
         {/* ── Page header ── */}
         <section className="border-b border-gray-200 bg-white">
           <div className="container py-10 md:py-12">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-[11px] text-gray-400 mb-6" aria-label="Breadcrumb">
-              <Link to="/" className="flex items-center gap-1 hover:text-[#0F2952] transition-colors">
+              <Link to="/" className="flex items-center gap-1 hover:text-[#0145F2] transition-colors">
                 <House size={12} weight="fill" /> Početna
               </Link>
               <CaretRight size={11} className="opacity-40" />
-              <span className="text-[#0F2952] font-semibold">{pageTitle}</span>
+              <span className="text-[#0A0E17] font-semibold">{pageTitle}</span>
             </nav>
 
             <h1
-              className="text-3xl md:text-4xl font-bold text-[#0F2952] uppercase"
-              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+              className="text-3xl md:text-4xl font-bold text-[#0A0E17] uppercase"
+              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
               {pageTitle}
             </h1>
@@ -70,7 +70,7 @@ export default function Category() {
         </section>
 
         {/* ── Content ── */}
-        <section className="py-12 bg-gray-50">
+        <section className="py-12 bg-[#F2F4F7]">
           <div className="container">
             <div className="flex gap-8 items-start">
 
@@ -85,10 +85,10 @@ export default function Category() {
                 {/* Sort bar */}
                 <div className="flex items-center justify-between mb-5 py-3 border-b border-gray-200">
                   <span className="text-[12px] text-gray-500">
-                    Prikazano <strong className="text-[#0F2952]">{sorted.length}</strong> od {allProducts.length} proizvoda
+                    Prikazano <strong className="text-[#0A0E17]">{sorted.length}</strong> od {allProducts.length} proizvoda
                   </span>
                   <select
-                    className="border border-gray-300 px-3 py-2 text-[12px] text-[#0F2952] focus:outline-none focus:border-[#0F2952] bg-white cursor-pointer"
+                    className="border border-gray-300 px-3 py-2 text-[12px] text-[#0A0E17] focus:outline-none focus:border-[#0145F2] bg-white cursor-pointer"
                     value={sort}
                     onChange={(e) => setSort(e.target.value)}
                     aria-label="Sortiranje"

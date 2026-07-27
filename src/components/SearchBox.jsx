@@ -5,7 +5,7 @@ import { useAllProducts, rankBestsellers, hasAnyStock } from '../hooks/useProduc
 import { useCategories } from '../hooks/useCategories'
 import { fmtKM } from '../data/catalog'
 
-const FONT = 'Montserrat, Inter, system-ui, sans-serif'
+const FONT = 'Inter, system-ui, sans-serif'
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false)
@@ -69,7 +69,7 @@ function ProductRow({ p, onGo }) {
   return (
     <button
       type="button"
-      className="flex items-center gap-3.5 w-full px-4 py-3 bg-transparent border-0 cursor-pointer text-left hover:bg-gray-50 transition-colors"
+      className="flex items-center gap-3.5 w-full px-4 py-3 bg-transparent border-0 cursor-pointer text-left hover:bg-[#F2F4F7] transition-colors"
       onClick={() => onGo(`/proizvod/${p.slug}`)}
     >
       <div className="w-14 h-14 bg-white border border-gray-200 rounded-lg shrink-0 overflow-hidden flex items-center justify-center">
@@ -80,7 +80,7 @@ function ProductRow({ p, onGo }) {
         <p className="text-[12px] text-gray-500 m-0 mt-0.5 truncate">{subtitle}</p>
         <p className="m-0 mt-1 flex items-baseline gap-2">
           {p.old && <span className="text-[12px] text-gray-400 line-through">{fmtKM(p.old)}</span>}
-          <span className={`text-[14px] font-bold ${p.old ? 'text-[#E02020]' : 'text-[#0F2952]'}`}>{fmtKM(p.price)}</span>
+          <span className={`text-[14px] font-bold ${p.old ? 'text-[#E02020]' : 'text-[#0A0E17]'}`}>{fmtKM(p.price)}</span>
         </p>
       </div>
     </button>
@@ -120,7 +120,7 @@ function SuggestionList({ typed, matches, rows, chips, query, onGo }) {
       {typed && matches.length > 0 && (
         <button
           type="button"
-          className="flex items-center justify-center gap-1.5 w-full px-4 py-3.5 bg-gray-50 border-0 border-t border-gray-200 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0F2952] cursor-pointer hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center gap-1.5 w-full px-4 py-3.5 bg-[#F2F4F7] border-0 border-t border-gray-200 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0A0E17] cursor-pointer hover:bg-gray-100 transition-colors"
           onClick={() => onGo(`/pretraga?q=${encodeURIComponent(query.trim())}`)}
         >
           Svi rezultati ({matches.length}) <ArrowRight size={12} weight="bold" />
@@ -184,7 +184,7 @@ export default function SearchBox({ onNavigate }) {
       <div style={{ fontFamily: FONT }} className="flex-1">
         <button
           type="button"
-          className="flex items-center gap-2 w-full h-10 px-3.5 bg-gray-50 border border-gray-200 text-left cursor-pointer"
+          className="flex items-center gap-2 w-full h-10 px-3.5 bg-[#F2F4F7] border border-gray-200 text-left cursor-pointer"
           onClick={() => setOpen(true)}
           aria-label="Otvori pretragu"
         >
@@ -236,7 +236,7 @@ export default function SearchBox({ onNavigate }) {
   return (
     <div ref={rootRef} className="relative flex-1 max-w-[460px]" style={{ fontFamily: FONT }}>
       <form
-        className="flex items-center gap-2 h-10 px-3.5 bg-gray-50 border border-gray-200 focus-within:border-[#0F2952] focus-within:bg-white transition-all duration-150"
+        className="flex items-center gap-2 h-10 px-3.5 bg-[#F2F4F7] border border-gray-200 focus-within:border-[#0145F2] focus-within:bg-white transition-all duration-150"
         onSubmit={submit}
       >
         <MagnifyingGlass size={15} className="text-gray-400 shrink-0" />
@@ -251,7 +251,7 @@ export default function SearchBox({ onNavigate }) {
       </form>
 
       {open && hasContent && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-[0_16px_32px_-12px_rgba(10,31,66,0.25)] z-[60] flex flex-col max-h-[70vh] overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-[0_16px_32px_-12px_rgba(10,14,23,0.25)] z-[60] flex flex-col max-h-[70vh] overflow-hidden">
           <SuggestionList typed={typed} matches={matches} rows={rows} chips={chips} query={query} onGo={go} />
         </div>
       )}

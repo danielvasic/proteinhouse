@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { Envelope, LockKey, User as UserIcon } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 
-const inputCls = 'w-full border border-gray-300 pl-10 pr-4 py-3.5 text-[13px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none focus:border-[#0F2952] transition-colors duration-150 bg-white'
+const inputCls = 'w-full border border-gray-300 pl-10 pr-4 py-3.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
 
 function Field({ label, children }) {
   return (
@@ -78,8 +78,8 @@ export default function Login() {
       </Helmet>
 
       <main
-        className="min-h-[calc(100vh-220px)] bg-gray-50 flex items-center justify-center py-16 px-4"
-        style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+        className="min-h-[calc(100vh-220px)] bg-[#F2F4F7] flex items-center justify-center py-16 px-4"
+        style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
       >
         <div className="w-full max-w-[440px]">
 
@@ -93,8 +93,8 @@ export default function Login() {
               <div className="h-px w-8 bg-gray-300" />
             </div>
             <h1
-              className="text-3xl font-bold text-[#0F2952] uppercase"
-              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+              className="text-3xl font-bold text-[#0A0E17] uppercase"
+              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
               {isRegister ? 'Registracija' : 'Prijava'}
             </h1>
@@ -136,7 +136,7 @@ export default function Login() {
                     <input className={inputCls} type="password" placeholder="••••••••" autoComplete="new-password" value={form.confirmPassword} onChange={set('confirmPassword')} required />
                   </InputWrap>
                 </Field>
-                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0A1F42] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
+                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
                   {loading ? 'Kreiranje naloga…' : 'Kreiraj nalog'}
                 </button>
               </form>
@@ -154,14 +154,14 @@ export default function Login() {
                 </Field>
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 text-[12px] text-gray-600 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 accent-[#0F2952]" checked={form.remember} onChange={(e) => setForm((f) => ({ ...f, remember: e.target.checked }))} />
+                    <input type="checkbox" className="w-4 h-4 accent-[#0145F2]" checked={form.remember} onChange={(e) => setForm((f) => ({ ...f, remember: e.target.checked }))} />
                     Zapamti me
                   </label>
-                  <Link to="/nalog/zaboravljena-sifra" className="text-[12px] text-gray-500 hover:text-[#0F2952] transition-colors">
+                  <Link to="/nalog/zaboravljena-sifra" className="text-[12px] text-gray-500 hover:text-[#0145F2] transition-colors">
                     Zaboravljena šifra?
                   </Link>
                 </div>
-                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0F2952] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0A1F42] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
+                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
                   {loading ? 'Prijavljivanje…' : 'Prijavi se'}
                 </button>
               </form>
@@ -175,11 +175,11 @@ export default function Login() {
             </div>
 
             {isRegister ? (
-              <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150">
+              <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
                 Imam nalog — Prijavi se
               </Link>
             ) : (
-              <Link to="/nalog/registracija" className="block w-full text-center py-3.5 border border-[#0F2952] text-[#0F2952] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0F2952] hover:text-white transition-all duration-150">
+              <Link to="/nalog/registracija" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
                 Kreiraj nalog
               </Link>
             )}

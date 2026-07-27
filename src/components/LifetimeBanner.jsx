@@ -37,8 +37,8 @@ export default function LifetimeBanner() {
 
   return (
     <button
-      className="fixed bottom-4 left-4 z-[85] flex items-center gap-2.5 pl-3 pr-8 py-2.5 bg-[#0F2952] text-white border border-white/15 shadow-[0_8px_24px_-6px_rgba(10,31,66,0.5)] cursor-pointer hover:bg-[#0A1F42] transition-colors text-left"
-      style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+      className="fixed bottom-4 left-4 z-[85] flex items-center gap-2.5 pl-3 pr-8 py-2.5 bg-[#0145F2] text-white border border-white/15 shadow-[0_8px_24px_-6px_rgba(10,14,23,0.5)] cursor-pointer hover:bg-[#0136C4] transition-colors text-left"
+      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
       onClick={() => navigate(banner.link || '/kategorija/akcija')}
       aria-label={banner.text}
     >

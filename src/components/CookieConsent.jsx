@@ -25,8 +25,8 @@ export default function CookieConsent() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[90] bg-white border-t-2 border-[#0F2952] shadow-[0_-8px_32px_-8px_rgba(10,31,66,0.25)]"
-      style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+      className="fixed bottom-0 left-0 right-0 z-[90] bg-white border-t-2 border-[#0145F2] shadow-[0_-8px_32px_-8px_rgba(10,14,23,0.25)]"
+      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
       role="dialog"
       aria-label="Postavke kolačića"
     >
@@ -38,7 +38,7 @@ export default function CookieConsent() {
           <p className="text-[13px] text-gray-600 leading-relaxed m-0 flex-1">
             Koristimo kolačiće za bolje iskustvo kupovine i analitiku.{' '}
             <button
-              className="inline-flex items-center gap-0.5 text-[#0F2952] font-semibold underline underline-offset-2 bg-transparent border-0 p-0 cursor-pointer"
+              className="inline-flex items-center gap-0.5 text-[#0A0E17] font-semibold underline underline-offset-2 bg-transparent border-0 p-0 cursor-pointer"
               onClick={() => setMore((m) => !m)}
             >
               Više informacija {more ? <CaretUp size={10} /> : <CaretDown size={10} />}
@@ -52,7 +52,7 @@ export default function CookieConsent() {
               Odbij
             </button>
             <button
-              className="flex-1 sm:flex-none px-7 py-3 bg-[#0F2952] text-white border-0 text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0A1F42] transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-7 py-3 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer"
               onClick={() => decide('accepted')}
             >
               Prihvati
@@ -63,14 +63,14 @@ export default function CookieConsent() {
         {more && (
           <div className="mt-3 pt-3 border-t border-gray-100 text-[11px] text-gray-500 leading-relaxed">
             <p className="m-0 mb-1.5">
-              <strong className="text-[#0F2952]">Neophodni kolačići</strong> — korpa, sesija i sigurnost. Uvijek aktivni.
+              <strong className="text-[#0A0E17]">Neophodni kolačići</strong> — korpa, sesija i sigurnost. Uvijek aktivni.
             </p>
             <p className="m-0 mb-1.5">
-              <strong className="text-[#0F2952]">Analitički kolačići</strong> (Google Analytics) — anonimna statistika posjeta
+              <strong className="text-[#0A0E17]">Analitički kolačići</strong> (Google Analytics) — anonimna statistika posjeta
               koja nam pomaže da poboljšamo shop. Aktiviraju se samo ako prihvatite.
             </p>
             <p className="m-0">
-              Detalji u našim <Link to="/kolacici" className="text-[#0F2952] underline">pravilima kolačića</Link>.
+              Detalji u našim <Link to="/kolacici" className="text-[#0A0E17] underline">pravilima kolačića</Link>.
             </p>
           </div>
         )}

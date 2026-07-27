@@ -138,7 +138,7 @@ function ColumnEditor({ col, colIdx, totalCols, onChange, onMoveUp, onMoveDown, 
 
       <CardContent className="pt-0 space-y-2">
         {col.links.map((link, li) => (
-          <div key={li} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
+          <div key={li} className="flex items-center gap-2 px-3 py-2 bg-[#F2F4F7] rounded-lg border border-gray-100">
             {/* Link order controls */}
             <div className="flex flex-col gap-0.5 shrink-0">
               <button
@@ -418,7 +418,7 @@ export default function FooterAdmin() {
           <CardTitle className="text-sm">Preview footera</CardTitle>
         </CardHeader>
         <CardContent className="p-0 overflow-hidden rounded-b-lg">
-          <div className="bg-[#0A1F42] text-white px-6 py-8 text-[12px]">
+          <div className="bg-[#0A0E17] text-white px-6 py-8 text-[12px]">
             <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${Math.min(4, 1 + columns.length)}, minmax(0, 1fr))` }}>
               {/* Brand col */}
               <div>

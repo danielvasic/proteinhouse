@@ -29,10 +29,10 @@ export default function GoalsSection() {
 
   return (
     <section
-      className="py-12 md:py-16 bg-[#0A1F42] bg-cover bg-center"
+      className="py-12 md:py-16 bg-[#0A0E17] bg-cover bg-center"
       style={{
-        fontFamily: 'Montserrat, Inter, system-ui, sans-serif',
-        backgroundImage: `linear-gradient(100deg, rgba(10,31,66,0.94) 0%, rgba(10,31,66,0.82) 55%, rgba(10,31,66,0.60) 100%), url('${bgImage}')`,
+        fontFamily: 'Inter, system-ui, sans-serif',
+        backgroundImage: `linear-gradient(100deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.82) 55%, rgba(10,14,23,0.60) 100%), url('${bgImage}')`,
       }}
     >
       <div className="container">
@@ -41,7 +41,7 @@ export default function GoalsSection() {
             <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/60 mb-1.5 m-0">Pronađi svoje</p>
             <h2
               className="text-2xl md:text-3xl font-bold text-white uppercase m-0"
-              style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
               Kupovina po ciljevima
             </h2>
@@ -54,12 +54,12 @@ export default function GoalsSection() {
             return (
               <button
                 key={item.label}
-                className="group flex flex-col items-start gap-3 p-5 md:p-6 bg-[#0A1F42]/75 backdrop-blur-[2px] border border-white/20 text-left cursor-pointer hover:bg-white hover:border-white transition-all duration-200"
+                className="group flex flex-col items-start gap-3 p-5 md:p-6 bg-[#0A0E17]/75 backdrop-blur-[2px] border border-white/20 text-left cursor-pointer hover:bg-white hover:border-white transition-all duration-200"
                 onClick={() => navigate(item.to)}
               >
-                <Icon size={28} weight="duotone" className="text-white group-hover:text-[#0F2952] transition-colors" />
+                <Icon size={28} weight="duotone" className="text-white group-hover:text-[#0145F2] transition-colors" />
                 <div>
-                  <p className="text-[14px] md:text-[15px] font-bold text-white group-hover:text-[#0F2952] uppercase tracking-[0.04em] m-0 transition-colors">
+                  <p className="text-[14px] md:text-[15px] font-bold text-white group-hover:text-[#0145F2] uppercase tracking-[0.04em] m-0 transition-colors">
                     {item.label}
                   </p>
                   {item.sub && (
@@ -68,7 +68,7 @@ export default function GoalsSection() {
                     </p>
                   )}
                 </div>
-                <span className="flex items-center gap-1.5 mt-auto text-[10px] font-bold tracking-[0.12em] uppercase text-white/70 group-hover:text-[#0F2952] transition-colors">
+                <span className="flex items-center gap-1.5 mt-auto text-[10px] font-bold tracking-[0.12em] uppercase text-white/70 group-hover:text-[#0145F2] transition-colors">
                   Istraži <ArrowRight size={11} weight="bold" />
                 </span>
               </button>

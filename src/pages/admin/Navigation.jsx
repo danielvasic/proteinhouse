@@ -90,7 +90,7 @@ export default function Navigation() {
           {items.map((item, idx) => (
             <div
               key={item.key}
-              className={`flex items-center gap-3 px-4 py-3 border rounded-lg transition-colors ${item.active ? 'border-gray-200 bg-white' : 'border-gray-100 bg-gray-50 opacity-60'}`}
+              className={`flex items-center gap-3 px-4 py-3 border rounded-lg transition-colors ${item.active ? 'border-gray-200 bg-white' : 'border-gray-100 bg-[#F2F4F7] opacity-60'}`}
             >
               {/* Order controls */}
               <div className="flex flex-col gap-0.5 shrink-0">
@@ -186,7 +186,7 @@ export default function Navigation() {
           <CardTitle className="text-sm">Preview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center bg-[#0F2952] px-4 py-3 rounded gap-1 flex-wrap">
+          <div className="flex items-center bg-[#0145F2] px-4 py-3 rounded gap-1 flex-wrap">
             {items.filter(i => i.active && !i.right).map((item) => (
               <span
                 key={item.key}

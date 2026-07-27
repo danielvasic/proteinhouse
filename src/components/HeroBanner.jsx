@@ -64,11 +64,17 @@ export default function HeroBanner() {
       className="relative flex items-center bg-cover bg-center bg-no-repeat overflow-hidden min-h-[46vh] max-h-[50vh] md:max-h-none md:min-h-[440px] lg:min-h-[520px] transition-[background-image] duration-300"
       style={{
         backgroundImage: b.image_url
-          ? `linear-gradient(105deg, rgba(10,31,66,0.95) 0%, rgba(10,31,66,0.70) 52%, rgba(10,31,66,0.18) 100%), url('${b.image_url}')`
-          : 'linear-gradient(135deg, #0A1F42 0%, #0F2952 60%, #1F4399 100%)',
+          ? `linear-gradient(105deg, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.70) 52%, rgba(10,14,23,0.18) 100%), url('${b.image_url}')`
+          : 'linear-gradient(135deg, #0A0E17 0%, #101A30 55%, #0136C4 100%)',
       }}
     >
-      <div className="container w-full">
+      {/* Brand pattern overlay (chevroni) — suptilno, desna strana */}
+      <div
+        className="absolute inset-y-0 right-0 w-[55%] ph-pattern opacity-[0.05] pointer-events-none"
+        style={{ maskImage: 'linear-gradient(90deg, transparent 0%, black 60%)', WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 60%)' }}
+      />
+
+      <div className="container w-full relative">
         <div key={index} className="max-w-[620px] py-8 md:py-16" style={{ animation: 'heroFade 400ms ease' }}>
 
           {/* Eyebrow */}
@@ -77,7 +83,7 @@ export default function HeroBanner() {
               <div className="h-px w-10 bg-white/35" />
               <span
                 className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/55"
-                style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
               >
                 {b.eyebrow}
               </span>
@@ -87,7 +93,7 @@ export default function HeroBanner() {
           {/* Headline */}
           <h1
             className="text-[34px] md:text-6xl lg:text-[64px] font-bold text-white uppercase leading-[0.95] tracking-[-0.02em] mb-4 md:mb-7"
-            style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+            style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
           >
             {titleLines.map((line, i) => (
               <span key={i}>{line}{i < titleLines.length - 1 && <br />}</span>
@@ -98,7 +104,7 @@ export default function HeroBanner() {
           {b.subtitle && (
             <p
               className="text-[13px] md:text-[15px] text-white/65 leading-relaxed mb-5 md:mb-8 max-w-[440px]"
-              style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
             >
               {b.subtitle}
             </p>
@@ -108,8 +114,8 @@ export default function HeroBanner() {
           <div className="flex flex-wrap gap-3">
             {b.cta_primary_text && (
               <button
-                className="flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 bg-white text-[#0F2952] text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
-                style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+                className="flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 bg-white text-[#0A0E17] text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
+                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                 onClick={() => navigate(b.cta_primary_link || '/kategorija/akcija')}
               >
                 <Tag size={15} weight="fill" /> {b.cta_primary_text}
@@ -118,7 +124,7 @@ export default function HeroBanner() {
             {b.cta_secondary_text && (
               <button
                 className="flex items-center gap-2 px-6 md:px-8 py-3 md:py-3.5 border border-white/35 text-white text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase hover:border-white/70 hover:bg-white/10 transition-all duration-150 cursor-pointer"
-                style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                 onClick={() => navigate(b.cta_secondary_link || '/kategorija/proteini')}
               >
                 {b.cta_secondary_text} <ArrowRight size={14} weight="bold" />
@@ -132,13 +138,13 @@ export default function HeroBanner() {
               <div key={label}>
                 <p
                   className="text-[26px] font-bold text-white leading-none"
-                  style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
                 >
                   {value}
                 </p>
                 <p
                   className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/45 mt-1"
-                  style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
+                  style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                 >
                   {label}
                 </p>

@@ -69,7 +69,7 @@ export default function AdminLayout() {
 
   if (loading || !admin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F2F4F7]">
         <div className="h-10 w-10 rounded-full border-4 border-gray-200 border-t-emerald-500 animate-spin" />
       </div>
     )
@@ -78,7 +78,7 @@ export default function AdminLayout() {
   const initial = admin?.email?.[0]?.toUpperCase() ?? 'A'
 
   return (
-    <div className="min-h-screen flex bg-gray-50" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+    <div className="min-h-screen flex bg-[#F2F4F7]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -93,7 +93,7 @@ export default function AdminLayout() {
           'fixed inset-y-0 left-0 z-50 w-64 flex flex-col transition-transform duration-300 lg:static lg:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
-        style={{ background: '#0F2952', color: '#c9d8f0' }}
+        style={{ background: '#0145F2', color: '#c9d8f0' }}
       >
         {/* Brand */}
         <div className="flex h-16 items-center gap-3 px-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
@@ -206,7 +206,7 @@ export default function AdminLayout() {
             <Bell size={18} />
           </Button>
           <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-            style={{ background: '#0F2952' }}>
+            style={{ background: '#0145F2' }}>
             {initial}
           </div>
         </header>

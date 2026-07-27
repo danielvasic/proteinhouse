@@ -1,29 +1,43 @@
+/* Kompaktni box logo — PROTEIN u plavom boxu, HOUSE bijela traka unutra */
 .logo {
-  display: inline-flex;
-  align-items: baseline;
-  font-family: var(--ph-font-display);
+  display: inline-block;
+  background: #0145F2;
+  border-radius: 0.28em;
+  padding: 0.18em 0.3em 0.24em;
+  text-align: center;
   line-height: 1;
-  color: var(--ph-navy-700);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
   white-space: nowrap;
   user-select: none;
   cursor: default;
-  gap: 0;
 }
 
 .logo[role='button'] {
   cursor: pointer;
 }
 
+/* Na tamnoj podlozi: bijeli rub kao na originalu */
 .onDark {
-  color: var(--ph-white);
+  box-shadow: 0 0 0 0.09em #ffffff;
 }
 
 .protein {
-  font-weight: 700;
+  display: block;
+  color: #ffffff;
+  font-family: 'Archivo Black', 'Arial Black', sans-serif;
+  font-weight: 400;
+  font-size: 1em;
+  letter-spacing: 0.01em;
 }
 
 .house {
-  font-weight: 200;
+  display: block;
+  background: #ffffff;
+  color: #0145F2;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.33em;
+  letter-spacing: 0.6em;
+  padding: 0.32em 0 0.32em 0.6em;
+  border-radius: 0.22em;
+  margin-top: 0.14em;
 }
