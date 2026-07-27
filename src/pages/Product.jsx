@@ -142,7 +142,7 @@ export default function Product() {
         </div>
 
         {/* ── Product layout ── */}
-        <section className="py-10 md:py-14 bg-gray-50">
+        <section className="py-12 md:py-16 bg-gray-50">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200">
 
@@ -354,7 +354,7 @@ function DescriptionTabs({ product }) {
   const current = tabs.find((t) => t.key === active) || tabs[0]
 
   return (
-    <section className="py-10 bg-white border-t border-gray-200" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+    <section className="py-12 bg-white border-t border-gray-200" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
       <div className="container max-w-[860px]">
         <div className="flex border-b border-gray-200 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((t) => (

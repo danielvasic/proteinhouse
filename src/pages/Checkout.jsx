@@ -242,7 +242,7 @@ export default function Checkout() {
           </div>
         </div>
 
-        <section className="py-10 bg-gray-50 min-h-[60vh]">
+        <section className="py-12 bg-gray-50 min-h-[60vh]">
           <div className="container max-w-[1000px]">
             <StepIndicator current={step} />
 

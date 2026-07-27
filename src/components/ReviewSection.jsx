@@ -79,7 +79,7 @@ export default function ReviewSection({ product }) {
   const inputCls = 'w-full border border-gray-300 px-3.5 py-2.5 text-[13px] text-[#0F2952] placeholder:text-gray-400 focus:outline-none focus:border-[#0F2952] transition-colors bg-white'
 
   return (
-    <section className="py-10 bg-white border-t border-gray-200" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+    <section className="py-12 bg-white border-t border-gray-200" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
       <div className="container max-w-[860px]">
         <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
           <div>

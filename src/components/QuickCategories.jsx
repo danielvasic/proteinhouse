@@ -37,7 +37,7 @@ export default function QuickCategories() {
   return (
     <section className="bg-white border-b border-gray-200" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
       <div className="container">
-        <div className="flex gap-2 py-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-2 py-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((item) => {
             const Icon = ICONS[item.label.toLowerCase()] || Tag
             return (

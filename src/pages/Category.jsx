@@ -70,7 +70,7 @@ export default function Category() {
         </section>
 
         {/* ── Content ── */}
-        <section className="py-10 bg-gray-50">
+        <section className="py-12 bg-gray-50">
           <div className="container">
             <div className="flex gap-8 items-start">
 

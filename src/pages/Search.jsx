@@ -69,7 +69,7 @@ export default function Search() {
         </section>
 
         {/* ── Results ── */}
-        <section className="py-10 bg-gray-50 min-h-[400px]">
+        <section className="py-12 bg-gray-50 min-h-[400px]">
           <div className="container">
 
             {q && (

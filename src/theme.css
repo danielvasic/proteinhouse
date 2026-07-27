@@ -146,7 +146,7 @@
 
   /* Layout */
   --ph-container-max:    1280px;
-  --ph-container-gutter: 24px;
+  --ph-container-gutter: 20px;   /* mobile; šire na većim ekranima (vidi .container) */
   --ph-z-header:  50;
   --ph-z-overlay: 80;
   --ph-z-modal:   100;
@@ -195,6 +195,8 @@ img {
   margin: 0 auto;
   padding: 0 var(--ph-container-gutter);
 }
+@media (min-width: 768px)  { .container { padding: 0 32px; } }
+@media (min-width: 1280px) { .container { padding: 0 40px; } }
 
 /* Focus visible ring */
 :focus-visible {
