@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { InstagramLogo, FacebookLogo, YoutubeLogo, TiktokLogo } from '@phosphor-icons/react'
+import { InstagramLogo, FacebookLogo, YoutubeLogo, TiktokLogo, Phone, Envelope, MapPin, Clock } from '@phosphor-icons/react'
 import Logo from './Logo'
 import { useSiteContent } from '../hooks/useSiteContent'
 
@@ -19,30 +19,26 @@ const DEFAULT_COLUMNS = {
       links: [
         { label: 'O nama',               to: '/o-nama' },
         { label: 'Kontakt',              to: '/kontakt' },
+        { label: 'Blog',                 to: '/blog' },
         { label: 'Politika privatnosti', to: '/privatnost' },
         { label: 'Politika povrata',     to: '/povrat' },
-        { label: 'Pravila kolačića',     to: '/kolacici' },
       ],
     },
     {
       heading: 'NALOG',
       links: [
-        { label: 'Prijava',           to: '/nalog' },
-        { label: 'Registracija',      to: '/nalog/registracija' },
-        { label: 'Moje narudžbe',     to: '/nalog/narudzbe' },
-        { label: 'Bodovi lojalnosti', to: '/nalog/bodovi' },
-        { label: 'Wishlist',          to: '/wishlist' },
+        { label: 'Prijava',       to: '/nalog' },
+        { label: 'Registracija',  to: '/nalog/registracija' },
+        { label: 'Moje narudžbe', to: '/nalog/narudzbe' },
       ],
     },
     {
       heading: 'PRODAVNICA',
       links: [
-        { label: 'Praćenje pošiljke',  to: '/pracenje' },
-        { label: 'Kako kupiti',        to: '/kako-kupiti' },
-        { label: 'Dostava',            to: '/dostava' },
-        { label: 'Dodatni popust',     to: '/popust' },
-        { label: 'Pronađi prodavnicu', to: '/prodavnice' },
-        { label: 'Pokloni',            to: '/pokloni' },
+        { label: 'Praćenje pošiljke', to: '/pracenje' },
+        { label: 'Dostava',           to: '/dostava' },
+        { label: 'Kako kupiti',       to: '/kako-kupiti' },
+        { label: 'Novosti i akcije',  to: '/novosti' },
       ],
     },
   ],
@@ -57,12 +53,19 @@ const DEFAULT_SOCIAL = {
   ],
 }
 
-const FOOTER_KEYS     = ['footer_columns', 'footer_social', 'footer_description', 'footer_bottom_text']
+const FOOTER_KEYS     = [
+  'footer_columns', 'footer_social', 'footer_description', 'footer_bottom_text',
+  'contact_phone', 'contact_email', 'contact_hours', 'contact_address',
+]
 const FOOTER_DEFAULTS = {
   footer_columns:     DEFAULT_COLUMNS,
   footer_social:      DEFAULT_SOCIAL,
   footer_description: 'Potpora za vaš fitness cilj i kvalitetni suplementi za svaki korak vašeg aktivnog života.',
   footer_bottom_text: '✓ PLAĆANJE POUZEĆEM',
+  contact_phone:      '065/091-094',
+  contact_email:      'podrska@proteinhouse.ba',
+  contact_hours:      'PON–SUB 9:00–21:00',
+  contact_address:    'Kardinala Stepinca bb (Mepas Mall), Mostar',
 }
 
 // Dynamic md: grid class based on number of columns (brand col + link cols)
@@ -86,7 +89,7 @@ export default function Footer() {
       style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}
     >
       <div className="container">
-        <div className={`grid grid-cols-2 ${mdGridCls} gap-x-8 gap-y-8 py-10 md:py-12`}>
+        <div className={`grid grid-cols-2 ${mdGridCls} gap-x-10 gap-y-10 py-14 md:py-16`}>
 
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
@@ -96,6 +99,34 @@ export default function Footer() {
                 {description}
               </p>
             )}
+
+            {/* Kontakt info */}
+            <ul className="flex flex-col gap-2.5 mt-6 list-none p-0 m-0 text-[13px] text-white/55">
+              {data.contact_phone && (
+                <li className="flex items-center gap-2.5">
+                  <Phone size={15} weight="duotone" className="shrink-0 text-white/40" />
+                  <a href={`tel:${String(data.contact_phone).replace(/[^\d+]/g, '')}`} className="hover:text-white transition-colors">{data.contact_phone}</a>
+                </li>
+              )}
+              {data.contact_email && (
+                <li className="flex items-center gap-2.5">
+                  <Envelope size={15} weight="duotone" className="shrink-0 text-white/40" />
+                  <a href={`mailto:${data.contact_email}`} className="hover:text-white transition-colors">{data.contact_email}</a>
+                </li>
+              )}
+              {data.contact_address && (
+                <li className="flex items-start gap-2.5">
+                  <MapPin size={15} weight="duotone" className="shrink-0 text-white/40 mt-0.5" />
+                  <span>{data.contact_address}</span>
+                </li>
+              )}
+              {data.contact_hours && (
+                <li className="flex items-center gap-2.5">
+                  <Clock size={15} weight="duotone" className="shrink-0 text-white/40" />
+                  <span>{data.contact_hours}</span>
+                </li>
+              )}
+            </ul>
             {socialLinks.length > 0 && (
               <div className="flex gap-2 mt-5">
                 {socialLinks.map(({ network, href, label }) => {
@@ -125,11 +156,11 @@ export default function Footer() {
           {cols.map((col, ci) => (
             <div key={col.heading || ci}>
               {col.heading && (
-                <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 mb-3.5">
+                <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 mb-5">
                   {col.heading}
                 </h4>
               )}
-              <ul className="flex flex-col gap-2 list-none p-0 m-0">
+              <ul className="flex flex-col gap-3 list-none p-0 m-0">
                 {(col.links ?? []).map((l, li) => (
                   <li key={l.label || li}>
                     {l.to?.startsWith('http') ? (
@@ -160,7 +191,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/8">
-        <div className="container flex flex-col sm:flex-row items-center justify-between gap-2 py-4 pb-6">
+        <div className="container flex flex-col sm:flex-row items-center justify-between gap-2 py-5 pb-8">
           <span className="text-[11px] text-white/30">
             © {new Date().getFullYear()} ProteinHouse d.o.o. Sva prava zadržana.
           </span>

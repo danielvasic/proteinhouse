@@ -14,7 +14,8 @@ const SECTIONS = {
     fields: [
       { key: 'contact_phone',   label: 'Telefon',                        type: 'text',     placeholder: '+387 36 xxx xxx' },
       { key: 'contact_email',   label: 'Email adresa',                   type: 'text',     placeholder: 'info@proteinhouse.ba' },
-      { key: 'contact_hours',   label: 'Radno vrijeme',                  type: 'text',     placeholder: 'PON–PET 9–17 · SUB 9–14' },
+      { key: 'contact_hours',   label: 'Radno vrijeme',                  type: 'text',     placeholder: 'PON–SUB 9:00–21:00' },
+      { key: 'contact_address', label: 'Adresa (footer)',                type: 'text',     placeholder: 'Kardinala Stepinca bb (Mepas Mall), Mostar' },
       { key: 'footer_shipping', label: 'Tekst dostave (header i footer)', type: 'text',     placeholder: 'BESPLATNA DOSTAVA > 100 KM' },
     ],
   },

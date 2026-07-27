@@ -9,6 +9,7 @@ insert into site_content (key, value) values
   ('contact_phone',  '{"text": "065/091-094 (dostupni i na Viberu)"}'),
   ('contact_email',  '{"text": "podrska@proteinhouse.ba"}'),
   ('contact_hours',  '{"text": "PON–SUB 9:00–21:00"}'),
+  ('contact_address','{"text": "Kardinala Stepinca bb (Mepas Mall), Mostar"}'),
   ('footer_phone',   '{"text": "065/091-094"}'),
   ('footer_email',   '{"text": "podrska@proteinhouse.ba"}'),
   ('footer_description', '{"text": "Potpora za vaš fitness cilj i kvalitetni suplementi za svaki korak vašeg aktivnog života."}'),
