@@ -39,9 +39,9 @@ const DEFAULT_NAV = [
 
 const UTILITY_KEYS    = ['contact_phone', 'contact_email', 'contact_hours', 'footer_shipping']
 const UTILITY_DEFAULT = {
-  contact_phone:    '+387 33 545 000',
-  contact_email:    'info@proteinhouse.ba',
-  contact_hours:    'PON–PET 9–17 · SUB 9–14',
+  contact_phone:    '065/091-094',
+  contact_email:    'podrska@proteinhouse.ba',
+  contact_hours:    'PON–SUB 9:00–21:00',
   footer_shipping:  'BESPLATNA DOSTAVA > 100 KM',
 }
 

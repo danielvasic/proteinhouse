@@ -61,7 +61,7 @@ const FOOTER_KEYS     = ['footer_columns', 'footer_social', 'footer_description'
 const FOOTER_DEFAULTS = {
   footer_columns:     DEFAULT_COLUMNS,
   footer_social:      DEFAULT_SOCIAL,
-  footer_description: 'Online protein i suplement shop u BiH. Originalni proizvodi, brza dostava, bodovi lojalnosti uz svaku kupovinu.',
+  footer_description: 'Potpora za vaš fitness cilj i kvalitetni suplementi za svaki korak vašeg aktivnog života.',
   footer_bottom_text: '✓ PLAĆANJE POUZEĆEM',
 }
 
