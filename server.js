@@ -48,7 +48,7 @@ async function createServer() {
         render = (await import('./dist/server/entry-server.js')).render
       }
 
-      const { html: appHtml, head } = await render(req.originalUrl)
+      const { html: appHtml, head } = await render(req.originalUrl, `${req.protocol}://${req.get('host')}`)
 
       const finalHtml = template
         .replace('<!--app-head-->', head ?? '')
