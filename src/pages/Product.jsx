@@ -144,12 +144,12 @@ export default function Product() {
         {/* ── Product layout ── */}
         <section className="py-12 md:py-16 bg-gray-50">
           <div className="container">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
 
-              {/* Image */}
-              <div className="relative bg-white flex items-center justify-center p-10 md:p-14">
+              {/* Hero kartica — slika + najrelevantnije brojke (Ostrovit stil, editabilno u adminu) */}
+              <div className="relative bg-[#0145F2] rounded-[28px] flex flex-col items-center p-7 md:p-10 overflow-hidden">
                 {isDiscount && (
-                  <div className="absolute top-5 left-5 w-[52px] h-[52px] rounded-full bg-[#0F2952] flex items-center justify-center">
+                  <div className="absolute top-5 left-5 w-[52px] h-[52px] rounded-full bg-[#0A0E17] flex items-center justify-center z-10">
                     <span className="text-white text-[11px] font-extrabold text-center leading-tight">{product.badge}</span>
                   </div>
                 )}
@@ -157,19 +157,36 @@ export default function Product() {
                   <img
                     src={product.img}
                     alt={product.title}
-                    className="w-full max-w-[400px] object-contain"
+                    className="w-full max-w-[360px] object-contain drop-shadow-[0_24px_32px_rgba(0,0,0,0.25)]"
                     width={600}
                     height={540}
                   />
                 ) : (
-                  <div className="w-full max-w-[400px] aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-sm">
+                  <div className="w-full max-w-[360px] aspect-square bg-white/10 rounded-2xl flex items-center justify-center text-white/50 text-sm">
                     Nema slike
+                  </div>
+                )}
+
+                {product.heroStats.length > 0 && (
+                  <div className={`grid gap-3 w-full mt-8 md:mt-10 text-center text-white ${product.heroStats.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                    {product.heroStats.slice(0, 3).map((s, i) => (
+                      <div key={i}>
+                        <p
+                          className="text-4xl md:text-6xl font-extrabold leading-none m-0"
+                          style={{ fontFamily: 'Oswald, Impact, system-ui, sans-serif' }}
+                        >
+                          {s.value}
+                        </p>
+                        <p className="text-[11px] md:text-[14px] font-bold uppercase tracking-[0.12em] text-white/60 mt-2 m-0">{s.label}</p>
+                        {s.sub && <p className="text-[11px] md:text-[13px] font-semibold mt-0.5 m-0">{s.sub}</p>}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* Info */}
-              <div className="bg-white p-8 md:p-12 flex flex-col">
+              <div className="bg-white rounded-[28px] border border-gray-200 p-7 md:p-10 flex flex-col">
 
                 <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-2">{product.brand}</p>
                 <h1

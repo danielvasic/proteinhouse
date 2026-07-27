@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 196" font-family="'Exo 2', 'Archivo Narrow', 'Arial Narrow', sans-serif">
+  <!-- ProteinHouse logo — svijetla podloga. PROTEIN u plavom boxu, HOUSE razmaknuto ispod. -->
+  <!-- Napomena: koristi webfont Exo 2 — za standalone upotrebu (print/email) konvertovati tekst u krivulje. -->
+  <rect x="0" y="0" width="360" height="128" fill="#0145F2"/>
+  <text x="30" y="94" textLength="300" lengthAdjust="spacingAndGlyphs"
+        font-size="78" font-weight="800" fill="#FFFFFF">PROTEIN</text>
+  <text x="34" y="180" textLength="292" lengthAdjust="spacing"
+        font-size="34" font-weight="700" fill="#0A0E17">HOUSE</text>
+</svg>

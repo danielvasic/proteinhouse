@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 196" font-family="'Exo 2', 'Archivo Narrow', 'Arial Narrow', sans-serif">
+  <!-- ProteinHouse logo — reversed (tamna/plava podloga), sve bijelo na punom plavom bloku. -->
+  <rect x="0" y="0" width="360" height="196" fill="#0145F2"/>
+  <text x="30" y="94" textLength="300" lengthAdjust="spacingAndGlyphs"
+        font-size="78" font-weight="800" fill="#FFFFFF">PROTEIN</text>
+  <text x="34" y="176" textLength="292" lengthAdjust="spacing"
+        font-size="34" font-weight="700" fill="#FFFFFF">HOUSE</text>
+</svg>

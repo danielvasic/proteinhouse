@@ -51,6 +51,7 @@ function norm(p) {
     usage:          p.usage_instructions || '',
     composition:    p.composition || '',
     nutrition:      p.nutrition_info || '',
+    heroStats:      Array.isArray(p.hero_stats) ? p.hero_stats.filter((s) => s?.value) : [],
   }
 }
 
