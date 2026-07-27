@@ -33,7 +33,7 @@ const SECTIONS = {
     fields: [
       { key: 'site_title',       label: 'Naziv sajta',         type: 'text',     placeholder: 'ProteinHouse' },
       { key: 'meta_description', label: 'Meta opis (početna)',  type: 'textarea', placeholder: 'Kupujte proteine…' },
-      { key: 'og_image',         label: 'OG slika URL',        type: 'text',     placeholder: 'https://proteinhouse.ba/og-image.jpg' },
+      { key: 'og_image',         label: 'OG slika URL',        type: 'text',     placeholder: 'https://proteinhouse.ba/og-image.png' },
     ],
   },
 }

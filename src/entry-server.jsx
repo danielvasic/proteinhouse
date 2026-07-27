@@ -7,8 +7,10 @@ import './globals.css'
 import './theme.css'
 import { supabase, getProductImageUrl } from './lib/supabase'
 
-const SITE_URL      = 'https://proteinhouse.ba'
-const OG_DEFAULT_IMG = `${SITE_URL}/og-image.jpg`
+const SITE_URL      = 'https://proteinhouse.ba'   // canonical uvijek na glavnu domenu
+// OG slika mora biti dostupna SADA (WhatsApp/FB je fetchaju s ovog URL-a).
+// TODO pri prelasku na glavnu domenu: new.proteinhouse.ba → proteinhouse.ba
+const OG_DEFAULT_IMG = 'https://new.proteinhouse.ba/og-image.png'
 
 // ─── Pre-fetch page-specific meta from Supabase ────────────────────────────
 // renderToString is synchronous — useProduct/useCategories hooks can't fetch
