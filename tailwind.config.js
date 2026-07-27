@@ -6,14 +6,14 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
+    // Usklađeno s .container u theme.css — 20px mobile, 32px od md, 40px od xl
     container: {
       center: true,
       padding: {
-        DEFAULT: '1rem',
-        sm:      '1.5rem',
-        lg:      '2rem',
-        xl:      '2rem',
-        '2xl':   '2rem',
+        DEFAULT: '1.25rem',
+        md:      '2rem',
+        xl:      '2.5rem',
+        '2xl':   '2.5rem',
       },
     },
     extend: {

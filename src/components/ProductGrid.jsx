@@ -10,7 +10,7 @@ export default function ProductGrid({ title, eyebrow, products, categorySlug, ma
   if (items.length === 0) return null
 
   return (
-    <section className="py-10 md:py-14 bg-gray-50" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
+    <section className="py-12 md:py-16 bg-gray-50" style={{ fontFamily: 'Montserrat, Inter, system-ui, sans-serif' }}>
       <div className="container">
         <div className="flex items-end justify-between gap-4 mb-6 md:mb-8">
           <div>
