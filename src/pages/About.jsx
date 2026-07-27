@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async'
 import { ShieldCheck, Truck, Star, Users, MapPin, Clock, Phone, Envelope } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
 import { useStores } from '../hooks/useStores'
+import { useParallax } from '../lib/useParallax'
 
 const VALUES = [
   { Icon: ShieldCheck, title: 'Originalnost', desc: 'Svi naši proizvodi su 100% originalni s certifikatima proizvođača i garantiranom autentičnošću.' },
@@ -25,6 +26,7 @@ const STAT_DEFAULTS = {
 
 export default function About() {
   const { data }           = useSiteContent(['about_hero_image', 'about_intro', ...STAT_KEYS], STAT_DEFAULTS)
+  const heroParallax       = useParallax(0.16)
   const { stores, loading: storesLoading } = useStores()
 
   const stats = [1, 2, 3, 4].map((n) => ({
@@ -43,14 +45,17 @@ export default function About() {
       <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
         {/* ── Hero ── */}
-        <section
-          className="relative flex items-end min-h-[340px] md:min-h-[420px] bg-cover bg-center overflow-hidden"
-          style={{
-            backgroundImage: data.about_hero_image
-              ? `linear-gradient(105deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.60) 60%, rgba(10,14,23,0.20) 100%), url('${data.about_hero_image}')`
-              : 'linear-gradient(135deg, #0A0E17 0%, #0145F2 60%, #0136C4 100%)',
-          }}
-        >
+        <section className="relative flex items-end min-h-[340px] md:min-h-[420px] overflow-hidden bg-[#0A0E17]">
+          {/* Pozadinski sloj — parallax na scroll */}
+          <div
+            ref={heroParallax}
+            className="absolute inset-x-0 -inset-y-[16%] bg-cover bg-center will-change-transform"
+            style={{
+              backgroundImage: data.about_hero_image
+                ? `linear-gradient(105deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.60) 60%, rgba(10,14,23,0.20) 100%), url('${data.about_hero_image}')`
+                : 'linear-gradient(135deg, #0A0E17 0%, #0145F2 60%, #0136C4 100%)',
+            }}
+          />
           <div className="absolute inset-0 ph-pattern opacity-[0.05] pointer-events-none" />
           <div className="container pb-12 md:pb-16 relative">
             <div className="flex items-center gap-3 mb-5">

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Scales, Barbell, Lightning, Heartbeat } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { useParallax } from '../lib/useParallax'
 
 const ICONS = [Scales, Barbell, Lightning, Heartbeat]
 
@@ -24,17 +25,23 @@ export default function GoalsSection() {
   const items = (data.goals_items?.items ?? DEFAULTS.goals_items.items)
     .filter((i) => i?.label && i?.to)
   const bgImage = data.goals_bg_image || DEFAULTS.goals_bg_image
+  const parallaxRef = useParallax(0.14)
 
   if (items.length === 0) return null
 
   return (
     <section
-      className="relative py-12 md:py-16 bg-[#0A0E17] bg-cover bg-center overflow-hidden"
-      style={{
-        fontFamily: 'Inter, system-ui, sans-serif',
-        backgroundImage: `linear-gradient(100deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.82) 55%, rgba(10,14,23,0.60) 100%), url('${bgImage}')`,
-      }}
+      className="relative py-12 md:py-16 bg-[#0A0E17] overflow-hidden"
+      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
     >
+      {/* Pozadinska fotka — parallax na scroll */}
+      <div
+        ref={parallaxRef}
+        className="absolute inset-x-0 -inset-y-[16%] bg-cover bg-center will-change-transform"
+        style={{
+          backgroundImage: `linear-gradient(100deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.82) 55%, rgba(10,14,23,0.60) 100%), url('${bgImage}')`,
+        }}
+      />
       <div className="absolute inset-0 ph-pattern opacity-[0.04] pointer-events-none" />
       <div className="container relative">
         <div className="flex items-end justify-between mb-6 md:mb-8">

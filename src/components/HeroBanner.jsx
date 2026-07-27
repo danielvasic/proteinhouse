@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Tag, ArrowRight } from '@phosphor-icons/react'
+import { useParallax } from '../lib/useParallax'
 
 const FALLBACK = {
   eyebrow:            'ProteinHouse',
@@ -58,17 +59,21 @@ export default function HeroBanner() {
 
   const b = slides[index % count]
   const titleLines = (b.title_lines || FALLBACK.title_lines).split('/')
+  const parallaxRef = useParallax(0.18)
 
   return (
-    <section
-      className="relative flex items-center bg-cover bg-center bg-no-repeat overflow-hidden min-h-[46vh] max-h-[50vh] md:max-h-none md:min-h-[440px] lg:min-h-[520px] transition-[background-image] duration-300"
-      style={{
-        backgroundImage: b.image_url
-          ? `linear-gradient(105deg, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.70) 52%, rgba(10,14,23,0.18) 100%), url('${b.image_url}')`
-          : 'linear-gradient(135deg, #0A0E17 0%, #101A30 55%, #0136C4 100%)',
-      }}
-    >
-      {/* Brand pattern overlay (chevroni) — suptilno, desna strana */}
+    <section className="relative flex items-center overflow-hidden min-h-[46vh] max-h-[50vh] md:max-h-none md:min-h-[440px] lg:min-h-[520px]">
+      {/* Pozadinski sloj — parallax na scroll */}
+      <div
+        ref={parallaxRef}
+        className="absolute inset-x-0 -inset-y-[14%] bg-cover bg-center bg-no-repeat will-change-transform transition-[background-image] duration-300"
+        style={{
+          backgroundImage: b.image_url
+            ? `linear-gradient(105deg, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.70) 52%, rgba(10,14,23,0.18) 100%), url('${b.image_url}')`
+            : 'linear-gradient(135deg, #0A0E17 0%, #101A30 55%, #0136C4 100%)',
+        }}
+      />
+      {/* Brand pattern overlay (mozaik) — suptilno, desna strana */}
       <div
         className="absolute inset-y-0 right-0 w-[55%] ph-pattern opacity-[0.05] pointer-events-none"
         style={{ maskImage: 'linear-gradient(90deg, transparent 0%, black 60%)', WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 60%)' }}
