@@ -262,8 +262,8 @@ export default function Product() {
                   onChange={setFlavor}
                 />
 
-                {/* Qty + Add to cart */}
-                <div className="flex gap-3 mb-6" ref={buyRef}>
+                {/* Qty + Add to cart — na mobilnom dugme puni red ispod da se tekst ne stisne */}
+                <div className="flex flex-wrap gap-3 mb-6" ref={buyRef}>
                   <div className={`flex items-center border ${outOfStock ? 'border-gray-200 opacity-40' : 'border-gray-300'}`}>
                     <button
                       className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-[#F2F4F7] hover:text-[#0145F2] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
@@ -285,7 +285,7 @@ export default function Product() {
                   </div>
 
                   <button
-                    className={`flex-1 flex items-center justify-center gap-2.5 py-3 text-[11px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 border-0 ${
+                    className={`order-3 sm:order-2 w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-2.5 py-3.5 sm:py-3 text-[12px] sm:text-[11px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 border-0 ${
                       outOfStock
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         : 'bg-[#0145F2] text-white hover:bg-[#0136C4] cursor-pointer'
@@ -298,7 +298,7 @@ export default function Product() {
                   </button>
 
                   <button
-                    className="w-12 h-12 flex items-center justify-center border border-gray-300 text-gray-400 hover:border-[#0145F2] hover:text-[#0145F2] transition-all duration-150 cursor-pointer bg-transparent"
+                    className="order-2 sm:order-3 ml-auto sm:ml-0 w-12 h-12 flex items-center justify-center border border-gray-300 text-gray-400 hover:border-[#0145F2] hover:text-[#0145F2] transition-all duration-150 cursor-pointer bg-transparent"
                     aria-label="Dodaj na wishlist"
                   >
                     <Heart size={18} />
