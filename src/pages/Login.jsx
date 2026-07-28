@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { Envelope, LockKey, User as UserIcon } from '@phosphor-icons/react'
+import { Envelope, LockKey, User as UserIcon, ShieldCheck, Package, SignOut, UserCircle } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+
+const isAdminUser = (u) => u?.user_metadata?.role === 'admin'
 
 const inputCls = 'w-full border border-gray-300 pl-10 pr-4 py-3.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
 
@@ -32,22 +34,36 @@ export default function Login() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', remember: false })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState(null)   // prijavljeni korisnik → profil umjesto forme
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
+
+  // Prepoznaj postojeću sesiju (i promjene stanja) — stranica postaje "Moj nalog"
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null))
+    return () => subscription.unsubscribe()
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
       if (authError) throw authError
-      navigate('/')
+      // Admin ide pravo u administraciju, običan korisnik na svoj nalog
+      navigate(isAdminUser(data.user) ? '/admin' : '/nalog')
     } catch (err) {
       setError(err.message || 'Greška pri prijavi. Pokušajte ponovo.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
   }
 
   const handleRegister = async (e) => {
@@ -61,12 +77,62 @@ export default function Login() {
         options: { data: { full_name: form.name } },
       })
       if (authError) throw authError
-      navigate('/')
+      navigate('/nalog')
     } catch (err) {
       setError(err.message || 'Greška pri registraciji. Pokušajte ponovo.')
     } finally {
       setLoading(false)
     }
+  }
+
+  // ── Prijavljen: "Moj nalog" umjesto login forme ──
+  if (user && !isRegister) {
+    const admin = isAdminUser(user)
+    const displayName = user.user_metadata?.full_name || user.email
+    return (
+      <>
+        <Helmet><title>Moj nalog — ProteinHouse</title></Helmet>
+        <main
+          className="min-h-[calc(100vh-220px)] bg-white flex items-center justify-center py-16 px-4"
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        >
+          <div className="w-full max-w-[440px]">
+            <div className="mb-8 text-center">
+              <UserCircle size={52} weight="duotone" className="text-[#0145F2] mx-auto mb-3" />
+              <h1 className="text-3xl font-bold text-[#0A0E17] uppercase" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+                Moj nalog
+              </h1>
+              <p className="text-[13px] text-gray-500 mt-2">
+                Prijavljeni ste kao <strong className="text-[#0A0E17]">{displayName}</strong>
+              </p>
+            </div>
+
+            <div className="bg-white border border-gray-200 p-6 space-y-3">
+              {admin && (
+                <button
+                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer"
+                  onClick={() => navigate('/admin')}
+                >
+                  <ShieldCheck size={15} weight="fill" /> Administracija
+                </button>
+              )}
+              <button
+                className="w-full flex items-center justify-center gap-2 py-3.5 border border-[#0145F2] text-[#0145F2] bg-transparent text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all cursor-pointer"
+                onClick={() => navigate('/pracenje')}
+              >
+                <Package size={15} /> Praćenje pošiljke
+              </button>
+              <button
+                className="w-full flex items-center justify-center gap-2 py-3.5 border border-gray-300 text-gray-500 bg-transparent text-[11px] font-bold tracking-[0.12em] uppercase hover:border-gray-400 transition-colors cursor-pointer"
+                onClick={handleSignOut}
+              >
+                <SignOut size={15} /> Odjava
+              </button>
+            </div>
+          </div>
+        </main>
+      </>
+    )
   }
 
   return (
