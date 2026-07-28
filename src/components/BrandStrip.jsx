@@ -33,21 +33,20 @@ export default function BrandStrip() {
           </p>
           <div className="h-px flex-1 bg-gray-200" />
         </div>
-        <div
-          className="grid items-center gap-8"
-          style={{ gridTemplateColumns: `repeat(${Math.min(brands.length, 8)}, 1fr)` }}
-        >
+        {/* Fiksna visina kutije + object-contain = svi logotipi vizuelno ujednačeni,
+            bez obzira na omjer fajla; responsive broj kolona umjesto stisnutih 8 */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-9 items-center">
           {brands.map((b) => (
             <div
               key={b.id}
-              className="flex items-center justify-center opacity-40 hover:opacity-80 transition-opacity duration-200"
+              className="flex items-center justify-center h-12 md:h-14 opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-200"
               title={b.name}
             >
               {b.logo_url ? (
                 <img
                   src={b.logo_url}
                   alt={b.name}
-                  className="max-h-10 w-auto object-contain grayscale"
+                  className="h-full w-full max-w-[150px] object-contain"
                   loading="lazy"
                 />
               ) : (
