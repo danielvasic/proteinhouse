@@ -56,10 +56,12 @@ export default function GoalsSection() {
             onClick={() => navigate(item.to)}
             aria-label={item.label}
           >
+            {/* Slika: default zatamnjena i lagano zumirana → na hover se posvijetli i odzumira */}
             <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+              className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-500 group-hover:scale-100"
               style={{ backgroundImage: `url('${item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}')` }}
             />
+            <div className="absolute inset-0 bg-[#0A0E17]/45 transition-colors duration-300 group-hover:bg-[#0A0E17]/10" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E17]/85 via-[#0A0E17]/15 to-transparent" />
             <span
               className="absolute bottom-4 left-4 md:bottom-5 md:left-5 text-white text-[17px] md:text-[21px] font-bold uppercase tracking-[0.02em] text-left leading-tight"
