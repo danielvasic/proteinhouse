@@ -25,7 +25,10 @@ const SECTIONS = {
   goals: {
     label: 'Kupovina po ciljevima',
     fields: [
-      { key: 'goals_bg_image', label: 'Pozadinska slika sekcije (preporuka: tamna gym fotka, min 1600px širine)', type: 'image' },
+      { key: 'goals_img_1', label: 'Slika 1 — Mršavljenje',      type: 'image' },
+      { key: 'goals_img_2', label: 'Slika 2 — Izgradnja mišića', type: 'image' },
+      { key: 'goals_img_3', label: 'Slika 3 — Energija i fokus', type: 'image' },
+      { key: 'goals_img_4', label: 'Slika 4 — Zdravlje',         type: 'image' },
     ],
   },
   lifetime: {

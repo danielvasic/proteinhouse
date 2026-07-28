@@ -1,88 +1,74 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Scales, Barbell, Lightning, Heartbeat } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
-import { useParallax } from '../lib/useParallax'
-
-const ICONS = [Scales, Barbell, Lightning, Heartbeat]
 
 const DEFAULTS = {
   goals_items: {
     items: [
-      { label: 'Mršanje',          sub: 'Sagorijevanje i kontrola težine', to: '/kategorija/kontrola' },
-      { label: 'Izgradnja mišića', sub: 'Proteini, kreatin i gaineri',     to: '/kategorija/proteini' },
-      { label: 'Energija i fokus', sub: 'Pre-workout i stimulansi',        to: '/kategorija/performanse' },
-      { label: 'Zdravlje',         sub: 'Vitamini, minerali i omega',      to: '/kategorija/vitamini' },
+      { label: 'Mršavljenje',      to: '/kategorija/mrsavljenje' },
+      { label: 'Izgradnja mišića', to: '/kategorija/proteini' },
+      { label: 'Energija i fokus', to: '/kategorija/pre-workout' },
+      { label: 'Zdravlje',         to: '/kategorija/vitamini' },
     ],
   },
-  // Default gym fotka (Unsplash, slobodna za komerc. upotrebu) — zamjenjiva u Admin → Sadržaj
-  goals_bg_image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=70',
+  // Default ilustracije ciljeva (Unsplash, slobodno za komerc. upotrebu) —
+  // zamjenjive u Admin → Sadržaj → Kupovina po ciljevima
+  goals_img_1: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=70',
+  goals_img_2: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=70',
+  goals_img_3: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=900&q=70',
+  goals_img_4: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=900&q=70',
 }
 
-/** „Kupovina po ciljevima“ — sekcija između proizvoda da razbije monotoniju. */
+/**
+ * „Kupovina po ciljevima“ — naslov iznad, pa 4 velike foto-pločice
+ * od ruba do ruba ekrana (bez razmaka), naslov cilja preko slike.
+ */
 export default function GoalsSection() {
   const navigate = useNavigate()
-  const { data } = useSiteContent(['goals_items', 'goals_bg_image'], DEFAULTS)
+  const { data } = useSiteContent(
+    ['goals_items', 'goals_img_1', 'goals_img_2', 'goals_img_3', 'goals_img_4'],
+    DEFAULTS
+  )
   const items = (data.goals_items?.items ?? DEFAULTS.goals_items.items)
     .filter((i) => i?.label && i?.to)
-  const bgImage = data.goals_bg_image || DEFAULTS.goals_bg_image
-  const parallaxRef = useParallax(0.14)
+    .slice(0, 4)
 
   if (items.length === 0) return null
 
   return (
-    <section
-      className="relative py-12 md:py-16 bg-[#0A0E17] overflow-hidden"
-      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
-    >
-      {/* Pozadinska fotka — parallax na scroll */}
-      <div
-        ref={parallaxRef}
-        className="absolute inset-x-0 -inset-y-[16%] bg-cover bg-center will-change-transform"
-        style={{
-          backgroundImage: `linear-gradient(100deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.82) 55%, rgba(10,14,23,0.60) 100%), url('${bgImage}')`,
-        }}
-      />
-      <div className="absolute inset-0 ph-pattern opacity-[0.04] pointer-events-none" />
-      <div className="container relative">
-        <div className="flex items-end justify-between mb-6 md:mb-8">
-          <div>
-            <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/60 mb-1.5 m-0">Pronađi svoje</p>
-            <h2
-              className="text-2xl md:text-3xl font-bold text-white uppercase m-0"
+    <section className="bg-[#0A0E17]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      {/* Naslov iznad pločica */}
+      <div className="container py-7 md:py-9">
+        <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/50 mb-1.5 m-0">Pronađi svoje</p>
+        <h2
+          className="text-2xl md:text-3xl font-bold text-white uppercase m-0"
+          style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+        >
+          Kupovina po ciljevima
+        </h2>
+      </div>
+
+      {/* Pločice — full-bleed, bez razmaka: 2×2 na mobilnom, 4 u redu na desktopu */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-0 w-full">
+        {items.map((item, i) => (
+          <button
+            key={item.label}
+            className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden border-0 p-0 cursor-pointer bg-[#0A0E17]"
+            onClick={() => navigate(item.to)}
+            aria-label={item.label}
+          >
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+              style={{ backgroundImage: `url('${item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}')` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E17]/85 via-[#0A0E17]/15 to-transparent" />
+            <span
+              className="absolute bottom-4 left-4 md:bottom-5 md:left-5 text-white text-[17px] md:text-[21px] font-bold uppercase tracking-[0.02em] text-left leading-tight"
               style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
             >
-              Kupovina po ciljevima
-            </h2>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {items.map((item, i) => {
-            const Icon = ICONS[i % ICONS.length]
-            return (
-              <button
-                key={item.label}
-                className="group flex flex-col items-start gap-3 p-5 md:p-6 bg-[#0A0E17]/75 backdrop-blur-[2px] border border-white/20 text-left cursor-pointer hover:bg-white hover:border-white transition-all duration-200"
-                onClick={() => navigate(item.to)}
-              >
-                <Icon size={28} weight="duotone" className="text-white group-hover:text-[#0145F2] transition-colors" />
-                <div>
-                  <p className="text-[14px] md:text-[15px] font-bold text-white group-hover:text-[#0145F2] uppercase tracking-[0.04em] m-0 transition-colors">
-                    {item.label}
-                  </p>
-                  {item.sub && (
-                    <p className="text-[11.5px] text-white/75 group-hover:text-gray-500 mt-1 m-0 leading-snug transition-colors">
-                      {item.sub}
-                    </p>
-                  )}
-                </div>
-                <span className="flex items-center gap-1.5 mt-auto text-[10px] font-bold tracking-[0.12em] uppercase text-white/70 group-hover:text-[#0145F2] transition-colors">
-                  Istraži <ArrowRight size={11} weight="bold" />
-                </span>
-              </button>
-            )
-          })}
-        </div>
+              {item.label}
+            </span>
+          </button>
+        ))}
       </div>
     </section>
   )

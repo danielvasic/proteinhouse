@@ -66,7 +66,7 @@ export default function Tracking() {
           </div>
         </div>
 
-        <section className="py-12 bg-[#F2F4F7] min-h-[60vh]">
+        <section className="py-12 bg-white min-h-[60vh]">
           <div className="container max-w-[640px]">
             <h1
               className="text-3xl font-bold text-[#0A0E17] uppercase mb-2"

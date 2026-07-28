@@ -142,7 +142,7 @@ export default function Product() {
         </div>
 
         {/* ── Product layout ── */}
-        <section className="py-12 md:py-16 bg-[#F2F4F7]">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
 
