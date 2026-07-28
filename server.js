@@ -1,8 +1,11 @@
+import 'dotenv/config'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import express from 'express'
 import compression from 'compression'
+import { createClient } from '@supabase/supabase-js'
+import { generateProductCopy } from './src/server/bedrock.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isProd = process.env.NODE_ENV === 'production'
@@ -28,6 +31,26 @@ async function createServer() {
     const sirv = (await import('sirv')).default
     app.use(base, sirv(path.resolve(__dirname, 'dist/client'), { extensions: [] }))
   }
+
+  // AI generator opisa proizvoda — dev ekvivalent netlify/functions/generate-description.mjs
+  app.post('/api/generate-description', express.json(), async (req, res) => {
+    try {
+      const token = req.get('authorization')?.replace(/^Bearer\s+/i, '')
+      if (!token) return res.status(401).json({ error: 'Neautorizovano.' })
+
+      const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY)
+      const { data, error } = await supabase.auth.getUser(token)
+      if (error || data?.user?.user_metadata?.role !== 'admin') {
+        return res.status(401).json({ error: 'Neautorizovano.' })
+      }
+
+      const result = await generateProductCopy(req.body || {})
+      res.status(200).json(result)
+    } catch (err) {
+      const statusCode = err.code === 'BAD_INPUT' ? 400 : err.code === 'NOT_CONFIGURED' ? 501 : 500
+      res.status(statusCode).json({ error: err.message || 'Greška pri generisanju opisa.' })
+    }
+  })
 
   // Handle all routes with SSR
   app.use('*', async (req, res) => {

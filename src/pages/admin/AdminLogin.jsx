@@ -53,7 +53,7 @@ export default function AdminLogin() {
     <div
       className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #0A0E17 0%, #101A30 45%, #0145F2 100%)',
+        background: 'linear-gradient(160deg, #0145F2 0%, #0136C4 100%)',
         fontFamily: 'Inter, system-ui, sans-serif',
       }}
     >
