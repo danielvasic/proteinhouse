@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { Envelope, LockKey, User as UserIcon, ShieldCheck, Package, SignOut, UserCircle } from '@phosphor-icons/react'
+import { Envelope, LockKey, User as UserIcon, ShieldCheck, Package, SignOut, UserCircle, GoogleLogo } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 
 const isAdminUser = (u) => u?.user_metadata?.role === 'admin'
@@ -58,6 +58,20 @@ export default function Login() {
       setError(err.message || 'Greška pri prijavi. Pokušajte ponovo.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    setError('')
+    try {
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/nalog` },
+      })
+      if (authError) throw authError
+      // Browser se preusmjerava na Google — nema šta dalje raditi ovdje
+    } catch (err) {
+      setError(err.message || 'Greška pri prijavi preko Google-a.')
     }
   }
 
@@ -239,6 +253,15 @@ export default function Login() {
               <span className="text-[11px] text-gray-400">ili</span>
               <div className="h-px flex-1 bg-gray-200" />
             </div>
+
+            {/* Google SSO — isti tok za prijavu i registraciju (Supabase kreira nalog ako ne postoji) */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-2.5 py-3.5 border border-gray-300 text-[#0A0E17] bg-white text-[12px] font-bold uppercase tracking-[0.06em] hover:border-gray-400 hover:bg-gray-50 transition-all duration-150 cursor-pointer mb-6"
+            >
+              <GoogleLogo size={17} weight="bold" /> Nastavi preko Google-a
+            </button>
 
             {isRegister ? (
               <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
