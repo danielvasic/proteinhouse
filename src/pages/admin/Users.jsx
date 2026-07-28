@@ -16,18 +16,23 @@ export default function Users() {
   useEffect(() => {
     async function load() {
       try {
-        // Requires service_role key — will return 403 with anon key
-        // For now, we use the auth admin API if available
-        const { data, error: err } = await supabase.auth.admin.listUsers()
+        // admin_list_users je security definer RPC (supabase/admin_korisnici.sql) —
+        // radi s anon kljucem, iznutra provjerava da je pozivalac admin
+        const { data, error: err } = await supabase.rpc('admin_list_users')
         if (err) {
-          // Fallback: show message
-          setError('Prikaz korisnika zahtijeva service_role ključ. Pokrenite iz Supabase Dashboard → Auth → Users.')
+          setError(err.message.includes('admin_list_users')
+            ? 'Pokrenite supabase/admin_korisnici.sql u Supabase SQL editoru da aktivirate prikaz korisnika.'
+            : err.message)
           setLoading(false)
           return
         }
-        setUsers(data.users ?? [])
+        // Normaliziraj u oblik koji render očekuje (user_metadata.role)
+        setUsers((data ?? []).map((u) => ({
+          ...u,
+          user_metadata: { role: u.role, full_name: u.full_name },
+        })))
       } catch (e) {
-        setError('Prikaz korisnika zahtijeva service_role ključ u beku.')
+        setError(e.message || 'Greška pri učitavanju korisnika.')
       } finally {
         setLoading(false)
       }
@@ -36,19 +41,19 @@ export default function Users() {
   }, [])
 
   const toggleAdmin = async (userId, isAdmin) => {
-    const newMeta = isAdmin
-      ? { role: null }
-      : { role: 'admin' }
-    const { error: err } = await supabase.auth.admin.updateUserById(userId, {
-      user_metadata: newMeta,
+    const { error: err } = await supabase.rpc('admin_set_role', {
+      p_user_id: userId,
+      p_admin:   !isAdmin,
     })
-    if (!err) {
-      setUsers((us) => us.map((u) =>
-        u.id === userId
-          ? { ...u, user_metadata: { ...u.user_metadata, role: isAdmin ? null : 'admin' } }
-          : u
-      ))
+    if (err) {
+      setError(err.message)
+      return
     }
+    setUsers((us) => us.map((u) =>
+      u.id === userId
+        ? { ...u, user_metadata: { ...u.user_metadata, role: isAdmin ? null : 'admin' } }
+        : u
+    ))
   }
 
   const filtered = users.filter((u) => {
