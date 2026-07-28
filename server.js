@@ -4,7 +4,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import express from 'express'
 import compression from 'compression'
-import { createClient } from '@supabase/supabase-js'
+import { verifyAdmin } from './src/server/supabaseAdmin.js'
 import { generateProductCopy } from './src/server/bedrock.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -36,13 +36,8 @@ async function createServer() {
   app.post('/api/generate-description', express.json(), async (req, res) => {
     try {
       const token = req.get('authorization')?.replace(/^Bearer\s+/i, '')
-      if (!token) return res.status(401).json({ error: 'Neautorizovano.' })
-
-      const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY)
-      const { data, error } = await supabase.auth.getUser(token)
-      if (error || data?.user?.user_metadata?.role !== 'admin') {
-        return res.status(401).json({ error: 'Neautorizovano.' })
-      }
+      const admin = await verifyAdmin(token)
+      if (!admin) return res.status(401).json({ error: 'Neautorizovano.' })
 
       const result = await generateProductCopy(req.body || {})
       res.status(200).json(result)
