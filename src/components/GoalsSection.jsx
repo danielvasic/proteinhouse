@@ -10,12 +10,12 @@ const DEFAULTS = {
       { label: 'Zdravlje',         to: '/kategorija/vitamini' },
     ],
   },
-  // Default ilustracije ciljeva (Unsplash, slobodno za komerc. upotrebu) —
+  // Slavenove ilustracije ciljeva (public/goals/, optimizovane) —
   // zamjenjive u Admin → Sadržaj → Kupovina po ciljevima
-  goals_img_1: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=70',
-  goals_img_2: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=70',
-  goals_img_3: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=900&q=70',
-  goals_img_4: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=900&q=70',
+  goals_img_1: '/goals/mrsavljenje.jpg',
+  goals_img_2: '/goals/izgradnja-misica.jpg',
+  goals_img_3: '/goals/energija.jpg',
+  goals_img_4: '/goals/zdravlje.jpg',
 }
 
 /**
