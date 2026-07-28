@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
-import { hasAnyStock, getVariantStock } from '../hooks/useProducts'
+import { hasAnyStock, getVariantStock, getVariantImageSrc } from '../hooks/useProducts'
 
 const TAG_LABELS = { bestseller: 'BESTSELLER', new: 'NOVO', gainer: 'GAINER' }
 
@@ -36,7 +36,7 @@ export default function ProductCard({ product, bestseller = false }) {
   const { addItem } = useCart()
   const [hover, setHover] = useState(false)
 
-  const { id, slug, brand, title, price, old, img, badge, rating, reviews, tags = [], flavors = [], sizes = [] } = product
+  const { id, slug, brand, title, price, old, badge, rating, reviews, tags = [], flavors = [], sizes = [] } = product
   const isDiscount   = badge && badge.startsWith('-')
   const tilt         = useMemo(() => stickerTilt(id), [id])
   const inStock      = hasAnyStock(product)
@@ -50,6 +50,8 @@ export default function ProductCard({ product, bestseller = false }) {
   const hasVariants   = flavors.length > 0 || sizes.length > 0
   const variantStock  = hasVariants ? getVariantStock(product, flavor, size) : (product.stock ?? 0)
   const canAdd        = inStock && (!hasVariants || variantStock > 0)
+  // Ako galerija ima sliku vezanu za izabrani okus/gramažu, prikaži nju umjesto cover slike
+  const displayImg    = useMemo(() => getVariantImageSrc(product, flavor, size), [product, flavor, size])
 
   return (
     <article
@@ -98,7 +100,7 @@ export default function ProductCard({ product, bestseller = false }) {
       {/* Image — bijela, čista podloga (Elit stil) */}
       <div className="relative bg-white overflow-hidden" style={{ paddingBottom: '78%' }}>
         <img
-          src={img}
+          src={displayImg}
           alt={title}
           className={`absolute inset-0 w-full h-full object-contain p-5 transition-transform duration-500 ${hover ? 'scale-105' : 'scale-100'}`}
           loading="lazy"

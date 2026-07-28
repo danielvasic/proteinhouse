@@ -97,7 +97,10 @@ export async function generateProductCopy(input) {
   const response = await client().send(new ConverseCommand({
     modelId,
     messages: [{ role: 'user', content: [{ text: prompt }] }],
-    inferenceConfig: { maxTokens: 1024, temperature: 0.6 },
+    // Napomena: `temperature` namjerno izostavljen — neki noviji Bedrock modeli
+    // (npr. Opus 5 inference profile) ga vise ne prihvataju ("deprecated for
+    // this model") i vracaju gresku ako se posalje, cak i sa default vrijednoscu.
+    inferenceConfig: { maxTokens: 1024 },
   }))
 
   const raw = response.output?.message?.content?.[0]?.text?.trim() || ''

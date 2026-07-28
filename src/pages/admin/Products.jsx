@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Pencil, Trash2, Search, Package, Upload, CheckCircle2, XCircle, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react'
-import { supabase, getProductImageUrl, uploadProductImage } from '../../lib/supabase'
+import { supabase, getProductThumbUrl, uploadProductImage } from '../../lib/supabase'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
@@ -135,7 +135,7 @@ export default function Products() {
     setLoading(true)
     const { data } = await supabase
       .from('products')
-      .select('id, brand, title, internal_title, price, old_price, category, is_active, badge, image_url, image_path')
+      .select('id, brand, title, internal_title, price, old_price, category, is_active, badge, image_url, image_path, images')
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })
     setProducts(data ?? [])
@@ -219,8 +219,8 @@ export default function Products() {
                   filtered.map((p) => (
                     <TableRow key={p.id}>
                       <TableCell>
-                        {(p.image_path || p.image_url)
-                          ? <img src={getProductImageUrl(p)} alt="" className="w-12 h-12 rounded-lg object-cover border" onError={(e) => { e.target.style.display='none' }} />
+                        {(p.images?.length || p.image_path || p.image_url)
+                          ? <img src={getProductThumbUrl(p)} alt="" className="w-12 h-12 rounded-lg object-cover border" onError={(e) => { e.target.style.display='none' }} />
                           : <div className="w-12 h-12 rounded-lg border bg-gray-100 flex items-center justify-center text-gray-400 text-xs">?</div>
                         }
                       </TableCell>

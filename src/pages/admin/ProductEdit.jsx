@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Save, Plus, X, Upload, Image as ImageIcon, RefreshCw, Sparkles, Loader2 } from 'lucide-react'
+import { ArrowLeft, Save, Plus, X, Upload, RefreshCw, Sparkles, Loader2, ArrowUp, ArrowDown } from 'lucide-react'
 import { supabase, getProductImageUrl, uploadProductImage } from '../../lib/supabase'
 import { categories } from '../../data/catalog'
 import { Button } from '../../components/ui/button'
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const EMPTY = {
   brand: '', title: '', slug: '', price: '', old_price: '',
   description: '', category: 'proteini', image_url: '', image_path: '',
+  images: [], // [{path?, url?, variant: null|okus|gramaza|"okus|gramaza"}]
   badge: '', is_active: true, flavors: [], sizes: [], sort_order: 0,
   stock: 0, stock_variants: {},
   internal_title: '', tags: [],
@@ -230,6 +231,13 @@ export default function ProductEdit() {
         sizes:          data.sizes          ?? [],
         image_path:     data.image_path     ?? '',
         image_url:      data.image_url      ?? '',
+        // Ako galerija jos ne postoji, prikazi postojecu jednostruku sliku kao
+        // prvu stavku — cisto za UX (na Sacuvaj ce se to trajno upisati u images).
+        images: Array.isArray(data.images) && data.images.length
+          ? data.images
+          : (data.image_path || data.image_url)
+            ? [{ path: data.image_path || undefined, url: data.image_path ? undefined : data.image_url, variant: null }]
+            : [],
         stock:          data.stock          ?? 0,
         stock_variants: data.stock_variants ?? {},
         internal_title:     data.internal_title     ?? '',
@@ -298,8 +306,8 @@ export default function ProductEdit() {
     }
   }
 
-  /** Upload file to Supabase Storage */
-  const handleFileChange = async (e) => {
+  /** Upload i dodaj novu sliku u galeriju (products.images) */
+  const handleGalleryUpload = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
@@ -308,13 +316,36 @@ export default function ProductEdit() {
     if (uploadErr) {
       setError(`Upload greška: ${uploadErr.message}`)
     } else {
-      setForm((f) => ({ ...f, image_path: path, image_url: '' }))
+      setForm((f) => ({ ...f, images: [...f.images, { path, variant: null }] }))
     }
     setUploading(false)
     e.target.value = ''
   }
 
-  const clearImage = () => setForm((f) => ({ ...f, image_path: '', image_url: '' }))
+  const removeGalleryImage = (idx) =>
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }))
+
+  const moveGalleryImage = (idx, dir) =>
+    setForm((f) => {
+      const to = idx + dir
+      if (to < 0 || to >= f.images.length) return f
+      const next = [...f.images]
+      ;[next[idx], next[to]] = [next[to], next[idx]]
+      return { ...f, images: next }
+    })
+
+  const setGalleryVariant = (idx, variant) =>
+    setForm((f) => {
+      const next = [...f.images]
+      next[idx] = { ...next[idx], variant: variant || null }
+      return { ...f, images: next }
+    })
+
+  /** Sve moguce oznake varijanti za tagovanje slike: pojedinacni okusi i gramaze */
+  const variantOptions = useMemo(
+    () => [...(form.flavors || []), ...(form.sizes || [])],
+    [form.flavors, form.sizes]
+  )
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -343,11 +374,6 @@ export default function ProductEdit() {
       setSaving(false)
     }
   }
-
-  // Resolve preview URL
-  const previewUrl = form.image_path
-    ? getProductImageUrl({ image_path: form.image_path })
-    : form.image_url || ''
 
   if (loading) {
     return <div className="flex items-center justify-center py-16"><div className="h-7 w-7 rounded-full border-4 border-gray-200 border-t-primary animate-spin" /></div>
@@ -447,77 +473,100 @@ export default function ProductEdit() {
           </CardContent>
         </Card>
 
-        {/* ── Slika ── */}
+        {/* ── Galerija slika ── */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Slika proizvoda</CardTitle>
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Galerija slika</CardTitle>
+            <p className="text-xs text-muted-foreground font-normal mt-1">
+              Prva slika je naslovna (cover). Svaku sliku možeš vezati za okus ili gramažu — prikaže se
+              automatski kad kupac izabere tu varijantu na stranici proizvoda.
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-4 items-start">
-              {/* Preview */}
-              <div className="w-28 h-28 border-2 border-dashed border-gray-200 flex items-center justify-center bg-gray-50 shrink-0 overflow-hidden">
-                {previewUrl ? (
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.target.style.display = 'none' }}
-                  />
-                ) : (
-                  <ImageIcon size={28} className="text-gray-300" />
-                )}
-              </div>
-
-              <div className="flex-1 space-y-3">
-                {/* Upload dugme */}
-                <div>
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={() => fileRef.current?.click()}
-                    disabled={uploading}
-                  >
-                    {uploading
-                      ? <><RefreshCw size={14} className="animate-spin" /> Uploaduje se…</>
-                      : <><Upload size={14} /> Učitaj sliku</>
-                    }
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-1.5">
-                    JPG, PNG ili WebP · max 5MB · čuva se u Supabase Storage
-                  </p>
-                </div>
-
-                {/* Ili URL alternativa */}
-                <Field label="Ili unesi URL slike" hint="Koristi se samo ako nije uploadovana slika">
-                  <div className="flex gap-2">
-                    <Input
-                      value={form.image_url}
-                      onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value, image_path: '' }))}
-                      placeholder="https://..."
-                      disabled={!!form.image_path}
-                    />
-                    {previewUrl && (
-                      <Button type="button" variant="ghost" size="icon" onClick={clearImage} title="Ukloni sliku">
-                        <X size={15} />
-                      </Button>
-                    )}
+            {form.images.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {form.images.map((entry, idx) => (
+                  <div key={idx} className="border rounded-lg overflow-hidden bg-white">
+                    <div className="relative aspect-square bg-gray-50">
+                      <img
+                        src={getProductImageUrl({ image_path: entry.path, image_url: entry.url })}
+                        alt=""
+                        className="w-full h-full object-contain p-2"
+                        onError={(e) => { e.target.style.display = 'none' }}
+                      />
+                      {idx === 0 && (
+                        <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">
+                          COVER
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(idx)}
+                        className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center bg-white/90 hover:bg-white border rounded-full cursor-pointer"
+                        title="Ukloni sliku"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                    <div className="p-2 space-y-1.5">
+                      <Select value={entry.variant ?? '__none__'} onValueChange={(v) => setGalleryVariant(idx, v === '__none__' ? null : v)}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="Opšta slika" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__none__">Opšta (bez varijante)</SelectItem>
+                          {variantOptions.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="button"
+                          className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0"
+                          onClick={() => moveGalleryImage(idx, -1)}
+                          disabled={idx === 0}
+                          title="Pomjeri lijevo/gore"
+                        >
+                          <ArrowUp size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0"
+                          onClick={() => moveGalleryImage(idx, 1)}
+                          disabled={idx === form.images.length - 1}
+                          title="Pomjeri desno/dole"
+                        >
+                          <ArrowDown size={13} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </Field>
-
-                {form.image_path && (
-                  <p className="text-xs text-muted-foreground font-mono bg-gray-50 px-2 py-1 border rounded truncate">
-                    📦 Storage: {form.image_path}
-                  </p>
-                )}
+                ))}
               </div>
+            )}
+
+            <div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleGalleryUpload}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading
+                  ? <><RefreshCw size={14} className="animate-spin" /> Uploaduje se…</>
+                  : <><Upload size={14} /> Dodaj sliku</>
+                }
+              </Button>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                JPG, PNG ili WebP · max 5MB · čuva se u Supabase Storage
+              </p>
             </div>
           </CardContent>
         </Card>
