@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
 import { useAdmin } from '../../store/AdminContext'
+import Logo from '../../components/Logo'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -38,11 +39,8 @@ export default function AdminLogin() {
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3 text-center">
-          <img src="/logo.svg" alt="ProteinHouse" className="h-16 w-16" />
+          <Logo size="md" onDark />
           <div>
-            <h1 className="text-xl font-bold text-white tracking-widest" style={{ fontFamily: 'Oswald, Impact, sans-serif' }}>
-              PROTEIN<span className="font-light">HOUSE</span>
-            </h1>
             <p className="text-sm text-blue-200/70 mt-1">Admin panel</p>
           </div>
         </div>

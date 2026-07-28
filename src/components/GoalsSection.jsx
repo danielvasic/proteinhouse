@@ -52,7 +52,7 @@ export default function GoalsSection() {
         {items.map((item, i) => (
           <button
             key={item.label}
-            className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden border-0 p-0 cursor-pointer bg-[#0A0E17]"
+            className="group relative aspect-[3/4] md:aspect-auto md:h-[380px] xl:h-[420px] overflow-hidden border-0 p-0 cursor-pointer bg-[#0A0E17]"
             onClick={() => navigate(item.to)}
             aria-label={item.label}
           >
@@ -61,7 +61,7 @@ export default function GoalsSection() {
               className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-500 group-hover:scale-100"
               style={{ backgroundImage: `url('${item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}')` }}
             />
-            <div className="absolute inset-0 bg-[#0A0E17]/45 transition-colors duration-300 group-hover:bg-[#0A0E17]/10" />
+            <div className="absolute inset-0 bg-[#0A0E17]/30 transition-colors duration-300 group-hover:bg-[#0A0E17]/5" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E17]/85 via-[#0A0E17]/15 to-transparent" />
             <span
               className="absolute bottom-4 left-4 md:bottom-5 md:left-5 text-white text-[17px] md:text-[21px] font-bold uppercase tracking-[0.02em] text-left leading-tight"

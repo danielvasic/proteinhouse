@@ -6,6 +6,7 @@ import {
   Bell, Settings, ExternalLink, Star, Newspaper, Navigation, MapPin, Columns,
 } from 'lucide-react'
 import { useAdmin } from '../../store/AdminContext'
+import Logo from '../../components/Logo'
 import { Button } from '../../components/ui/button'
 import { Separator } from '../../components/ui/separator'
 import { cn } from '../../lib/utils'
@@ -95,14 +96,11 @@ export default function AdminLayout() {
         )}
         style={{ background: '#0145F2', color: '#c9d8f0' }}
       >
-        {/* Brand */}
-        <div className="flex h-16 items-center gap-3 px-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-          <img src="/logo.svg" alt="PH" className="h-8 w-8 rounded-full shrink-0" />
+        {/* Brand — novi box logo s bijelim rubom (plava podloga sidebara) */}
+        <div className="flex h-20 items-center gap-3 px-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+          <Logo size="sm" onDark />
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-white text-sm tracking-widest" style={{ fontFamily: 'Oswald, Impact, sans-serif' }}>
-              PROTEIN<span className="font-light">HOUSE</span>
-            </p>
-            <p className="text-[11px]" style={{ color: 'rgba(201,216,240,0.5)' }}>Admin panel</p>
+            <p className="text-[11px] font-semibold tracking-[0.08em] uppercase" style={{ color: 'rgba(201,216,240,0.6)' }}>Admin panel</p>
           </div>
           <button
             className="lg:hidden text-white/50 hover:text-white"

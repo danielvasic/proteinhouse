@@ -51,7 +51,18 @@ export default function Header() {
   const { totalItems, openDrawer } = useCart()
   const [shopOpen,   setShopOpen]   = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [authUser,   setAuthUser]   = useState(null)
   const closeTimer = useRef(null)
+
+  // Prati prijavu — ikona naloga pokazuje stanje
+  useEffect(() => {
+    let subscription
+    import('../lib/supabase').then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data: { session } }) => setAuthUser(session?.user ?? null))
+      subscription = supabase.auth.onAuthStateChange((_e, session) => setAuthUser(session?.user ?? null)).data.subscription
+    })
+    return () => subscription?.unsubscribe()
+  }, [])
 
   // Dynamic data from DB
   const { categories }     = useCategories()
@@ -96,8 +107,9 @@ export default function Header() {
             </div>
 
             <div className="ml-auto flex items-center gap-0.5">
-              <Link to="/nalog" className={`${iconBtnCls} hidden md:flex`} aria-label="Nalog">
-                <User size={20} />
+              <Link to="/nalog" className={`${iconBtnCls} hidden md:flex relative`} aria-label={authUser ? 'Moj nalog' : 'Prijava'} title={authUser?.email}>
+                <User size={20} weight={authUser ? 'fill' : 'regular'} />
+                {authUser && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 border border-white" />}
               </Link>
               <button className={`${iconBtnCls} hidden md:flex`} aria-label="Wishlist">
                 <Heart size={20} />
@@ -272,7 +284,7 @@ export default function Header() {
             className="flex items-center gap-3 px-5 py-3.5 bg-transparent border-0 font-bold text-[12px] tracking-[0.1em] uppercase text-[#0A0E17] cursor-pointer text-left hover:bg-[#F2F4F7] transition-colors"
             onClick={() => { navigate('/nalog'); setMobileOpen(false) }}
           >
-            <User size={17} className="text-gray-400" /> PRIJAVA / REGISTRACIJA
+            <User size={17} weight={authUser ? 'fill' : 'regular'} className={authUser ? 'text-emerald-600' : 'text-gray-400'} /> {authUser ? 'MOJ NALOG' : 'PRIJAVA / REGISTRACIJA'}
           </button>
         </div>
       </div>
