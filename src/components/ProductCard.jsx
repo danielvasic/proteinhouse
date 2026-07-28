@@ -53,7 +53,7 @@ export default function ProductCard({ product, bestseller = false }) {
 
   return (
     <article
-      className={`relative bg-white border border-gray-200 overflow-hidden cursor-pointer flex flex-col group transition-all duration-200 ${hover ? 'shadow-[0_12px_32px_-8px_rgba(15,41,82,0.14)] border-gray-300' : ''}`}
+      className={`relative bg-white overflow-hidden cursor-pointer flex flex-col group transition-all duration-200 ${hover ? 'shadow-[0_12px_32px_-8px_rgba(15,41,82,0.16)]' : ''}`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onClick={() => navigate(`/proizvod/${slug}`)}

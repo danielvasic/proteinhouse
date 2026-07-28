@@ -118,7 +118,7 @@ export default function Product() {
           name: product.title, brand: { '@type': 'Brand', name: product.brand },
           description: product.description, image: product.img,
           offers: { '@type': 'Offer', price: product.price, priceCurrency: 'BAM', availability: 'https://schema.org/InStock' },
-          ...(product.rating && { aggregateRating: { '@type': 'AggregateRating', ratingValue: product.rating, reviewCount: product.reviews } }),
+          ...(product.rating > 0 && { aggregateRating: { '@type': 'AggregateRating', ratingValue: product.rating, reviewCount: product.reviews } }),
         })}</script>
       </Helmet>
 
@@ -142,7 +142,7 @@ export default function Product() {
         </div>
 
         {/* ── Product layout ── */}
-        <section className="py-12 md:py-16 bg-[#F2F4F7]">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
 
@@ -152,6 +152,11 @@ export default function Product() {
                 {isDiscount && (
                   <div className="absolute top-5 left-5 w-[52px] h-[52px] rounded-full bg-[#0A0E17] flex items-center justify-center z-10">
                     <span className="text-white text-[11px] font-extrabold text-center leading-tight">{product.badge}</span>
+                  </div>
+                )}
+                {product.tags?.includes('bestseller') && (
+                  <div className="absolute top-5 right-5 z-10 px-3 py-1.5 bg-[#0A0E17] text-white text-[10px] font-bold tracking-[0.14em] uppercase rounded-md">
+                    Bestseller
                   </div>
                 )}
                 {product.img ? (
@@ -197,7 +202,7 @@ export default function Product() {
                   {product.title}
                 </h1>
 
-                {product.rating && (
+                {product.rating > 0 && (
                   <div className="flex items-center gap-2.5 mb-5 pb-5 border-b border-gray-100">
                     <StarRating rating={product.rating} />
                     <span className="text-[12px] text-gray-400">({product.reviews} recenzija)</span>

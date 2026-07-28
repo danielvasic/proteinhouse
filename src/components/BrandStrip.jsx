@@ -21,7 +21,7 @@ export default function BrandStrip() {
   if (loading || brands.length === 0) return null
 
   return (
-    <section className="py-12 bg-[#F2F4F7] border-b border-gray-200">
+    <section className="py-12 bg-white border-b border-gray-200">
       <div className="container">
         <div className="flex items-center gap-4 mb-7">
           <div className="h-px flex-1 bg-gray-200" />
