@@ -48,6 +48,17 @@ export function getProductImageUrl(product) {
 }
 
 /**
+ * Cover slika proizvoda: prva stavka galerije (images[]) ako postoji,
+ * inace stari jednostruki image_path/image_url (backward-compat fallback).
+ */
+export function getProductThumbUrl(product) {
+  if (!product) return ''
+  const first = Array.isArray(product.images) && product.images.length ? product.images[0] : null
+  if (first) return getProductImageUrl({ image_path: first.path, image_url: first.url })
+  return getProductImageUrl(product)
+}
+
+/**
  * Upload a file to the product-images bucket.
  * Returns { path, error }
  */

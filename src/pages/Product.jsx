@@ -57,6 +57,17 @@ export default function Product() {
   const [qty,    setQty]    = useState(1)
   const [flavor, setFlavor] = useState(null)
   const [size,   setSize]   = useState(null)
+  const [activeIdx, setActiveIdx] = useState(0)
+
+  // Galerija: prebaci na sliku vezanu za izabrani okus/gramažu (ako postoji)
+  useEffect(() => {
+    if (!product?.images?.length) return
+    const comboKey = flavor && size ? `${flavor}|${size}` : null
+    const idx = product.images.findIndex((i) =>
+      (comboKey && i.variant === comboKey) || (flavor && i.variant === flavor) || (size && i.variant === size)
+    )
+    if (idx >= 0) setActiveIdx(idx)
+  }, [flavor, size, product])
 
   // Floating "kupi" traka — prati te dok skrolaš (Ostrovit stil)
   const buyRef = useRef(null)
@@ -159,17 +170,40 @@ export default function Product() {
                     Bestseller
                   </div>
                 )}
-                {product.img ? (
-                  <img
-                    src={product.img}
-                    alt={product.title}
-                    className="relative w-full max-w-[360px] object-contain drop-shadow-[0_24px_32px_rgba(0,0,0,0.25)]"
-                    width={600}
-                    height={540}
-                  />
-                ) : (
-                  <div className="w-full max-w-[360px] aspect-square bg-white/10 rounded-2xl flex items-center justify-center text-white/50 text-sm">
-                    Nema slike
+                {(() => {
+                  const gallery = product.images?.length ? product.images : null
+                  const mainSrc = gallery ? gallery[activeIdx]?.src || gallery[0]?.src : product.img
+                  return mainSrc ? (
+                    <img
+                      src={mainSrc}
+                      alt={product.title}
+                      className="relative w-full max-w-[360px] object-contain drop-shadow-[0_24px_32px_rgba(0,0,0,0.25)]"
+                      width={600}
+                      height={540}
+                    />
+                  ) : (
+                    <div className="w-full max-w-[360px] aspect-square bg-white/10 rounded-2xl flex items-center justify-center text-white/50 text-sm">
+                      Nema slike
+                    </div>
+                  )
+                })()}
+
+                {/* Minijature — samo ako galerija ima vise od jedne slike */}
+                {product.images?.length > 1 && (
+                  <div className="relative flex gap-2 mt-5 flex-wrap justify-center">
+                    {product.images.map((im, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setActiveIdx(i)}
+                        className={`w-14 h-14 rounded-lg bg-white/10 border-2 overflow-hidden shrink-0 cursor-pointer transition-colors ${
+                          i === activeIdx ? 'border-white' : 'border-transparent hover:border-white/40'
+                        }`}
+                        aria-label={`Slika proizvoda ${i + 1}`}
+                      >
+                        <img src={im.src} alt="" className="w-full h-full object-contain p-1" />
+                      </button>
+                    ))}
                   </div>
                 )}
 

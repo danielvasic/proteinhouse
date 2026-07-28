@@ -10,7 +10,7 @@
  *                description, flavors, sizes, rating, reviews }
  */
 import { useEffect, useState, useMemo } from 'react'
-import { supabase, getProductImageUrl } from '../lib/supabase'
+import { supabase, getProductImageUrl, getProductThumbUrl } from '../lib/supabase'
 
 /**
  * Ako naziv počinje imenom brenda, skini ga iz prikaza — brend se prikazuje
@@ -36,7 +36,13 @@ function norm(p) {
     slug:           p.slug,
     price:          Number(p.price),
     old:            p.old_price ? Number(p.old_price) : null,
-    img:            getProductImageUrl(p),
+    img:            getProductThumbUrl(p),
+    images:         (Array.isArray(p.images) ? p.images : [])
+                       .map((entry) => ({
+                         src:     getProductImageUrl({ image_path: entry.path, image_url: entry.url }),
+                         variant: entry.variant || null,
+                       }))
+                       .filter((entry) => entry.src),
     badge:          p.badge  || null,
     cat:            p.category ?? p.cat,
     description:    p.description || '',
@@ -78,6 +84,22 @@ export function getVariantStock(product, flavor, size) {
             : ''
   if (!key) return product.stock ?? 0
   return product.stock_variants?.[key]?.qty ?? 0
+}
+
+/**
+ * Slika koja odgovara izabranom okusu/gramaži (galerija sa vezanim varijantama).
+ * Prioritet: tačan par okus+gramaža → samo okus → samo gramaža → prva slika
+ * u galeriji → stara jednostruka slika (product.img).
+ */
+export function getVariantImageSrc(product, flavor, size) {
+  const gallery = product?.images
+  if (!gallery?.length) return product?.img || ''
+  const comboKey = flavor && size ? `${flavor}|${size}` : null
+  const match =
+    (comboKey && gallery.find((i) => i.variant === comboKey)) ||
+    (flavor   && gallery.find((i) => i.variant === flavor)) ||
+    (size     && gallery.find((i) => i.variant === size))
+  return match?.src || gallery[0]?.src || product.img || ''
 }
 
 /** True if any variant (or simple stock) is > 0 */
