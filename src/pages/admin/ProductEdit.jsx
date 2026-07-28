@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Save, Plus, X, Upload, Image as ImageIcon, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Save, Plus, X, Upload, Image as ImageIcon, RefreshCw, Sparkles, Loader2 } from 'lucide-react'
 import { supabase, getProductImageUrl, uploadProductImage } from '../../lib/supabase'
 import { categories } from '../../data/catalog'
 import { Button } from '../../components/ui/button'
@@ -21,19 +21,40 @@ const EMPTY = {
   hero_stats: [],
 }
 
+const DESCRIPTION_FIELDS = ['description', 'usage_instructions', 'composition', 'nutrition_info']
+
 function slugify(str) {
   return str.toLowerCase()
     .replace(/[čć]/g, 'c').replace(/[šđ]/g, (m) => m === 'š' ? 's' : 'd')
     .replace(/ž/g, 'z').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
-function Field({ label, children, hint }) {
+function Field({ label, children, hint, right }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <div className="flex items-center justify-between gap-2">
+        <Label>{label}</Label>
+        {right}
+      </div>
       {children}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
+  )
+}
+
+/** Mala "AI generiši/regeneriši" ikonica uz label polja opisa */
+function AiFieldButton({ busy, onClick, disabled }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || busy}
+      title="Generiši preko AI-a (Claude Sonnet)"
+      className="flex items-center gap-1 text-[11px] font-medium text-violet-600 hover:text-violet-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0 p-0"
+    >
+      {busy ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+      {busy ? 'Generiše…' : 'AI'}
+    </button>
   )
 }
 
@@ -194,6 +215,9 @@ export default function ProductEdit() {
   const [uploading, setUploading] = useState(false)
   const [error,     setError]     = useState('')
   const [loading,   setLoading]   = useState(!isNew)
+  // null = ništa u toku; 'all' = generiše sva polja; ili konkretan field key
+  const [generating, setGenerating] = useState(null)
+  const [aiError,    setAiError]    = useState('')
 
   useEffect(() => {
     if (isNew) return
@@ -226,6 +250,52 @@ export default function ProductEdit() {
       if (key === 'title' && isNew) next.slug = slugify(val)
       return next
     })
+  }
+
+  /**
+   * AI generator opisa (Claude Sonnet preko AWS Bedrocka, /api/generate-description).
+   * singleField = null → glavno dugme: generiše SAMO prazna polja (ne dira ono što je već upisano).
+   * singleField = 'x'  → ikonica uz jedno polje: uvijek (re)generiše baš to polje.
+   */
+  const generateCopy = async (singleField = null) => {
+    if (!form.brand.trim() || !form.title.trim()) {
+      setAiError('Unesite brend i naziv proizvoda prije generisanja opisa.')
+      return
+    }
+    const fields = singleField
+      ? [singleField]
+      : DESCRIPTION_FIELDS.filter((k) => !form[k]?.trim())
+    if (fields.length === 0) {
+      setAiError('Sva polja su već popunjena — obriši polje pa klikni AI da ga regenerišeš.')
+      return
+    }
+    setAiError('')
+    setGenerating(singleField || 'all')
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          brand: form.brand, title: form.title, category: form.category,
+          existing: {
+            description: form.description, usage_instructions: form.usage_instructions,
+            composition: form.composition, nutrition_info: form.nutrition_info,
+          },
+          fields,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Greška pri generisanju opisa.')
+      setForm((f) => ({ ...f, ...data }))
+    } catch (err) {
+      setAiError(err.message || 'Greška pri generisanju opisa.')
+    } finally {
+      setGenerating(null)
+    }
   }
 
   /** Upload file to Supabase Storage */
@@ -497,20 +567,50 @@ export default function ProductEdit() {
 
         {/* ── Opis (tabovi na stranici proizvoda) ── */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Opis proizvoda</CardTitle>
+          <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Opis proizvoda</CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">Popunjava samo prazna polja — za regenerisanje jednog polja klikni AI pored njega.</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5 shrink-0"
+              disabled={generating !== null || (!form.brand.trim() || !form.title.trim())}
+              onClick={() => generateCopy(null)}
+            >
+              {generating === 'all' ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-violet-600" />}
+              {generating === 'all' ? 'Generiše…' : 'AI generiši opis'}
+            </Button>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Field label="Opis">
+            {aiError && (
+              <div className="rounded-lg bg-amber-50 border border-amber-200 text-amber-800 px-3 py-2 text-xs">{aiError}</div>
+            )}
+            <Field
+              label="Opis"
+              right={<AiFieldButton busy={generating === 'description'} disabled={generating !== null} onClick={() => generateCopy('description')} />}
+            >
               <Textarea value={form.description} onChange={set('description')} rows={4} placeholder="Kratak opis proizvoda…" />
             </Field>
-            <Field label="Način upotrebe" hint="Prikazuje se kao poseban tab (Ostrovit stil)">
+            <Field
+              label="Način upotrebe"
+              hint="Prikazuje se kao poseban tab (Ostrovit stil)"
+              right={<AiFieldButton busy={generating === 'usage_instructions'} disabled={generating !== null} onClick={() => generateCopy('usage_instructions')} />}
+            >
               <Textarea value={form.usage_instructions} onChange={set('usage_instructions')} rows={3} placeholder="npr. Pomiješajte 1 mjericu (30g) s 250ml vode…" />
             </Field>
-            <Field label="Sastav">
+            <Field
+              label="Sastav"
+              right={<AiFieldButton busy={generating === 'composition'} disabled={generating !== null} onClick={() => generateCopy('composition')} />}
+            >
               <Textarea value={form.composition} onChange={set('composition')} rows={3} placeholder="Sastojci proizvoda…" />
             </Field>
-            <Field label="Nutritivne vrijednosti">
+            <Field
+              label="Nutritivne vrijednosti"
+              right={<AiFieldButton busy={generating === 'nutrition_info'} disabled={generating !== null} onClick={() => generateCopy('nutrition_info')} />}
+            >
               <Textarea value={form.nutrition_info} onChange={set('nutrition_info')} rows={4} placeholder="Na 100g / po porciji…" />
             </Field>
           </CardContent>

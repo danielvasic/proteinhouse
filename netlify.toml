@@ -13,6 +13,13 @@
   # esbuild bundles the function + all imports into a single file — no runtime path issues
   node_bundler = "esbuild"
 
+# API funkcije (npr. AI generator opisa) — mora ici PRIJE catch-all SSR pravila ispod,
+# jer Netlify uzima prvo pravilo koje se poklopi.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 # Static assets in dist/client are served directly by Netlify CDN (fast, cached, no function hit).
 # Every other URL is an SSR rewrite — the browser URL stays the same (status 200).
 [[redirects]]
