@@ -247,7 +247,8 @@ export default function Product() {
 
                 {/* Price */}
                 <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-3xl font-bold text-[#1e272e]" style={NUMERIC}>
+                  {/* Snižena cijena u Vulcan Orangeu — brand book tu boju drži za popuste */}
+                  <span className={`text-3xl font-bold ${product.old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`} style={NUMERIC}>
                     {fmtKM(product.price)}
                   </span>
                   {product.old && (
@@ -344,8 +345,8 @@ export default function Product() {
                 {/* Trust badges */}
                 <div className="grid grid-cols-2 gap-px bg-gray-200 mt-auto">
                   {[
-                    { Icon: Truck,       icon: 'dostava',  title: 'Besplatna dostava', sub: 'Preko 100 KM' },
-                    { Icon: ShieldCheck, icon: 'original', title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
+                    { Icon: Truck,       icon: 'paket',            title: 'Besplatna dostava', sub: 'Preko 100 KM' },
+                    { Icon: ShieldCheck, icon: 'placanje-potvrda', title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
                   ].map(({ Icon, icon, title, sub }) => (
                     <div key={title} className="flex items-center gap-3 bg-[#edf1f5] px-4 py-3">
                       <BrandIcon name={icon} size={20}

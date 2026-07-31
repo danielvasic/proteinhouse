@@ -487,7 +487,8 @@ export default function Checkout() {
                     <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Kupon</h2>
                     {coupon ? (
                       <div className="flex items-center gap-3 border border-[#0145F2]/30 bg-[#edf1f5] px-4 py-3">
-                        <Ticket size={18} weight="duotone" className="text-[#0145F2] shrink-0" />
+                        <BrandIcon name="popust" size={20}
+                          fallback={<Ticket size={18} weight="duotone" className="text-[#0145F2] shrink-0" />} />
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] font-bold text-[#1e272e]">{coupon.code}</p>
                           {coupon.description && <p className="text-[11px] text-gray-500">{coupon.description}</p>}
@@ -540,12 +541,12 @@ export default function Checkout() {
 
                   <div className="grid grid-cols-2 gap-3 p-4 bg-white border border-gray-200">
                     <div className="flex items-center gap-2.5 text-[12px] text-gray-600">
-                      <BrandIcon name="dostava" size={18}
+                      <BrandIcon name="paket" size={18}
                         fallback={<Truck size={16} weight="duotone" className="text-[#1e272e] shrink-0" />} />
                       Isporuka 1–3 radna dana
                     </div>
                     <div className="flex items-center gap-2.5 text-[12px] text-gray-600">
-                      <BrandIcon name="original" size={18}
+                      <BrandIcon name="paket-potvrda" size={18}
                         fallback={<ShieldCheck size={16} weight="duotone" className="text-[#1e272e] shrink-0" />} />
                       Originalni proizvodi
                     </div>

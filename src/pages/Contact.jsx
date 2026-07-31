@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { Phone, Envelope, MapPin, Clock } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
 import { useStores } from '../hooks/useStores'
+import BrandIcon from '../components/BrandIcon'
 import { BODY, DISPLAY } from '../lib/typography'
 
 const inputCls = 'w-full border border-gray-300 px-4 py-3.5 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
@@ -23,12 +24,12 @@ export default function Contact() {
 
   // Build INFO list from site_content — skip empty fields
   const INFO = [
-    data.contact_phone && { Icon: Phone,    label: 'Telefon',       text: data.contact_phone },
-    data.contact_email && { Icon: Envelope, label: 'Email',         text: data.contact_email },
+    data.contact_phone && { Icon: Phone,    brand: 'telefon',  label: 'Telefon',       text: data.contact_phone },
+    data.contact_email && { Icon: Envelope, brand: 'email',    label: 'Email',         text: data.contact_email },
     // First active store address shown if available
-    stores[0]?.address && { Icon: MapPin,   label: 'Adresa',        text: `${stores[0].address}${stores[0].city ? ', ' + stores[0].city : ''}` },
+    stores[0]?.address && { Icon: MapPin,   brand: 'lokacija', label: 'Adresa',        text: `${stores[0].address}${stores[0].city ? ', ' + stores[0].city : ''}` },
     data.contact_hours || stores[0]?.working_hours
-      ? { Icon: Clock, label: 'Radno vrijeme', text: data.contact_hours || stores[0]?.working_hours }
+      ? { Icon: Clock, brand: 'sat', label: 'Radno vrijeme', text: data.contact_hours || stores[0]?.working_hours }
       : null,
   ].filter(Boolean)
 
@@ -82,10 +83,10 @@ export default function Contact() {
                 </p>
 
                 <div className="flex flex-col gap-6">
-                  {INFO.map(({ Icon, label, text }) => (
+                  {INFO.map(({ Icon, brand, label, text }) => (
                     <div key={label} className="flex items-start gap-4">
                       <div className="w-9 h-9 border border-gray-200 flex items-center justify-center shrink-0">
-                        <Icon size={16} weight="duotone" color="#0145F2" />
+                        <BrandIcon name={brand} size={20} fallback={<Icon size={16} weight="duotone" color="#0145F2" />} />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-0.5">{label}</p>

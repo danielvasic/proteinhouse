@@ -2,15 +2,26 @@ import { useNavigate } from 'react-router-dom'
 import { Scales, Barbell, Drop, Lightning, Sparkle, Leaf, Tag } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
 import { BODY } from '../lib/typography'
+import BrandIcon from './BrandIcon'
 
-// Standardne ikonice po pojmu (placeholder dok se ne kupi Adobe Stock gym set)
+// Brend ikone iz brand booka po pojmu; Phosphor ostaje kao rezerva.
 const ICONS = {
-  'mršanje':          Scales,
-  'izgradnja mišića': Barbell,
-  'whey':             Drop,
-  'kreatin':          Lightning,
-  'izolat':           Sparkle,
-  'vitamini':         Leaf,
+  'mršanje':           { brand: 'vaga',               Icon: Scales },
+  'mršavljenje':       { brand: 'vaga',               Icon: Scales },
+  'izgradnja mišića':  { brand: 'bicep',              Icon: Barbell },
+  'whey':              { brand: 'protein',            Icon: Drop },
+  'proteini':          { brand: 'protein',            Icon: Drop },
+  // 'energija' je u brand booku sitna i gusta pa se na 18px slije — za male
+  // formate koristiti 'mjerica' / 'energija-ciklus', koje ostaju čitljive.
+  'kreatin':           { brand: 'mjerica',            Icon: Lightning },
+  'pre-workout':       { brand: 'energija-ciklus',    Icon: Lightning },
+  'energija':          { brand: 'energija-ciklus',    Icon: Lightning },
+  'izolat':            { brand: 'sejker',             Icon: Sparkle },
+  'gaineri':           { brand: 'sejker-obrok',       Icon: Sparkle },
+  'aminokiseline':     { brand: 'molekula',           Icon: Sparkle },
+  'omega 3':           { brand: 'omega-3',            Icon: Drop },
+  'vitamini':          { brand: 'suplement-imunitet', Icon: Leaf },
+  'minerali':          { brand: 'minerali',           Icon: Leaf },
 }
 
 const DEFAULTS = {
@@ -40,14 +51,17 @@ export default function QuickCategories() {
       <div className="container">
         <div className="flex gap-2 py-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((item) => {
-            const Icon = ICONS[item.label.toLowerCase()] || Tag
+            const { brand, Icon } = ICONS[item.label.toLowerCase()] ?? { Icon: Tag }
             return (
               <button
                 key={item.label}
-                className="shrink-0 flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-[11px] font-bold tracking-[0.08em] uppercase text-[#1e272e] hover:bg-[#0145F2] hover:border-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer whitespace-nowrap"
+                // Podloga ostaje bijela i na hoveru — brend ikone su dvobojne
+                // pa se na plavoj pozadini ne bi vidjele.
+                className="shrink-0 flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-[11px] font-bold tracking-[0.08em] uppercase text-[#1e272e] hover:border-[#0145F2] hover:text-[#0145F2] transition-all duration-150 cursor-pointer whitespace-nowrap"
                 onClick={() => navigate(item.to)}
               >
-                <Icon size={14} weight="duotone" /> {item.label}
+                <BrandIcon name={brand} size={18} fallback={<Icon size={14} weight="duotone" />} />
+                {item.label}
               </button>
             )
           })}

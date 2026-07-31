@@ -13,6 +13,7 @@ import { useCart } from '../store/CartContext'
 import { useCategories } from '../hooks/useCategories'
 import { useSiteContent } from '../hooks/useSiteContent'
 import { BODY } from '../lib/typography'
+import BrandIcon from './BrandIcon'
 
 const CAT_ICONS = {
   proteini:    Flask,
@@ -116,7 +117,7 @@ export default function Header() {
                 <Heart size={20} />
               </button>
               <button className={iconBtnCls} aria-label="Korpa" onClick={openDrawer}>
-                <ShoppingCart size={20} />
+                <BrandIcon name="korpa" size={22} fallback={<ShoppingCart size={20} />} />
                 {totalItems > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-[#0145F2] text-white text-[9px] font-bold flex items-center justify-center">
                     {totalItems}

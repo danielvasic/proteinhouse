@@ -151,7 +151,8 @@ export default function ProductCard({ product, bestseller = false }) {
           )}
 
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-[17px] font-extrabold text-[#1e272e]">{fmtKM(price)}</span>
+            {/* Snižena cijena ide u Vulcan Orange — brand book tu boju drži za popuste */}
+            <span className={`text-[17px] font-extrabold ${old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`}>{fmtKM(price)}</span>
             {old && (
               <span className="text-xs text-gray-400 line-through font-normal">{fmtKM(old)}</span>
             )}

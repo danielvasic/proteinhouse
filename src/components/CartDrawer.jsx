@@ -5,6 +5,7 @@ import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { FREE_SHIPPING_THRESHOLD } from '../lib/shipping'
 import CartAddons from './CartAddons'
+import BrandIcon from './BrandIcon'
 import { BODY, NUMERIC } from '../lib/typography'
 
 export default function CartDrawer() {
@@ -61,7 +62,8 @@ export default function CartDrawer() {
         <div className="flex-1 overflow-y-auto">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-center py-16 px-6">
-              <ShoppingCart size={44} color="#D1D5DB" weight="thin" />
+              <BrandIcon name="korpa-prazna" size={56}
+                fallback={<ShoppingCart size={44} color="#D1D5DB" weight="thin" />} />
               <div>
                 <p className="text-[13px] font-semibold text-[#1e272e] mb-1">Korpa je prazna</p>
                 <p className="text-[12px] text-gray-400">Dodajte proizvode iz naše ponude</p>
@@ -102,8 +104,9 @@ export default function CartDrawer() {
         <div className="border-t border-gray-200 p-5 flex flex-col gap-3">
           {/* Shipping nudge */}
           {nudge > 0 && items.length > 0 && (
-            <div className="flex items-center justify-between py-2.5 px-3.5 border border-gray-200 bg-[#edf1f5]">
-              <span className="text-[11px] text-gray-500">
+            <div className="flex items-center gap-3 py-2.5 px-3.5 border border-gray-200 bg-[#edf1f5]">
+              <BrandIcon name="paket" size={22} />
+              <span className="text-[11px] text-gray-500 flex-1">
                 Još <strong className="text-[#1e272e] font-bold">{fmtKM(nudge)}</strong> do besplatne dostave
               </span>
               <div className="w-24 h-1 bg-gray-200 overflow-hidden">
