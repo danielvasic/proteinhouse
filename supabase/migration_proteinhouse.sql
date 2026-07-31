@@ -69,7 +69,7 @@ on conflict (slug) do update set
 -- ── 4. HERO BANER (početni) ──────────────────────────────────
 insert into hero_banners (eyebrow, title_lines, subtitle, cta_primary_text, cta_primary_link, cta_secondary_text, cta_secondary_link, image_url, is_active, sort_order)
 values (
-  'Sarajevo · Mostar · Banja Luka',
+  'Dostava po cijeloj BiH · Mepas Mall, Mostar',
   'Proteini i/suplementi/za pobjednike',
   'Originalni proizvodi top svjetskih brendova. Brza dostava po cijeloj BiH. Do −50% na izabrane artikle.',
   'Pogledaj akcije',   '/kategorija/akcija',
