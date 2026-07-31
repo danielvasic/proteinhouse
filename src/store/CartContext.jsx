@@ -7,8 +7,11 @@ const CartContext = createContext(null)
 function cartReducer(state, action) {
   switch (action.type) {
     case 'ADD': {
+      // Cijena ulazi u ključ jer isti proizvod može biti u korpi po redovnoj
+      // cijeni i po add-on promo cijeni — to su dvije zasebne stavke.
       const idx = state.items.findIndex((x) =>
         x.id === action.payload.id &&
+        x.price === action.payload.price &&
         (x.selectedFlavor ?? null) === (action.payload.selectedFlavor ?? null) &&
         (x.selectedSize   ?? null) === (action.payload.selectedSize   ?? null)
       )

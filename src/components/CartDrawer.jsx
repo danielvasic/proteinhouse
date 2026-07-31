@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { ShoppingCart, X } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
-
-const FREE_SHIPPING_THRESHOLD = 100
+import { FREE_SHIPPING_THRESHOLD } from '../lib/shipping'
+import CartAddons from './CartAddons'
 
 export default function CartDrawer() {
   const navigate = useNavigate()
@@ -67,6 +67,7 @@ export default function CartDrawer() {
               </div>
             </div>
           ) : (
+            <>
             <div className="divide-y divide-gray-100">
               {items.map((item, idx) => (
                 <div key={`${item.id}-${idx}`} className="flex gap-3 p-4 relative">
@@ -91,6 +92,8 @@ export default function CartDrawer() {
                 </div>
               ))}
             </div>
+            <CartAddons />
+            </>
           )}
         </div>
 

@@ -94,14 +94,29 @@ export async function generateProductCopy(input) {
   const modelId = process.env.BEDROCK_MODEL_ID || DEFAULT_MODEL_ID
   const prompt  = buildPrompt({ ...input, fields })
 
-  const response = await client().send(new ConverseCommand({
-    modelId,
-    messages: [{ role: 'user', content: [{ text: prompt }] }],
-    // Napomena: `temperature` namjerno izostavljen — neki noviji Bedrock modeli
-    // (npr. Opus 5 inference profile) ga vise ne prihvataju ("deprecated for
-    // this model") i vracaju gresku ako se posalje, cak i sa default vrijednoscu.
-    inferenceConfig: { maxTokens: 1024 },
-  }))
+  let response
+  try {
+    response = await client().send(new ConverseCommand({
+      modelId,
+      messages: [{ role: 'user', content: [{ text: prompt }] }],
+      // Napomena: `temperature` namjerno izostavljen — neki noviji Bedrock modeli
+      // (npr. Opus 5 inference profile) ga vise ne prihvataju ("deprecated for
+      // this model") i vracaju gresku ako se posalje, cak i sa default vrijednoscu.
+      inferenceConfig: { maxTokens: 1024 },
+    }))
+  } catch (err) {
+    // AWS SDK greske (ValidationException, AccessDeniedException,
+    // ModelNotReadyException, ThrottlingException...) inace nestanu iza
+    // generickog "Bedrock is unable to process your request." — ovdje ih
+    // logujemo pune (Netlify function logs / lokalna konzola) i vracamo
+    // konkretan naziv+poruku admin panelu da se odmah zna sta ne valja.
+    console.error('Bedrock ConverseCommand failed:', {
+      name: err.name, message: err.message, httpStatusCode: err.$metadata?.httpStatusCode,
+      requestId: err.$metadata?.requestId, modelId,
+    })
+    const detail = err.name ? `${err.name} — ${err.message}` : (err.message || 'nepoznata greška')
+    throw Object.assign(new Error(`Bedrock greška (${detail})`), { code: 'BEDROCK_ERROR' })
+  }
 
   const raw = response.output?.message?.content?.[0]?.text?.trim() || ''
   const jsonText = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '')

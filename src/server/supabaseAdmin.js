@@ -17,6 +17,22 @@ class NoopWebSocket {
   addEventListener() {}  removeEventListener() {}
 }
 
+/**
+ * Klijent sa service_role ključem — zaobilazi RLS. Koristi ga SAMO pozadinski
+ * posao bez prijavljenog korisnika (npr. scheduled funkcija za podsjetnike).
+ * Ključ nikad ne smije doći do frontenda.
+ */
+export function serviceClient() {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!key) {
+    throw Object.assign(new Error('Nedostaje SUPABASE_SERVICE_ROLE_KEY.'), { code: 'NOT_CONFIGURED' })
+  }
+  return createClient(process.env.VITE_SUPABASE_URL, key, {
+    auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+    realtime: { transport: NoopWebSocket },
+  })
+}
+
 /** Vraća korisnika ako je JWT valjan i ima role='admin' u metapodacima, inače null. */
 export async function verifyAdmin(token) {
   if (!token) return null
