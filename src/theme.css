@@ -222,6 +222,25 @@ img {
 }
 @media (max-width: 767px) { .ph-pattern { background-size: 48px 48px; } }
 
+/* Glavni CTA — Vulcan Orange.
+   Brand book 2026: narančasta je za "važna i energična naglašavanja — super
+   popusti, CTAs". Drži se za akcije koje vode do kupovine (dodaj u korpu,
+   nastavi do plaćanja, potvrdi narudžbu); plava ostaje za navigaciju,
+   filtere i pomoćne radnje da narančasta ne izgubi udarnost.
+   Boja je ovdje, a ne u Tailwind klasama, da CTA bude jedan pojam na
+   jednom mjestu. */
+.ph-cta {
+  background: var(--ph-vulcan-orange);
+  color: #ffffff;
+  border: 0;
+}
+.ph-cta:hover:not(:disabled) { background: #e03903; }
+.ph-cta:disabled {
+  background: var(--ph-gray-200);
+  color: var(--ph-gray-500);
+  cursor: not-allowed;
+}
+
 /* Focus visible ring */
 :focus-visible {
   outline: none;

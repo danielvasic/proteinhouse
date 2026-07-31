@@ -160,7 +160,7 @@ export default function ProductCard({ product, bestseller = false }) {
           <button
             className={`w-full py-3 text-[11px] font-bold tracking-[0.1em] uppercase transition-all duration-150 ${
               canAdd
-                ? 'border border-[#0145F2] text-[#1e272e] bg-transparent hover:bg-[#0145F2] hover:text-white cursor-pointer'
+                ? 'ph-cta cursor-pointer'
                 : 'border border-gray-200 text-gray-400 bg-[#edf1f5] cursor-not-allowed'
             }`}
             onClick={(e) => { e.stopPropagation(); if (canAdd) addItem({ ...product, selectedFlavor: flavor, selectedSize: size }) }}

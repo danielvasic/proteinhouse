@@ -325,7 +325,7 @@ export default function Product() {
                     className={`order-3 sm:order-2 w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-2.5 py-3.5 sm:py-3 text-[12px] sm:text-[11px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 border-0 ${
                       outOfStock
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-[#0145F2] text-white hover:bg-[#0136C4] cursor-pointer'
+                        : 'ph-cta cursor-pointer'
                     }`}
                     onClick={handleAdd}
                     disabled={outOfStock}
@@ -385,7 +385,7 @@ export default function Product() {
             </div>
             <button
               className={`shrink-0 flex items-center gap-2 px-6 py-3 text-[11px] font-bold tracking-[0.1em] uppercase border-0 ${
-                outOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0145F2] text-white hover:bg-[#0136C4] cursor-pointer'
+                outOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'ph-cta cursor-pointer'
               }`}
               onClick={handleAdd}
               disabled={outOfStock}

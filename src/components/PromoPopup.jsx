@@ -94,7 +94,7 @@ export default function PromoPopup() {
             </p>
           )}
           <button
-            className="w-full py-3.5 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer"
+            className="ph-cta w-full py-3.5 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors cursor-pointer"
             onClick={() => { close(); navigate(promo.link || '/kategorija/akcija') }}
           >
             Iskoristi ponudu →

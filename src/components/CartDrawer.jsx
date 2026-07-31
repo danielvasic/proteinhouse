@@ -111,7 +111,7 @@ export default function CartDrawer() {
               </span>
               <div className="w-24 h-1 bg-gray-200 overflow-hidden">
                 <div
-                  className="h-full bg-[#0145F2] transition-all duration-300"
+                  className="h-full bg-[#00cec9] transition-all duration-300"
                   style={{ width: `${Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }}
                 />
               </div>
@@ -127,7 +127,7 @@ export default function CartDrawer() {
           </div>
 
           <button
-            className="w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] disabled:bg-gray-200 disabled:text-gray-400 transition-colors duration-150 cursor-pointer disabled:cursor-not-allowed"
+            className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors duration-150 cursor-pointer"
             disabled={items.length === 0}
             onClick={() => { closeDrawer(); navigate('/checkout') }}
           >

@@ -86,7 +86,8 @@ export default function HeroBanner() {
           {/* Eyebrow */}
           {b.eyebrow && (
             <div className="hidden md:flex items-center gap-3 mb-7">
-              <div className="h-px w-10 bg-white/35" />
+              {/* Cyan Neon — brand book ga drži za suptilne akcente koji razbijaju plavu monotoniju */}
+              <div className="h-[2px] w-10 bg-[#00cec9]" />
               <span
                 className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/55"
                 style={BODY}
@@ -120,7 +121,7 @@ export default function HeroBanner() {
           <div className="flex flex-wrap gap-3">
             {b.cta_primary_text && (
               <button
-                className="flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 bg-white text-[#1e272e] text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
+                className="ph-cta flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 cursor-pointer"
                 style={BODY}
                 onClick={() => navigate(b.cta_primary_link || '/kategorija/akcija')}
               >

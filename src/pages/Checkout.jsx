@@ -456,7 +456,7 @@ export default function Checkout() {
                     </div>
                   </div>
 
-                  <button type="submit" className="w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer border-0">
+                  <button type="submit" className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] uppercase transition-colors cursor-pointer">
                     Nastavi na pregled →
                   </button>
                 </form>
@@ -555,7 +555,7 @@ export default function Checkout() {
                   <button
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] disabled:bg-gray-300 transition-colors cursor-pointer border-0"
+                    className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] uppercase transition-colors cursor-pointer"
                   >
                     {submitting ? 'Obrađuje se…' : '✓ Potvrdi narudžbu'}
                   </button>
