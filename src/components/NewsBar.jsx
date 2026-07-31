@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { BODY } from '../lib/typography'
 
 const DEFAULT_MESSAGES = [
   'BESPLATNA DOSTAVA ZA NARUDŽBE PREKO 100 KM',
@@ -45,7 +46,7 @@ export default function NewsBar() {
       <div className="container">
         <p
           className={`py-2 m-0 text-center text-[10px] md:text-[11px] font-bold tracking-[0.14em] uppercase transition-opacity duration-250 ${visible ? 'opacity-100' : 'opacity-0'}`}
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          style={BODY}
         >
           {messages[index % messages.length]}
         </p>

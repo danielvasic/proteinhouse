@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const DEFAULTS = {
   goals_items: {
@@ -35,13 +36,13 @@ export default function GoalsSection() {
   if (items.length === 0) return null
 
   return (
-    <section className="bg-[#0A0E17]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <section className="bg-[#1e272e]" style={BODY}>
       {/* Naslov iznad pločica */}
       <div className="container py-7 md:py-9">
         <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/50 mb-1.5 m-0">Pronađi svoje</p>
         <h2
           className="text-2xl md:text-3xl font-bold text-white uppercase m-0"
-          style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+          style={DISPLAY}
         >
           Kupovina po ciljevima
         </h2>
@@ -52,7 +53,7 @@ export default function GoalsSection() {
         {items.map((item, i) => (
           <button
             key={item.label}
-            className="group relative aspect-[3/4] md:aspect-auto md:h-[380px] xl:h-[420px] overflow-hidden border-0 p-0 cursor-pointer bg-[#0A0E17]"
+            className="group relative aspect-[3/4] md:aspect-auto md:h-[380px] xl:h-[420px] overflow-hidden border-0 p-0 cursor-pointer bg-[#1e272e]"
             onClick={() => navigate(item.to)}
             aria-label={item.label}
           >
@@ -61,11 +62,11 @@ export default function GoalsSection() {
               className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-500 group-hover:scale-100"
               style={{ backgroundImage: `url('${item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}')` }}
             />
-            <div className="absolute inset-0 bg-[#0A0E17]/30 transition-colors duration-300 group-hover:bg-[#0A0E17]/5" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E17]/85 via-[#0A0E17]/15 to-transparent" />
+            <div className="absolute inset-0 bg-[#1e272e]/30 transition-colors duration-300 group-hover:bg-[#1e272e]/5" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1e272e]/85 via-[#1e272e]/15 to-transparent" />
             <span
               className="absolute bottom-4 left-4 md:bottom-5 md:left-5 text-white text-[17px] md:text-[21px] font-bold uppercase tracking-[0.02em] text-left leading-tight"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              style={DISPLAY}
             >
               {item.label}
             </span>

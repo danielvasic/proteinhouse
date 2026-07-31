@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { House, CaretRight, Check, Package, Gear, Truck, XCircle, MagnifyingGlass } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { fmtKM } from '../data/catalog'
+import { BODY, DISPLAY } from '../lib/typography'
 
 // Koraci praćenja: Zaprimljena → U obradi → Poslano → Isporučena
 const STEPS = [
@@ -44,7 +45,7 @@ export default function Tracking() {
   const stepIndex = order ? STEPS.findIndex((s) => s.key === order.status) : -1
   const cancelled = order?.status === 'otkazana'
 
-  const inputCls = 'w-full border border-gray-300 px-4 py-3 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white'
+  const inputCls = 'w-full border border-gray-300 px-4 py-3 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white'
 
   return (
     <>
@@ -53,7 +54,7 @@ export default function Tracking() {
         <meta name="description" content="Pratite status svoje ProteinHouse narudžbe — od zaprimanja do isporuke." />
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
         <div className="border-b border-gray-200 bg-white">
           <div className="container py-6">
             <nav className="flex items-center gap-2 text-[11px] text-gray-400" aria-label="Breadcrumb">
@@ -61,7 +62,7 @@ export default function Tracking() {
                 <House size={12} weight="fill" /> Početna
               </Link>
               <CaretRight size={11} className="opacity-40" />
-              <span className="text-[#0A0E17] font-semibold">Praćenje pošiljke</span>
+              <span className="text-[#1e272e] font-semibold">Praćenje pošiljke</span>
             </nav>
           </div>
         </div>
@@ -69,8 +70,8 @@ export default function Tracking() {
         <section className="py-12 bg-white min-h-[60vh]">
           <div className="container max-w-[640px]">
             <h1
-              className="text-3xl font-bold text-[#0A0E17] uppercase mb-2"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-3xl font-bold text-[#1e272e] uppercase mb-2"
+              style={DISPLAY}
             >
               Praćenje pošiljke
             </h1>
@@ -110,11 +111,11 @@ export default function Tracking() {
                 <div className="flex items-center justify-between flex-wrap gap-2 mb-8">
                   <div>
                     <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 m-0">Narudžba</p>
-                    <p className="text-[16px] font-bold text-[#0A0E17] m-0">{order.order_number}</p>
+                    <p className="text-[16px] font-bold text-[#1e272e] m-0">{order.order_number}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 m-0">Ukupno</p>
-                    <p className="text-[16px] font-bold text-[#0A0E17] m-0">{fmtKM(Number(order.total))}</p>
+                    <p className="text-[16px] font-bold text-[#1e272e] m-0">{fmtKM(Number(order.total))}</p>
                   </div>
                 </div>
 
@@ -141,7 +142,7 @@ export default function Tracking() {
                             )}
                           </div>
                           <div className="pb-6">
-                            <p className={`text-[13px] font-bold m-0 ${done ? 'text-[#0A0E17]' : 'text-gray-400'}`}>{label}</p>
+                            <p className={`text-[13px] font-bold m-0 ${done ? 'text-[#1e272e]' : 'text-gray-400'}`}>{label}</p>
                             {current && (
                               <p className="text-[11px] text-gray-400 mt-0.5 m-0">
                                 Ažurirano: {new Date(order.updated_at).toLocaleDateString('bs-BA')}
@@ -161,7 +162,7 @@ export default function Tracking() {
                       {order.items.map((it, i) => (
                         <div key={i} className="flex justify-between gap-3 text-[12px]">
                           <span className="text-gray-600 min-w-0 truncate">{it.qty} × {it.brand} {it.title}</span>
-                          <span className="font-semibold text-[#0A0E17] shrink-0">{fmtKM(it.price * it.qty)}</span>
+                          <span className="font-semibold text-[#1e272e] shrink-0">{fmtKM(it.price * it.qty)}</span>
                         </div>
                       ))}
                     </div>

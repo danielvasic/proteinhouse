@@ -6,6 +6,7 @@ import CategorySidebar from '../components/CategorySidebar'
 import ProductCard from '../components/ProductCard'
 import { getCategoryBySlug } from '../data/catalog'
 import { useProductsByCategory } from '../hooks/useProducts'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const SORT_OPTIONS = [
   { value: 'newest',     label: 'Najnovije' },
@@ -45,7 +46,7 @@ export default function Category() {
         <link rel="canonical" href={`https://proteinhouse.ba/kategorija/${slug}`} />
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
 
         {/* ── Page header ── */}
         <section className="border-b border-gray-200 bg-white">
@@ -56,12 +57,12 @@ export default function Category() {
                 <House size={12} weight="fill" /> Početna
               </Link>
               <CaretRight size={11} className="opacity-40" />
-              <span className="text-[#0A0E17] font-semibold">{pageTitle}</span>
+              <span className="text-[#1e272e] font-semibold">{pageTitle}</span>
             </nav>
 
             <h1
-              className="text-3xl md:text-4xl font-bold text-[#0A0E17] uppercase"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-3xl md:text-4xl font-bold text-[#1e272e] uppercase"
+              style={DISPLAY}
             >
               {pageTitle}
             </h1>
@@ -85,10 +86,10 @@ export default function Category() {
                 {/* Sort bar */}
                 <div className="flex items-center justify-between mb-5 py-3 border-b border-gray-200">
                   <span className="text-[12px] text-gray-500">
-                    Prikazano <strong className="text-[#0A0E17]">{sorted.length}</strong> od {allProducts.length} proizvoda
+                    Prikazano <strong className="text-[#1e272e]">{sorted.length}</strong> od {allProducts.length} proizvoda
                   </span>
                   <select
-                    className="border border-gray-300 px-3 py-2 text-[12px] text-[#0A0E17] focus:outline-none focus:border-[#0145F2] bg-white cursor-pointer"
+                    className="border border-gray-300 px-3 py-2 text-[12px] text-[#1e272e] focus:outline-none focus:border-[#0145F2] bg-white cursor-pointer"
                     value={sort}
                     onChange={(e) => setSort(e.target.value)}
                     aria-label="Sortiranje"

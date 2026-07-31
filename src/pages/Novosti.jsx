@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
+import { BODY, DISPLAY } from '../lib/typography'
 
 function formatDate(iso) {
   if (!iso) return ''
@@ -33,7 +34,7 @@ export default function Novosti() {
         <link rel="canonical" href="https://proteinhouse.ba/novosti" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
 
         <section className="border-b border-gray-200 bg-white">
           <div className="container py-10 md:py-14">
@@ -42,15 +43,15 @@ export default function Novosti() {
               <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Šta se dešava</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-[#0A0E17] uppercase"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-4xl md:text-5xl font-bold text-[#1e272e] uppercase"
+              style={DISPLAY}
             >
               Vijesti
             </h1>
           </div>
         </section>
 
-        <section className="py-12 bg-[#F2F4F7] min-h-[400px]">
+        <section className="py-12 bg-[#edf1f5] min-h-[400px]">
           <div className="container max-w-[760px]">
             {loading ? (
               <div className="flex justify-center py-16">
@@ -62,7 +63,7 @@ export default function Novosti() {
               </div>
             ) : news.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-[15px] font-bold text-[#0A0E17] uppercase mb-2" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+                <p className="text-[15px] font-bold text-[#1e272e] uppercase mb-2" style={DISPLAY}>
                   Nema vijesti
                 </p>
                 <p className="text-[13px] text-gray-400">Uskoro dolaze novosti.</p>
@@ -75,8 +76,8 @@ export default function Novosti() {
                       {formatDate(item.published_at)}
                     </p>
                     <h2
-                      className="text-xl font-bold text-[#0A0E17] uppercase leading-snug mb-3"
-                      style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                      className="text-xl font-bold text-[#1e272e] uppercase leading-snug mb-3"
+                      style={DISPLAY}
                     >
                       {item.title}
                     </h2>

@@ -1,5 +1,6 @@
 import { Truck, ShieldCheck, Star, Gift } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { BODY } from '../lib/typography'
 
 const ICONS = [Truck, ShieldCheck, Star, Gift]
 
@@ -41,8 +42,8 @@ export default function PromoStrip() {
               <Icon size={20} weight="duotone" color="#0145F2" className="shrink-0 opacity-75" />
               <div>
                 <p
-                  className="text-[12px] font-bold text-[#0A0E17] leading-tight"
-                  style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                  className="text-[12px] font-bold text-[#1e272e] leading-tight"
+                  style={BODY}
                 >
                   {title}
                 </p>

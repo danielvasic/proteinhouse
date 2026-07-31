@@ -3,10 +3,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Envelope, LockKey, User as UserIcon, ShieldCheck, Package, SignOut, UserCircle, GoogleLogo } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const isAdminUser = (u) => u?.user_metadata?.role === 'admin'
 
-const inputCls = 'w-full border border-gray-300 pl-10 pr-4 py-3.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
+const inputCls = 'w-full border border-gray-300 pl-10 pr-4 py-3.5 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
 
 function Field({ label, children }) {
   return (
@@ -108,16 +109,16 @@ export default function Login() {
         <Helmet><title>Moj nalog — ProteinHouse</title></Helmet>
         <main
           className="min-h-[calc(100vh-220px)] bg-white flex items-center justify-center py-16 px-4"
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          style={BODY}
         >
           <div className="w-full max-w-[440px]">
             <div className="mb-8 text-center">
               <UserCircle size={52} weight="duotone" className="text-[#0145F2] mx-auto mb-3" />
-              <h1 className="text-3xl font-bold text-[#0A0E17] uppercase" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+              <h1 className="text-3xl font-bold text-[#1e272e] uppercase" style={DISPLAY}>
                 Moj nalog
               </h1>
               <p className="text-[13px] text-gray-500 mt-2">
-                Prijavljeni ste kao <strong className="text-[#0A0E17]">{displayName}</strong>
+                Prijavljeni ste kao <strong className="text-[#1e272e]">{displayName}</strong>
               </p>
             </div>
 
@@ -158,8 +159,8 @@ export default function Login() {
       </Helmet>
 
       <main
-        className="min-h-[calc(100vh-220px)] bg-[#F2F4F7] flex items-center justify-center py-16 px-4"
-        style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        className="min-h-[calc(100vh-220px)] bg-[#edf1f5] flex items-center justify-center py-16 px-4"
+        style={BODY}
       >
         <div className="w-full max-w-[440px]">
 
@@ -173,8 +174,8 @@ export default function Login() {
               <div className="h-px w-8 bg-gray-300" />
             </div>
             <h1
-              className="text-3xl font-bold text-[#0A0E17] uppercase"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-3xl font-bold text-[#1e272e] uppercase"
+              style={DISPLAY}
             >
               {isRegister ? 'Registracija' : 'Prijava'}
             </h1>
@@ -258,17 +259,17 @@ export default function Login() {
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 border border-gray-300 text-[#0A0E17] bg-white text-[12px] font-bold uppercase tracking-[0.06em] hover:border-gray-400 hover:bg-gray-50 transition-all duration-150 cursor-pointer mb-6"
+              className="w-full flex items-center justify-center gap-2.5 py-3.5 border border-gray-300 text-[#1e272e] bg-white text-[12px] font-bold uppercase tracking-[0.06em] hover:border-gray-400 hover:bg-gray-50 transition-all duration-150 cursor-pointer mb-6"
             >
               <GoogleLogo size={17} weight="bold" /> Nastavi preko Google-a
             </button>
 
             {isRegister ? (
-              <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
+              <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
                 Imam nalog — Prijavi se
               </Link>
             ) : (
-              <Link to="/nalog/registracija" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
+              <Link to="/nalog/registracija" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
                 Kreiraj nalog
               </Link>
             )}

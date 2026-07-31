@@ -9,6 +9,8 @@ import { useCart } from '../store/CartContext'
 import { getCategoryBySlug, fmtKM } from '../data/catalog'
 import { useProduct, getVariantStock } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
+import BrandIcon from '../components/BrandIcon'
+import { BODY, DISPLAY, NUMERIC } from '../lib/typography'
 
 function StarRating({ rating }) {
   return (
@@ -93,7 +95,7 @@ export default function Product() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div className="flex items-center justify-center py-24" style={BODY}>
         <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-[#0145F2] animate-spin" />
       </div>
     )
@@ -101,8 +103,8 @@ export default function Product() {
 
   if (!product) {
     return (
-      <div className="container py-24 text-center" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-        <h1 className="text-2xl font-bold text-[#0A0E17] mb-4" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+      <div className="container py-24 text-center" style={BODY}>
+        <h1 className="text-2xl font-bold text-[#1e272e] mb-4" style={DISPLAY}>
           Proizvod nije pronađen
         </h1>
         <Link to="/" className="text-[13px] text-gray-500 underline hover:text-[#0145F2]">← Nazad na početnu</Link>
@@ -133,7 +135,7 @@ export default function Product() {
         })}</script>
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
 
         {/* ── Breadcrumb ── */}
         <div className="border-b border-gray-200 bg-white">
@@ -147,7 +149,7 @@ export default function Product() {
                 {category?.label || product.cat}
               </Link>
               <CaretRight size={11} className="opacity-40" />
-              <span className="text-[#0A0E17] font-semibold truncate max-w-[200px]">{product.brand}</span>
+              <span className="text-[#1e272e] font-semibold truncate max-w-[200px]">{product.brand}</span>
             </nav>
           </div>
         </div>
@@ -158,15 +160,15 @@ export default function Product() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
 
               {/* Hero kartica — slika + najrelevantnije brojke (Ostrovit stil, editabilno u adminu) */}
-              <div className="relative bg-[#0145F2] rounded-[28px] flex flex-col items-center p-7 md:p-10 overflow-hidden">
+              <div className="relative bg-[#0145F2] flex flex-col items-center p-7 md:p-10 overflow-hidden">
                 <div className="absolute inset-0 ph-pattern opacity-[0.07] pointer-events-none" />
                 {isDiscount && (
-                  <div className="absolute top-5 left-5 w-[52px] h-[52px] rounded-full bg-[#0A0E17] flex items-center justify-center z-10">
-                    <span className="text-white text-[11px] font-extrabold text-center leading-tight">{product.badge}</span>
+                  <div className="absolute top-5 left-5 w-[52px] h-[52px] bg-[#ff4103] flex items-center justify-center z-10">
+                    <span className="text-white text-[11px] font-extrabold italic text-center leading-tight">{product.badge}</span>
                   </div>
                 )}
                 {product.tags?.includes('bestseller') && (
-                  <div className="absolute top-5 right-5 z-10 px-3 py-1.5 bg-[#0A0E17] text-white text-[10px] font-bold tracking-[0.14em] uppercase rounded-md">
+                  <div className="absolute top-5 right-5 z-10 px-3 py-1.5 bg-[#1e272e] text-white text-[10px] font-bold tracking-[0.14em] uppercase ">
                     Bestseller
                   </div>
                 )}
@@ -182,7 +184,7 @@ export default function Product() {
                       height={540}
                     />
                   ) : (
-                    <div className="w-full max-w-[360px] aspect-square bg-white/10 rounded-2xl flex items-center justify-center text-white/50 text-sm">
+                    <div className="w-full max-w-[360px] aspect-square bg-white/10 flex items-center justify-center text-white/50 text-sm">
                       Nema slike
                     </div>
                   )
@@ -196,7 +198,7 @@ export default function Product() {
                         key={i}
                         type="button"
                         onClick={() => setActiveIdx(i)}
-                        className={`w-14 h-14 rounded-lg bg-white/10 border-2 overflow-hidden shrink-0 cursor-pointer transition-colors ${
+                        className={`w-14 h-14 bg-white/10 border-2 overflow-hidden shrink-0 cursor-pointer transition-colors ${
                           i === activeIdx ? 'border-white' : 'border-transparent hover:border-white/40'
                         }`}
                         aria-label={`Slika proizvoda ${i + 1}`}
@@ -213,7 +215,7 @@ export default function Product() {
                       <div key={i}>
                         <p
                           className="text-4xl md:text-6xl font-extrabold leading-none m-0"
-                          style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                          style={DISPLAY}
                         >
                           {s.value}
                         </p>
@@ -226,12 +228,12 @@ export default function Product() {
               </div>
 
               {/* Info */}
-              <div className="bg-white rounded-[28px] border border-gray-200 p-7 md:p-10 flex flex-col">
+              <div className="bg-white border border-gray-200 p-7 md:p-10 flex flex-col">
 
                 <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-2">{product.brand}</p>
                 <h1
-                  className="text-2xl md:text-3xl font-bold text-[#0A0E17] uppercase leading-tight mb-4"
-                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                  className="text-2xl md:text-3xl font-bold text-[#1e272e] uppercase leading-tight mb-4"
+                  style={DISPLAY}
                 >
                   {product.title}
                 </h1>
@@ -245,7 +247,7 @@ export default function Product() {
 
                 {/* Price */}
                 <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-3xl font-bold text-[#0A0E17]" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+                  <span className="text-3xl font-bold text-[#1e272e]" style={NUMERIC}>
                     {fmtKM(product.price)}
                   </span>
                   {product.old && (
@@ -300,16 +302,16 @@ export default function Product() {
                 <div className="flex flex-wrap gap-3 mb-6" ref={buyRef}>
                   <div className={`flex items-center border ${outOfStock ? 'border-gray-200 opacity-40' : 'border-gray-300'}`}>
                     <button
-                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-[#F2F4F7] hover:text-[#0145F2] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
+                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-[#edf1f5] hover:text-[#0145F2] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
                       onClick={() => setQty((q) => Math.max(1, q - 1))}
                       disabled={outOfStock}
                       aria-label="Smanji količinu"
                     >
                       <Minus size={14} weight="bold" />
                     </button>
-                    <span className="w-10 text-center text-[13px] font-bold text-[#0A0E17]">{qty}</span>
+                    <span className="w-10 text-center text-[13px] font-bold text-[#1e272e]">{qty}</span>
                     <button
-                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-[#F2F4F7] hover:text-[#0145F2] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
+                      className="w-10 h-12 flex items-center justify-center text-gray-500 hover:bg-[#edf1f5] hover:text-[#0145F2] transition-colors cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed"
                       onClick={() => setQty((q) => Math.min(currentStock || 99, q + 1))}
                       disabled={outOfStock}
                       aria-label="Povećaj količinu"
@@ -342,13 +344,14 @@ export default function Product() {
                 {/* Trust badges */}
                 <div className="grid grid-cols-2 gap-px bg-gray-200 mt-auto">
                   {[
-                    { Icon: Truck,       title: 'Besplatna dostava', sub: 'Preko 100 KM' },
-                    { Icon: ShieldCheck, title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
-                  ].map(({ Icon, title, sub }) => (
-                    <div key={title} className="flex items-center gap-3 bg-[#F2F4F7] px-4 py-3">
-                      <Icon size={18} weight="duotone" color="#0145F2" className="shrink-0 opacity-70" />
+                    { Icon: Truck,       icon: 'dostava',  title: 'Besplatna dostava', sub: 'Preko 100 KM' },
+                    { Icon: ShieldCheck, icon: 'original', title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
+                  ].map(({ Icon, icon, title, sub }) => (
+                    <div key={title} className="flex items-center gap-3 bg-[#edf1f5] px-4 py-3">
+                      <BrandIcon name={icon} size={20}
+                        fallback={<Icon size={18} weight="duotone" color="#0145F2" className="shrink-0 opacity-70" />} />
                       <div>
-                        <p className="text-[11px] font-bold text-[#0A0E17]">{title}</p>
+                        <p className="text-[11px] font-bold text-[#1e272e]">{title}</p>
                         <p className="text-[10px] text-gray-400">{sub}</p>
                       </div>
                     </div>
@@ -373,10 +376,10 @@ export default function Product() {
         >
           <div className="container flex items-center gap-3 py-2.5">
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold text-[#0A0E17] truncate m-0">{product.brand} · {product.title}</p>
-              <p className="text-[15px] font-bold text-[#0A0E17] m-0" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+              <p className="text-[11px] font-semibold text-[#1e272e] truncate m-0">{product.brand} · {product.title}</p>
+              <p className="text-[15px] font-bold text-[#1e272e] m-0" style={NUMERIC}>
                 {fmtKM(product.price)}
-                {product.old && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{fmtKM(product.old)}</span>}
+                {product.old && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={BODY}>{fmtKM(product.old)}</span>}
               </p>
             </div>
             <button
@@ -411,7 +414,7 @@ function DescriptionTabs({ product }) {
   const current = tabs.find((t) => t.key === active) || tabs[0]
 
   return (
-    <section className="py-12 bg-white border-t border-gray-200" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <section className="py-12 bg-white border-t border-gray-200" style={BODY}>
       <div className="container max-w-[860px]">
         <div className="flex border-b border-gray-200 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((t) => (
@@ -419,7 +422,7 @@ function DescriptionTabs({ product }) {
               key={t.key}
               className={`shrink-0 px-5 py-3 text-[11px] font-bold tracking-[0.1em] uppercase bg-transparent border-0 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
                 t.key === current.key
-                  ? 'border-[#0145F2] text-[#0A0E17]'
+                  ? 'border-[#0145F2] text-[#1e272e]'
                   : 'border-transparent text-gray-400 hover:text-[#0145F2]'
               }`}
               onClick={() => setActive(t.key)}

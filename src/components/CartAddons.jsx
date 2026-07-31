@@ -49,7 +49,7 @@ export default function CartAddons() {
   if (offers.length === 0) return null
 
   return (
-    <div className="border-t border-gray-100 px-4 py-4 bg-[#F2F4F7]">
+    <div className="border-t border-gray-100 px-4 py-4 bg-[#edf1f5]">
       <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-3">
         Dodaj uz narudžbu
       </p>
@@ -70,7 +70,7 @@ export default function CartAddons() {
               <img src={product.img} alt="" className="w-full h-full object-contain" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-[#0A0E17] leading-tight line-clamp-1">
+              <p className="text-[11px] font-semibold text-[#1e272e] leading-tight line-clamp-1">
                 {product.brand} {product.title}
               </p>
               <p className="text-[11px] text-gray-500 mt-0.5">
@@ -80,7 +80,7 @@ export default function CartAddons() {
                 )}
               </p>
             </div>
-            <span className="w-7 h-7 shrink-0 flex items-center justify-center bg-[#F2F4F7] text-[#0145F2] group-hover:bg-[#0145F2] group-hover:text-white transition-colors">
+            <span className="w-7 h-7 shrink-0 flex items-center justify-center bg-[#edf1f5] text-[#0145F2] group-hover:bg-[#0145F2] group-hover:text-white transition-colors">
               <Plus size={14} weight="bold" />
             </span>
           </button>

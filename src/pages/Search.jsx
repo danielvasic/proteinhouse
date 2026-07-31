@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { MagnifyingGlass, House, CaretRight } from '@phosphor-icons/react'
 import ProductCard from '../components/ProductCard'
 import { useSearchProducts } from '../hooks/useProducts'
+import { BODY, DISPLAY } from '../lib/typography'
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -22,7 +23,7 @@ export default function Search() {
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
 
         {/* ── Header ── */}
         <section className="border-b border-gray-200 bg-white">
@@ -32,12 +33,12 @@ export default function Search() {
                 <House size={12} weight="fill" /> Početna
               </Link>
               <CaretRight size={11} className="opacity-40" />
-              <span className="text-[#0A0E17] font-semibold">Pretraga</span>
+              <span className="text-[#1e272e] font-semibold">Pretraga</span>
             </nav>
 
             <h1
-              className="text-3xl md:text-4xl font-bold text-[#0A0E17] uppercase mb-6"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-3xl md:text-4xl font-bold text-[#1e272e] uppercase mb-6"
+              style={DISPLAY}
             >
               Pretraga
             </h1>
@@ -52,7 +53,7 @@ export default function Search() {
                   name="q"
                   defaultValue={q}
                   key={q}
-                  className="flex-1 px-4 py-3.5 text-[14px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none bg-transparent"
+                  className="flex-1 px-4 py-3.5 text-[14px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none bg-transparent"
                   placeholder="Pretraži proizvode, brendove…"
                   aria-label="Pretraga"
                   autoFocus
@@ -75,7 +76,7 @@ export default function Search() {
             {q && (
               <p className="text-[12px] text-gray-500 mb-6">
                 {results.length > 0
-                  ? <><strong className="text-[#0A0E17]">{results.length}</strong> {results.length === 1 ? 'rezultat' : 'rezultata'} za „{q}"</>
+                  ? <><strong className="text-[#1e272e]">{results.length}</strong> {results.length === 1 ? 'rezultat' : 'rezultata'} za „{q}"</>
                   : <>Nema rezultata za „{q}"</>}
               </p>
             )}
@@ -90,14 +91,14 @@ export default function Search() {
               <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
                 <MagnifyingGlass size={48} color="#D1D5DB" weight="thin" />
                 <div>
-                  <p className="text-[15px] font-bold text-[#0A0E17] mb-1" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+                  <p className="text-[15px] font-bold text-[#1e272e] mb-1" style={DISPLAY}>
                     Nema rezultata
                   </p>
                   <p className="text-[13px] text-gray-400">Pokušajte s drugačijim pojmom ili pretražite naše kategorije.</p>
                 </div>
                 <Link
                   to="/"
-                  className="mt-2 px-6 py-3 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150"
+                  className="mt-2 px-6 py-3 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150"
                 >
                   ← Nazad na početnu
                 </Link>

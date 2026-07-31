@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Star, SealCheck } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import { BODY, DISPLAY } from '../lib/typography'
 
 function Stars({ value, size = 13 }) {
   return (
@@ -76,16 +77,16 @@ export default function ReviewSection({ product }) {
     }
   }
 
-  const inputCls = 'w-full border border-gray-300 px-3.5 py-2.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white'
+  const inputCls = 'w-full border border-gray-300 px-3.5 py-2.5 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white'
 
   return (
-    <section className="py-12 bg-white border-t border-gray-200" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <section className="py-12 bg-white border-t border-gray-200" style={BODY}>
       <div className="container max-w-[860px]">
         <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
           <div>
             <h2
-              className="text-xl md:text-2xl font-bold text-[#0A0E17] uppercase m-0"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-xl md:text-2xl font-bold text-[#1e272e] uppercase m-0"
+              style={DISPLAY}
             >
               Recenzije kupaca
             </h2>
@@ -97,7 +98,7 @@ export default function ReviewSection({ product }) {
             )}
           </div>
           <button
-            className="px-5 py-2.5 border border-[#0145F2] text-[#0A0E17] bg-transparent text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all cursor-pointer"
+            className="px-5 py-2.5 border border-[#0145F2] text-[#1e272e] bg-transparent text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all cursor-pointer"
             onClick={() => { setFormOpen((o) => !o); setResult(null) }}
           >
             {formOpen ? 'Zatvori' : 'Ocijeni proizvod'}
@@ -105,7 +106,7 @@ export default function ReviewSection({ product }) {
         </div>
 
         <p className="flex items-center gap-2 text-[11px] text-gray-400 mb-6">
-          <SealCheck size={14} weight="fill" className="text-[#0A0E17] shrink-0" />
+          <SealCheck size={14} weight="fill" className="text-[#1e272e] shrink-0" />
           Recenziju mogu ostaviti samo kupci koji su ovaj proizvod kupili online, najranije 15 dana nakon kupovine.
         </p>
 
@@ -116,7 +117,7 @@ export default function ReviewSection({ product }) {
         )}
 
         {formOpen && (
-          <form onSubmit={submit} className="border border-gray-200 bg-[#F2F4F7] p-5 md:p-6 mb-8 space-y-4">
+          <form onSubmit={submit} className="border border-gray-200 bg-[#edf1f5] p-5 md:p-6 mb-8 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Broj narudžbe *</label>
@@ -173,7 +174,7 @@ export default function ReviewSection({ product }) {
               <div key={r.id} className="py-5">
                 <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
                   <Stars value={r.rating} size={12} />
-                  <span className="text-[13px] font-bold text-[#0A0E17]">{r.customer_name}</span>
+                  <span className="text-[13px] font-bold text-[#1e272e]">{r.customer_name}</span>
                   <span className="flex items-center gap-1 text-[10px] font-bold tracking-[0.08em] uppercase text-emerald-600">
                     <SealCheck size={12} weight="fill" /> Verificirana kupovina
                   </span>

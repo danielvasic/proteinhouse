@@ -3,15 +3,23 @@
    Ported from colors_and_type.css (design handoff)
    ===================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Exo+2:ital,wght@0,500;0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700&display=swap');
+/* Brand Guidelines 2026: Inter ExtraBold italic za naslove, Roboto za tekst. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 :root {
+  /* --- Brand Guidelines 2026 — zvanična paleta --- */
+  --ph-electric-blue: #0145f2;  /* logo, naslovi, primarni brend elementi */
+  --ph-vulcan-orange: #ff4103;  /* super popusti i CTA — energično naglašavanje */
+  --ph-cyan-neon:     #00cec9;  /* suptilni akcenti, overlay, razbijanje plave monotonije */
+  --ph-night-black:   #1e272e;  /* tekst */
+  --ph-canvas-cloud:  #edf1f5;  /* pozadine i obrubi za kontrast */
+
   /* --- Brand colours --- */
-  --ph-navy-900: #0A0E17;   /* brand dark */
+  --ph-navy-900: #1e272e;   /* brand dark = Night Black */
   --ph-navy-800: #0136C4;
   --ph-navy-700: #0145F2;   /* PRIMARY — brand blue */
   --ph-navy-600: #2F63F5;
@@ -76,9 +84,9 @@
   --ph-border-2:      var(--ph-gray-300);
   --ph-border-strong: var(--ph-gray-900);
 
-  /* Typography */
-  --ph-font-display: 'Exo 2', 'Arial Narrow', system-ui, sans-serif;
-  --ph-font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  /* Typography — Brand Guidelines 2026 */
+  --ph-font-display: 'Inter', system-ui, sans-serif;
+  --ph-font-body:    'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
   /* Type scale */
   --ph-text-3xs: 10px;
