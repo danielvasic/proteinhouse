@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowRight } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
 import { useParallax } from '../lib/useParallax'
-import BrandIcon from './BrandIcon'
 import { BODY, DISPLAY } from '../lib/typography'
 
 const DEFAULTS = {
@@ -22,18 +21,7 @@ const DEFAULTS = {
   goals_img_4: '/goals/zdravlje.jpg',
 }
 
-/** Brend ikona po cilju — po redoslijedu, s pokrićem po nazivu ako se pločice preslože. */
-const ICON_BY_INDEX = ['vaga', 'bicep', 'energija-ciklus', 'suplement-imunitet']
-const ICON_BY_LABEL = {
-  'mršavljenje':       'vaga',
-  'mršanje':           'vaga',
-  'izgradnja mišića':  'bicep',
-  'energija i fokus':  'energija-ciklus',
-  'zdravlje':          'suplement-imunitet',
-  'imunitet':          'suplement-imunitet',
-}
-
-function GoalTile({ item, image, icon, onClick }) {
+function GoalTile({ item, image, onClick }) {
   // Parallax ide na vanjski sloj, a zoom/hover na unutrašnji — inline transform
   // iz hooka bi inače pregazio Tailwindov scale.
   const parallaxRef = useParallax(0.12)
@@ -54,11 +42,6 @@ function GoalTile({ item, image, icon, onClick }) {
 
       <div className="absolute inset-0 bg-[#1e272e]/35 transition-colors duration-300 group-hover:bg-[#1e272e]/10" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#1e272e]/90 via-[#1e272e]/20 to-transparent" />
-
-      {/* Brend ikona u bijelom kvadratu — čitljiva i na svijetlim fotografijama */}
-      <span className="absolute top-4 left-4 md:top-5 md:left-5 w-9 h-9 bg-white flex items-center justify-center">
-        <BrandIcon name={icon} size={22} />
-      </span>
 
       <span className="absolute bottom-4 left-4 right-4 md:bottom-5 md:left-5 md:right-5 flex items-end justify-between gap-2 text-left">
         <span
@@ -119,7 +102,6 @@ export default function GoalsSection() {
             key={item.label}
             item={item}
             image={item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}
-            icon={item.icon || ICON_BY_LABEL[item.label.toLowerCase()] || ICON_BY_INDEX[i]}
             onClick={() => navigate(item.to)}
           />
         ))}
