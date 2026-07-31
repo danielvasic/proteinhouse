@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Package, FileText, ShoppingCart, Users, Tag,
   Percent, LayoutTemplate, Image, LogOut, Menu, X, ChevronRight,
   Bell, Settings, ExternalLink, Star, Newspaper, Navigation, MapPin, Columns,
+  Ticket, Gift,
 } from 'lucide-react'
 import { useAdmin } from '../../store/AdminContext'
 import Logo from '../../components/Logo'
@@ -19,6 +20,8 @@ const NAV = [
   { label: 'Korisnici',   to: '/admin/korisnici',   icon: Users },
   { label: 'Kategorije',  to: '/admin/kategorije',  icon: Tag },
   { label: 'Ponude',      to: '/admin/ponude',      icon: Percent },
+  { label: 'Kuponi',      to: '/admin/kuponi',      icon: Ticket },
+  { label: 'Pokloni',     to: '/admin/pokloni',     icon: Gift },
   { label: 'Hero baneri', to: '/admin/hero-baneri', icon: Image },
   { label: 'Baneri',      to: '/admin/baneri',      icon: Image },
   { label: 'Brendovi',    to: '/admin/brendovi',    icon: Tag },
@@ -40,6 +43,8 @@ function PageTitle() {
     '/admin/korisnici': 'Korisnici',
     '/admin/kategorije': 'Kategorije',
     '/admin/ponude': 'Ponude',
+    '/admin/kuponi': 'Kuponi',
+    '/admin/pokloni': 'Gratis pokloni',
     '/admin/hero-baneri': 'Hero baneri',
     '/admin/baneri': 'Baneri',
     '/admin/istaknuti':  'Istaknuti sadržaj',

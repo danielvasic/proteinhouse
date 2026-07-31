@@ -35,6 +35,8 @@ const Orders       = lazy(() => import('./pages/admin/Orders'))
 const AdminUsers   = lazy(() => import('./pages/admin/Users'))
 const AdminCategories = lazy(() => import('./pages/admin/Categories'))
 const AdminPromotions = lazy(() => import('./pages/admin/Promotions'))
+const AdminCoupons    = lazy(() => import('./pages/admin/Coupons'))
+const AdminGifts      = lazy(() => import('./pages/admin/Gifts'))
 const AdminBanners    = lazy(() => import('./pages/admin/Banners'))
 const AdminSiteContent   = lazy(() => import('./pages/admin/SiteContent'))
 const AdminFeatured      = lazy(() => import('./pages/admin/FeaturedSections'))
@@ -84,6 +86,8 @@ export default function App() {
             <Route path="korisnici"        element={<AdminUsers />} />
             <Route path="kategorije"       element={<AdminCategories />} />
             <Route path="ponude"           element={<AdminPromotions />} />
+            <Route path="kuponi"           element={<AdminCoupons />} />
+            <Route path="pokloni"          element={<AdminGifts />} />
             <Route path="baneri"           element={<AdminBanners />} />
             <Route path="sadrzaj"          element={<AdminSiteContent />} />
             <Route path="istaknuti"        element={<AdminFeatured />} />

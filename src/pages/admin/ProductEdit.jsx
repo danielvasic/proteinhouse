@@ -20,6 +20,7 @@ const EMPTY = {
   internal_title: '', tags: [],
   usage_instructions: '', composition: '', nutrition_info: '',
   hero_stats: [],
+  addons: [], // [{ product_id, price }] — one-click dodaci u korpi
 }
 
 const DESCRIPTION_FIELDS = ['description', 'usage_instructions', 'composition', 'nutrition_info']
@@ -56,6 +57,66 @@ function AiFieldButton({ busy, onClick, disabled }) {
       {busy ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
       {busy ? 'Generiše…' : 'AI'}
     </button>
+  )
+}
+
+/**
+ * Add-on proizvodi — "Dodaj ON shaker za samo 10,00 KM" u korpi.
+ * Prazna cijena znači redovna cijena tog proizvoda.
+ */
+function AddonEditor({ selfId, value, onChange }) {
+  const [catalog, setCatalog] = useState([])
+
+  useEffect(() => {
+    supabase.from('products').select('id, brand, title, price').eq('is_active', true).order('brand')
+      .then(({ data }) => setCatalog(data ?? []))
+  }, [])
+
+  const byId  = Object.fromEntries(catalog.map((p) => [p.id, p]))
+  const taken = new Set(value.map((a) => a.product_id))
+  const free  = catalog.filter((p) => p.id !== selfId && !taken.has(p.id))
+
+  const update = (idx, patch) => onChange(value.map((a, i) => i === idx ? { ...a, ...patch } : a))
+
+  return (
+    <div className="space-y-3">
+      {value.map((addon, idx) => {
+        const p = byId[addon.product_id]
+        return (
+          <div key={addon.product_id} className="flex items-center gap-3 rounded-lg border p-2.5">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">
+                {p ? `${p.brand} ${p.title}` : 'Proizvod je obrisan ili neaktivan'}
+              </p>
+              {p && <p className="text-xs text-muted-foreground">Redovna: {Number(p.price).toFixed(2)} KM</p>}
+            </div>
+            <Input
+              className="w-28"
+              type="number"
+              step="0.01"
+              placeholder="Promo KM"
+              value={addon.price ?? ''}
+              onChange={(e) => update(idx, { price: e.target.value === '' ? null : parseFloat(e.target.value) })}
+            />
+            <Button type="button" variant="ghost" size="icon"
+              onClick={() => onChange(value.filter((_, i) => i !== idx))}>
+              <X size={15} />
+            </Button>
+          </div>
+        )
+      })}
+
+      <Select value="" onValueChange={(v) => onChange([...value, { product_id: v, price: null }])}>
+        <SelectTrigger className="w-full"><SelectValue placeholder="+ Dodaj add-on proizvod…" /></SelectTrigger>
+        <SelectContent>
+          {free.map((p) => (
+            <SelectItem key={p.id} value={p.id}>
+              {p.brand} {p.title} — {Number(p.price).toFixed(2)} KM
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   )
 }
 
@@ -246,6 +307,7 @@ export default function ProductEdit() {
         composition:        data.composition        ?? '',
         nutrition_info:     data.nutrition_info     ?? '',
         hero_stats:         Array.isArray(data.hero_stats) ? data.hero_stats : [],
+        addons:             Array.isArray(data.addons)     ? data.addons     : [],
       })
       setLoading(false)
     })
@@ -698,6 +760,24 @@ export default function ProductEdit() {
               stock={form.stock}
               onChangeVariants={(sv) => setForm((f) => ({ ...f, stock_variants: sv }))}
               onChangeStock={(s) => setForm((f) => ({ ...f, stock: s }))}
+            />
+          </CardContent>
+        </Card>
+
+        {/* ── One-click add-oni ── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Add-on proizvodi u korpi</CardTitle>
+            <p className="text-xs text-muted-foreground mt-1">
+              Kad kupac ubaci ovaj proizvod u korpu, ponudit ćemo mu ove artikle na jedan klik.
+              Ostavi cijenu praznu da se koristi redovna.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <AddonEditor
+              selfId={isNew ? null : id}
+              value={form.addons}
+              onChange={(v) => setForm((f) => ({ ...f, addons: v }))}
             />
           </CardContent>
         </Card>

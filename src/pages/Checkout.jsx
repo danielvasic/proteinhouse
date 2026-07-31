@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { House, CaretRight, Check, Truck, ShieldCheck, UserCircle, LockKey, Envelope } from '@phosphor-icons/react'
+import { House, CaretRight, Check, Truck, ShieldCheck, UserCircle, LockKey, Envelope, Gift, Ticket } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { supabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
+import { calcShipping } from '../lib/shipping'
+import GiftPicker from '../components/GiftPicker'
 
 const STEPS = ['Dostava', 'Pregled', 'Potvrda']
 
@@ -48,8 +50,9 @@ function StepIndicator({ current }) {
   )
 }
 
-function OrderSummary({ items, totalPrice }) {
-  const shipping = totalPrice >= 100 ? 0 : 7
+function OrderSummary({ items, totalPrice, coupon, gift }) {
+  const discount = coupon?.discount ?? 0
+  const shipping = calcShipping(totalPrice - discount, coupon?.free_shipping)
   return (
     <div className="border border-gray-200 bg-white p-6 space-y-4">
       <h3 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Pregled narudžbe</h3>
@@ -72,16 +75,34 @@ function OrderSummary({ items, totalPrice }) {
           </div>
         ))}
       </div>
+      {gift && (
+        <div className="flex gap-3 py-3 border-t border-gray-100 items-center">
+          <div className="w-12 h-12 border border-[#0145F2]/30 bg-[#F2F4F7] shrink-0 flex items-center justify-center">
+            <Gift size={18} weight="duotone" className="text-[#0145F2]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] text-[#0145F2] font-bold uppercase tracking-wide">Poklon</p>
+            <p className="text-[12px] font-semibold text-[#0A0E17] leading-tight truncate">{gift.title}</p>
+            {gift.size && <p className="text-[10px] text-gray-400">Veličina {gift.size}</p>}
+          </div>
+          <p className="text-[12px] font-bold text-[#0145F2] shrink-0">GRATIS</p>
+        </div>
+      )}
       <div className="pt-2 space-y-1.5 border-t border-gray-200">
         <div className="flex justify-between text-[12px] text-gray-500">
           <span>Međuzbir</span><span>{fmtKM(totalPrice)}</span>
         </div>
+        {discount > 0 && (
+          <div className="flex justify-between text-[12px] text-[#0145F2] font-semibold">
+            <span>Kupon {coupon.code}</span><span>−{fmtKM(discount)}</span>
+          </div>
+        )}
         <div className="flex justify-between text-[12px] text-gray-500">
           <span>Dostava</span>
           <span>{shipping === 0 ? <span className="text-[#0A0E17] font-semibold">BESPLATNO</span> : fmtKM(shipping)}</span>
         </div>
         <div className="flex justify-between text-[15px] font-bold text-[#0A0E17] pt-2 border-t border-gray-200">
-          <span>UKUPNO</span><span>{fmtKM(totalPrice + shipping)}</span>
+          <span>UKUPNO</span><span>{fmtKM(totalPrice - discount + shipping)}</span>
         </div>
       </div>
     </div>
@@ -96,6 +117,15 @@ export default function Checkout() {
   const [errors,    setErrors]    = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [orderNum,  setOrderNum]  = useState('')
+  // Snapshot za ekran potvrde — korpa se isprazni prije nego se on prikaže
+  const [placed,    setPlaced]    = useState(null)
+
+  // Kupon i gratis poklon
+  const [couponInput, setCouponInput] = useState('')
+  const [coupon,      setCoupon]      = useState(null)   // { code, discount, free_shipping, description }
+  const [couponError, setCouponError] = useState('')
+  const [couponBusy,  setCouponBusy]  = useState(false)
+  const [gift,        setGift]        = useState(null)
 
   // Auth state
   const [user,          setUser]          = useState(null)
@@ -146,8 +176,30 @@ export default function Checkout() {
     if (errors[key]) setErrors((e) => ({ ...e, [key]: '' }))
   }
 
-  const shipping = totalPrice >= 100 ? 0 : 7
-  const total    = totalPrice + shipping
+  const discount = coupon?.discount ?? 0
+  const shipping = calcShipping(totalPrice - discount, coupon?.free_shipping)
+  const total    = totalPrice - discount + shipping
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim()
+    if (!code) return
+    setCouponBusy(true)
+    setCouponError('')
+    try {
+      const { data, error } = await supabase.rpc('validate_coupon', {
+        p_code: code, p_subtotal: totalPrice, p_email: form.email || null,
+      })
+      if (error) throw error
+      if (!data?.valid) { setCoupon(null); setCouponError(data?.reason || 'Kupon nije valjan.'); return }
+      setCoupon({ ...data, discount: Number(data.discount) })
+      setCouponInput('')
+    } catch (err) {
+      console.error('validate_coupon:', err)
+      setCouponError('Trenutno ne možemo provjeriti kupon. Pokušajte ponovo.')
+    } finally {
+      setCouponBusy(false)
+    }
+  }
 
   if (items.length === 0 && step < 2) {
     return (
@@ -197,6 +249,11 @@ export default function Checkout() {
           price: i.price, qty: i.qty,
           selectedSize: i.selectedSize, selectedFlavor: i.selectedFlavor,
         })),
+        subtotal:      totalPrice,
+        discount,
+        coupon_code:   coupon?.code ?? null,
+        shipping_cost: shipping,
+        gift,
         total:   total,
         status:  'nova',
       }
@@ -212,6 +269,7 @@ export default function Checkout() {
         },
       })
       setOrderNum(orderNumber)
+      setPlaced({ total, gift })
       clearCart?.()
       setStep(2)
     } catch (err) {
@@ -400,7 +458,7 @@ export default function Checkout() {
                     Nastavi na pregled →
                   </button>
                 </form>
-                <OrderSummary items={items} totalPrice={totalPrice} />
+                <OrderSummary items={items} totalPrice={totalPrice} coupon={coupon} gift={gift} />
               </div>
             )}
 
@@ -417,6 +475,52 @@ export default function Checkout() {
                       <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Adresa</p><p className="font-semibold text-[#0A0E17]">{form.address}, {form.city} {form.zip}</p></div>
                     </div>
                     <button onClick={() => setStep(0)} className="text-[11px] text-gray-500 underline hover:text-[#0145F2] cursor-pointer bg-transparent border-0 p-0">Izmijeni podatke</button>
+                  </div>
+
+                  {/* Gratis poklon */}
+                  <GiftPicker subtotal={totalPrice} value={gift} onChange={setGift} />
+
+                  {/* Kupon */}
+                  <div className="bg-white border border-gray-200 p-6 space-y-3">
+                    <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Kupon</h2>
+                    {coupon ? (
+                      <div className="flex items-center gap-3 border border-[#0145F2]/30 bg-[#F2F4F7] px-4 py-3">
+                        <Ticket size={18} weight="duotone" className="text-[#0145F2] shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-bold text-[#0A0E17]">{coupon.code}</p>
+                          {coupon.description && <p className="text-[11px] text-gray-500">{coupon.description}</p>}
+                        </div>
+                        <span className="text-[12px] font-bold text-[#0145F2] shrink-0">−{fmtKM(discount)}</span>
+                        <button
+                          type="button"
+                          onClick={() => { setCoupon(null); setCouponError('') }}
+                          className="text-[11px] text-gray-400 hover:text-[#0145F2] underline cursor-pointer bg-transparent border-0 p-0 shrink-0"
+                        >
+                          Ukloni
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex gap-2">
+                          <input
+                            className={`${inputCls(couponError)} uppercase`}
+                            value={couponInput}
+                            onChange={(e) => { setCouponInput(e.target.value); setCouponError('') }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon() } }}
+                            placeholder="Unesi kod kupona"
+                          />
+                          <button
+                            type="button"
+                            onClick={applyCoupon}
+                            disabled={couponBusy || !couponInput.trim()}
+                            className="px-6 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#0A0E17] transition-colors cursor-pointer bg-transparent whitespace-nowrap"
+                          >
+                            {couponBusy ? '…' : 'Primijeni'}
+                          </button>
+                        </div>
+                        {couponError && <p className="text-red-500 text-[11px]">{couponError}</p>}
+                      </>
+                    )}
                   </div>
 
                   <div className="bg-white border border-gray-200 p-6 space-y-4">
@@ -451,7 +555,7 @@ export default function Checkout() {
                     {submitting ? 'Obrađuje se…' : '✓ Potvrdi narudžbu'}
                   </button>
                 </div>
-                <OrderSummary items={items} totalPrice={totalPrice} />
+                <OrderSummary items={items} totalPrice={totalPrice} coupon={coupon} gift={gift} />
               </div>
             )}
 
@@ -477,7 +581,15 @@ export default function Checkout() {
                   <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">Detalji narudžbe</p>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Broj narudžbe</span><span className="font-bold text-[#0A0E17]">{orderNum}</span></div>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Dostava na</span><span className="font-semibold">{form.address}, {form.city}</span></div>
-                  <div className="flex justify-between text-[13px]"><span className="text-gray-500">Ukupno</span><span className="font-bold text-[#0A0E17]">{fmtKM(total)}</span></div>
+                  {placed?.gift && (
+                    <div className="flex justify-between text-[13px]">
+                      <span className="text-gray-500">Poklon</span>
+                      <span className="font-semibold text-[#0145F2]">
+                        {placed.gift.title}{placed.gift.size ? ` · ${placed.gift.size}` : ''}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-[13px]"><span className="text-gray-500">Ukupno</span><span className="font-bold text-[#0A0E17]">{fmtKM(placed?.total ?? 0)}</span></div>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Plaćanje</span><span>Pouzećem</span></div>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3">

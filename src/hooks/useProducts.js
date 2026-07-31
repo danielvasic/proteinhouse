@@ -28,7 +28,7 @@ function displayTitle(brand, title) {
 }
 
 /** Normalise a DB row */
-function norm(p) {
+export function norm(p) {
   return {
     id:             p.id,
     brand:          p.brand,
@@ -58,6 +58,8 @@ function norm(p) {
     composition:    p.composition || '',
     nutrition:      p.nutrition_info || '',
     heroStats:      Array.isArray(p.hero_stats) ? p.hero_stats.filter((s) => s?.value) : [],
+    // One-click add-oni: [{ product_id, price }] — price je promo cijena ili null
+    addons:         (Array.isArray(p.addons) ? p.addons : []).filter((a) => a?.product_id),
   }
 }
 
