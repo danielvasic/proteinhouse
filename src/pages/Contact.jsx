@@ -3,8 +3,10 @@ import { Helmet } from 'react-helmet-async'
 import { Phone, Envelope, MapPin, Clock } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
 import { useStores } from '../hooks/useStores'
+import BrandIcon from '../components/BrandIcon'
+import { BODY, DISPLAY } from '../lib/typography'
 
-const inputCls = 'w-full border border-gray-300 px-4 py-3.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
+const inputCls = 'w-full border border-gray-300 px-4 py-3.5 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white'
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
@@ -22,12 +24,12 @@ export default function Contact() {
 
   // Build INFO list from site_content — skip empty fields
   const INFO = [
-    data.contact_phone && { Icon: Phone,    label: 'Telefon',       text: data.contact_phone },
-    data.contact_email && { Icon: Envelope, label: 'Email',         text: data.contact_email },
+    data.contact_phone && { Icon: Phone,    brand: 'telefon',  label: 'Telefon',       text: data.contact_phone },
+    data.contact_email && { Icon: Envelope, brand: 'email',    label: 'Email',         text: data.contact_email },
     // First active store address shown if available
-    stores[0]?.address && { Icon: MapPin,   label: 'Adresa',        text: `${stores[0].address}${stores[0].city ? ', ' + stores[0].city : ''}` },
+    stores[0]?.address && { Icon: MapPin,   brand: 'lokacija', label: 'Adresa',        text: `${stores[0].address}${stores[0].city ? ', ' + stores[0].city : ''}` },
     data.contact_hours || stores[0]?.working_hours
-      ? { Icon: Clock, label: 'Radno vrijeme', text: data.contact_hours || stores[0]?.working_hours }
+      ? { Icon: Clock, brand: 'sat', label: 'Radno vrijeme', text: data.contact_hours || stores[0]?.working_hours }
       : null,
   ].filter(Boolean)
 
@@ -44,7 +46,7 @@ export default function Contact() {
         <link rel="canonical" href="https://proteinhouse.ba/kontakt" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
 
         {/* ── Page header ── */}
         <section className="border-b border-gray-200 bg-white">
@@ -54,8 +56,8 @@ export default function Contact() {
               <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Stupite u kontakt</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-[#0A0E17] uppercase"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-4xl md:text-5xl font-bold text-[#1e272e] uppercase"
+              style={DISPLAY}
             >
               Kontakt
             </h1>
@@ -63,15 +65,15 @@ export default function Contact() {
         </section>
 
         {/* ── Content ── */}
-        <section className="py-12 md:py-16 bg-[#F2F4F7]">
+        <section className="py-12 md:py-16 bg-[#edf1f5]">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200">
 
               {/* Info */}
               <div className="bg-white p-8 md:p-12">
                 <h2
-                  className="text-xl font-bold text-[#0A0E17] uppercase mb-2"
-                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                  className="text-xl font-bold text-[#1e272e] uppercase mb-2"
+                  style={DISPLAY}
                 >
                   Informacije
                 </h2>
@@ -81,14 +83,14 @@ export default function Contact() {
                 </p>
 
                 <div className="flex flex-col gap-6">
-                  {INFO.map(({ Icon, label, text }) => (
+                  {INFO.map(({ Icon, brand, label, text }) => (
                     <div key={label} className="flex items-start gap-4">
                       <div className="w-9 h-9 border border-gray-200 flex items-center justify-center shrink-0">
-                        <Icon size={16} weight="duotone" color="#0145F2" />
+                        <BrandIcon name={brand} size={20} fallback={<Icon size={16} weight="duotone" color="#0145F2" />} />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-0.5">{label}</p>
-                        <p className="text-[13px] text-[#0A0E17] font-medium">{text}</p>
+                        <p className="text-[13px] text-[#1e272e] font-medium">{text}</p>
                       </div>
                     </div>
                   ))}
@@ -98,8 +100,8 @@ export default function Contact() {
               {/* Form */}
               <div className="bg-white p-8 md:p-12">
                 <h2
-                  className="text-xl font-bold text-[#0A0E17] uppercase mb-8"
-                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                  className="text-xl font-bold text-[#1e272e] uppercase mb-8"
+                  style={DISPLAY}
                 >
                   Pošalji poruku
                 </h2>

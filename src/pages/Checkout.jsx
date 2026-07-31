@@ -8,6 +8,8 @@ import { supabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
 import { calcShipping } from '../lib/shipping'
 import GiftPicker from '../components/GiftPicker'
+import BrandIcon from '../components/BrandIcon'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const STEPS = ['Dostava', 'Pregled', 'Potvrda']
 
@@ -25,7 +27,7 @@ function genOrderNumber() {
 }
 
 function inputCls(error) {
-  return `w-full border ${error ? 'border-red-400' : 'border-gray-300'} px-4 py-3 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white`
+  return `w-full border ${error ? 'border-red-400' : 'border-gray-300'} px-4 py-3 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white`
 }
 
 function StepIndicator({ current }) {
@@ -33,10 +35,10 @@ function StepIndicator({ current }) {
     <div className="flex items-center gap-0 mb-10">
       {STEPS.map((label, i) => (
         <div key={label} className="flex items-center">
-          <div className={`flex items-center gap-2 px-1 ${i <= current ? 'text-[#0A0E17]' : 'text-gray-400'}`}>
+          <div className={`flex items-center gap-2 px-1 ${i <= current ? 'text-[#1e272e]' : 'text-gray-400'}`}>
             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold border-2 transition-colors ${
               i < current  ? 'bg-[#0145F2] border-[#0145F2] text-white' :
-              i === current ? 'border-[#0145F2] text-[#0A0E17] bg-white' :
+              i === current ? 'border-[#0145F2] text-[#1e272e] bg-white' :
               'border-gray-300 text-gray-400 bg-white'
             }`}>
               {i < current ? <Check size={12} weight="bold" /> : i + 1}
@@ -59,17 +61,17 @@ function OrderSummary({ items, totalPrice, coupon, gift }) {
       <div className="divide-y divide-gray-100">
         {items.map((item, idx) => (
           <div key={idx} className="flex gap-3 py-3">
-            <div className="w-12 h-12 border border-gray-200 bg-[#F2F4F7] shrink-0 overflow-hidden">
+            <div className="w-12 h-12 border border-gray-200 bg-[#edf1f5] shrink-0 overflow-hidden">
               <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wide">{item.brand}</p>
-              <p className="text-[12px] font-semibold text-[#0A0E17] leading-tight truncate">{item.title}</p>
+              <p className="text-[12px] font-semibold text-[#1e272e] leading-tight truncate">{item.title}</p>
               {item.selectedSize   && <p className="text-[10px] text-gray-400">{item.selectedSize}</p>}
               {item.selectedFlavor && <p className="text-[10px] text-gray-400">{item.selectedFlavor}</p>}
             </div>
             <div className="text-right shrink-0">
-              <p className="text-[12px] font-bold text-[#0A0E17]">{fmtKM(item.price * item.qty)}</p>
+              <p className="text-[12px] font-bold text-[#1e272e]">{fmtKM(item.price * item.qty)}</p>
               <p className="text-[10px] text-gray-400">{item.qty} × {fmtKM(item.price)}</p>
             </div>
           </div>
@@ -77,12 +79,12 @@ function OrderSummary({ items, totalPrice, coupon, gift }) {
       </div>
       {gift && (
         <div className="flex gap-3 py-3 border-t border-gray-100 items-center">
-          <div className="w-12 h-12 border border-[#0145F2]/30 bg-[#F2F4F7] shrink-0 flex items-center justify-center">
+          <div className="w-12 h-12 border border-[#0145F2]/30 bg-[#edf1f5] shrink-0 flex items-center justify-center">
             <Gift size={18} weight="duotone" className="text-[#0145F2]" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-[#0145F2] font-bold uppercase tracking-wide">Poklon</p>
-            <p className="text-[12px] font-semibold text-[#0A0E17] leading-tight truncate">{gift.title}</p>
+            <p className="text-[12px] font-semibold text-[#1e272e] leading-tight truncate">{gift.title}</p>
             {gift.size && <p className="text-[10px] text-gray-400">Veličina {gift.size}</p>}
           </div>
           <p className="text-[12px] font-bold text-[#0145F2] shrink-0">GRATIS</p>
@@ -99,9 +101,9 @@ function OrderSummary({ items, totalPrice, coupon, gift }) {
         )}
         <div className="flex justify-between text-[12px] text-gray-500">
           <span>Dostava</span>
-          <span>{shipping === 0 ? <span className="text-[#0A0E17] font-semibold">BESPLATNO</span> : fmtKM(shipping)}</span>
+          <span>{shipping === 0 ? <span className="text-[#1e272e] font-semibold">BESPLATNO</span> : fmtKM(shipping)}</span>
         </div>
-        <div className="flex justify-between text-[15px] font-bold text-[#0A0E17] pt-2 border-t border-gray-200">
+        <div className="flex justify-between text-[15px] font-bold text-[#1e272e] pt-2 border-t border-gray-200">
           <span>UKUPNO</span><span>{fmtKM(totalPrice - discount + shipping)}</span>
         </div>
       </div>
@@ -203,9 +205,9 @@ export default function Checkout() {
 
   if (items.length === 0 && step < 2) {
     return (
-      <main className="container py-20 text-center" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main className="container py-20 text-center" style={BODY}>
         <p className="text-[15px] text-gray-500 mb-4">Vaša korpa je prazna.</p>
-        <Link to="/" className="inline-block px-6 py-3 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all">
+        <Link to="/" className="inline-block px-6 py-3 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all">
           Nastavi kupovinu
         </Link>
       </main>
@@ -295,7 +297,7 @@ export default function Checkout() {
             <nav className="flex items-center gap-2 text-[11px] text-gray-400">
               <Link to="/" className="flex items-center gap-1 hover:text-[#0145F2] transition-colors"><House size={12} weight="fill" /> Početna</Link>
               <CaretRight size={11} className="opacity-40" />
-              <span className="text-[#0A0E17] font-semibold">Narudžba</span>
+              <span className="text-[#1e272e] font-semibold">Narudžba</span>
             </nav>
           </div>
         </div>
@@ -312,9 +314,9 @@ export default function Checkout() {
                   {/* ── Login prompt ── */}
                   {user ? (
                     <div className="flex items-center gap-3 bg-white border border-[#0145F2]/20 px-5 py-3.5">
-                      <UserCircle size={20} weight="duotone" className="text-[#0A0E17] shrink-0" />
+                      <UserCircle size={20} weight="duotone" className="text-[#1e272e] shrink-0" />
                       <p className="text-[12px] text-gray-600 flex-1">
-                        Prijavljeni ste kao <strong className="text-[#0A0E17]">{user.email}</strong>
+                        Prijavljeni ste kao <strong className="text-[#1e272e]">{user.email}</strong>
                       </p>
                     </div>
                   ) : !loginOpen ? (
@@ -324,7 +326,7 @@ export default function Checkout() {
                         <button
                           type="button"
                           onClick={() => setLoginOpen(true)}
-                          className="text-[#0A0E17] font-bold underline underline-offset-2 hover:no-underline cursor-pointer bg-transparent border-0 p-0"
+                          className="text-[#1e272e] font-bold underline underline-offset-2 hover:no-underline cursor-pointer bg-transparent border-0 p-0"
                         >
                           Prijavite se za brži checkout
                         </button>
@@ -362,7 +364,7 @@ export default function Checkout() {
                             <Envelope size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                               type="email"
-                              className="w-full border border-gray-300 pl-8 pr-3 py-2.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white"
+                              className="w-full border border-gray-300 pl-8 pr-3 py-2.5 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white"
                               placeholder="vas@email.com"
                               value={loginData.email}
                               onChange={(e) => setLoginData((d) => ({ ...d, email: e.target.value }))}
@@ -377,7 +379,7 @@ export default function Checkout() {
                             <LockKey size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                               type="password"
-                              className="w-full border border-gray-300 pl-8 pr-3 py-2.5 text-[13px] text-[#0A0E17] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white"
+                              className="w-full border border-gray-300 pl-8 pr-3 py-2.5 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors bg-white"
                               placeholder="••••••••"
                               value={loginData.password}
                               onChange={(e) => setLoginData((d) => ({ ...d, password: e.target.value }))}
@@ -398,7 +400,7 @@ export default function Checkout() {
 
                       <p className="text-[11px] text-gray-400 pt-1">
                         Nemate nalog?{' '}
-                        <Link to="/nalog/registracija" className="text-[#0A0E17] underline hover:no-underline">
+                        <Link to="/nalog/registracija" className="text-[#1e272e] underline hover:no-underline">
                           Registrujte se
                         </Link>
                       </p>
@@ -454,7 +456,7 @@ export default function Checkout() {
                     </div>
                   </div>
 
-                  <button type="submit" className="w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer border-0">
+                  <button type="submit" className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] uppercase transition-colors cursor-pointer">
                     Nastavi na pregled →
                   </button>
                 </form>
@@ -469,10 +471,10 @@ export default function Checkout() {
                   <div className="bg-white border border-gray-200 p-6 space-y-3">
                     <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Podaci za dostavu</h2>
                     <div className="grid grid-cols-2 gap-2 text-[13px]">
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Ime</p><p className="font-semibold text-[#0A0E17]">{form.firstName} {form.lastName}</p></div>
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Telefon</p><p className="font-semibold text-[#0A0E17]">{form.phone}</p></div>
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Email</p><p className="font-semibold text-[#0A0E17]">{form.email}</p></div>
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Adresa</p><p className="font-semibold text-[#0A0E17]">{form.address}, {form.city} {form.zip}</p></div>
+                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Ime</p><p className="font-semibold text-[#1e272e]">{form.firstName} {form.lastName}</p></div>
+                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Telefon</p><p className="font-semibold text-[#1e272e]">{form.phone}</p></div>
+                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Email</p><p className="font-semibold text-[#1e272e]">{form.email}</p></div>
+                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Adresa</p><p className="font-semibold text-[#1e272e]">{form.address}, {form.city} {form.zip}</p></div>
                     </div>
                     <button onClick={() => setStep(0)} className="text-[11px] text-gray-500 underline hover:text-[#0145F2] cursor-pointer bg-transparent border-0 p-0">Izmijeni podatke</button>
                   </div>
@@ -484,10 +486,11 @@ export default function Checkout() {
                   <div className="bg-white border border-gray-200 p-6 space-y-3">
                     <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Kupon</h2>
                     {coupon ? (
-                      <div className="flex items-center gap-3 border border-[#0145F2]/30 bg-[#F2F4F7] px-4 py-3">
-                        <Ticket size={18} weight="duotone" className="text-[#0145F2] shrink-0" />
+                      <div className="flex items-center gap-3 border border-[#0145F2]/30 bg-[#edf1f5] px-4 py-3">
+                        <BrandIcon name="popust" size={20}
+                          fallback={<Ticket size={18} weight="duotone" className="text-[#0145F2] shrink-0" />} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-bold text-[#0A0E17]">{coupon.code}</p>
+                          <p className="text-[12px] font-bold text-[#1e272e]">{coupon.code}</p>
                           {coupon.description && <p className="text-[11px] text-gray-500">{coupon.description}</p>}
                         </div>
                         <span className="text-[12px] font-bold text-[#0145F2] shrink-0">−{fmtKM(discount)}</span>
@@ -513,7 +516,7 @@ export default function Checkout() {
                             type="button"
                             onClick={applyCoupon}
                             disabled={couponBusy || !couponInput.trim()}
-                            className="px-6 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#0A0E17] transition-colors cursor-pointer bg-transparent whitespace-nowrap"
+                            className="px-6 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#1e272e] transition-colors cursor-pointer bg-transparent whitespace-nowrap"
                           >
                             {couponBusy ? '…' : 'Primijeni'}
                           </button>
@@ -525,12 +528,12 @@ export default function Checkout() {
 
                   <div className="bg-white border border-gray-200 p-6 space-y-4">
                     <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Način plaćanja</h2>
-                    <div className="flex items-start gap-3 p-4 border-2 border-[#0145F2] bg-[#F2F4F7]">
+                    <div className="flex items-start gap-3 p-4 border-2 border-[#0145F2] bg-[#edf1f5]">
                       <div className="w-4 h-4 rounded-full border-2 border-[#0145F2] flex items-center justify-center mt-0.5 shrink-0">
                         <div className="w-2 h-2 rounded-full bg-[#0145F2]" />
                       </div>
                       <div>
-                        <p className="text-[13px] font-bold text-[#0A0E17]">Plaćanje pouzećem</p>
+                        <p className="text-[13px] font-bold text-[#1e272e]">Plaćanje pouzećem</p>
                         <p className="text-[12px] text-gray-500 mt-0.5">Platite gotovinom kuriru pri preuzimanju paketa.</p>
                       </div>
                     </div>
@@ -538,11 +541,13 @@ export default function Checkout() {
 
                   <div className="grid grid-cols-2 gap-3 p-4 bg-white border border-gray-200">
                     <div className="flex items-center gap-2.5 text-[12px] text-gray-600">
-                      <Truck size={16} weight="duotone" className="text-[#0A0E17] shrink-0" />
+                      <BrandIcon name="paket" size={18}
+                        fallback={<Truck size={16} weight="duotone" className="text-[#1e272e] shrink-0" />} />
                       Isporuka 1–3 radna dana
                     </div>
                     <div className="flex items-center gap-2.5 text-[12px] text-gray-600">
-                      <ShieldCheck size={16} weight="duotone" className="text-[#0A0E17] shrink-0" />
+                      <BrandIcon name="paket-potvrda" size={18}
+                        fallback={<ShieldCheck size={16} weight="duotone" className="text-[#1e272e] shrink-0" />} />
                       Originalni proizvodi
                     </div>
                   </div>
@@ -550,7 +555,7 @@ export default function Checkout() {
                   <button
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] disabled:bg-gray-300 transition-colors cursor-pointer border-0"
+                    className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] uppercase transition-colors cursor-pointer"
                   >
                     {submitting ? 'Obrađuje se…' : '✓ Potvrdi narudžbu'}
                   </button>
@@ -566,20 +571,20 @@ export default function Checkout() {
                   <Check size={28} weight="bold" color="white" />
                 </div>
                 <h1
-                  className="text-3xl font-bold text-[#0A0E17] uppercase mb-3"
-                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                  className="text-3xl font-bold text-[#1e272e] uppercase mb-3"
+                  style={DISPLAY}
                 >
                   Hvala na narudžbi!
                 </h1>
                 <p className="text-[13px] text-gray-500 leading-relaxed mb-2">
-                  Vaša narudžba <strong className="text-[#0A0E17]">{orderNum}</strong> je primljena.
+                  Vaša narudžba <strong className="text-[#1e272e]">{orderNum}</strong> je primljena.
                 </p>
                 <p className="text-[13px] text-gray-500 mb-8">
                   Potvrdu ćemo poslati na <strong>{form.email}</strong>. Isporuka 1–3 radna dana.
                 </p>
                 <div className="border border-gray-200 bg-white p-6 text-left mb-6 space-y-2">
                   <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">Detalji narudžbe</p>
-                  <div className="flex justify-between text-[13px]"><span className="text-gray-500">Broj narudžbe</span><span className="font-bold text-[#0A0E17]">{orderNum}</span></div>
+                  <div className="flex justify-between text-[13px]"><span className="text-gray-500">Broj narudžbe</span><span className="font-bold text-[#1e272e]">{orderNum}</span></div>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Dostava na</span><span className="font-semibold">{form.address}, {form.city}</span></div>
                   {placed?.gift && (
                     <div className="flex justify-between text-[13px]">
@@ -589,13 +594,13 @@ export default function Checkout() {
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between text-[13px]"><span className="text-gray-500">Ukupno</span><span className="font-bold text-[#0A0E17]">{fmtKM(placed?.total ?? 0)}</span></div>
+                  <div className="flex justify-between text-[13px]"><span className="text-gray-500">Ukupno</span><span className="font-bold text-[#1e272e]">{fmtKM(placed?.total ?? 0)}</span></div>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Plaćanje</span><span>Pouzećem</span></div>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <Link
                     to={`/pracenje?narudzba=${encodeURIComponent(orderNum)}`}
-                    className="inline-block px-8 py-4 border border-[#0145F2] text-[#0A0E17] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0145F2] hover:text-white transition-colors"
+                    className="inline-block px-8 py-4 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0145F2] hover:text-white transition-colors"
                   >
                     Prati pošiljku
                   </Link>

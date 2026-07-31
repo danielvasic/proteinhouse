@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { InstagramLogo, FacebookLogo, YoutubeLogo, TiktokLogo, Phone, Envelope, MapPin, Clock, CaretDown } from '@phosphor-icons/react'
 import Logo from './Logo'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { BODY } from '../lib/typography'
 
 /** Kolona linkova — na mobilnom collapsable (accordion), na desktopu uvijek otvorena */
 function FooterColumn({ col }) {
@@ -125,8 +126,8 @@ export default function Footer() {
 
   return (
     <footer
-      className="bg-[#0A0E17] text-white"
-      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+      className="bg-[#1e272e] text-white"
+      style={BODY}
     >
       <div className="container">
         <div className={`grid grid-cols-2 ${mdGridCls} gap-x-10 gap-y-6 md:gap-y-10 py-10 md:py-16`}>

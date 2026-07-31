@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { getConsent, setConsent, initAnalytics } from '../lib/analytics'
+import { BODY } from '../lib/typography'
 
 /**
  * Consent traka na dnu ekrana — dva dugmeta (Prihvati / Odbij),
@@ -26,7 +27,7 @@ export default function CookieConsent() {
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-[90] bg-white border-t-2 border-[#0145F2] shadow-[0_-8px_32px_-8px_rgba(10,14,23,0.25)]"
-      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+      style={BODY}
       role="dialog"
       aria-label="Postavke kolačića"
     >
@@ -38,7 +39,7 @@ export default function CookieConsent() {
           <p className="text-[13px] text-gray-600 leading-relaxed m-0 flex-1">
             Koristimo kolačiće za bolje iskustvo kupovine i analitiku.{' '}
             <button
-              className="inline-flex items-center gap-0.5 text-[#0A0E17] font-semibold underline underline-offset-2 bg-transparent border-0 p-0 cursor-pointer"
+              className="inline-flex items-center gap-0.5 text-[#1e272e] font-semibold underline underline-offset-2 bg-transparent border-0 p-0 cursor-pointer"
               onClick={() => setMore((m) => !m)}
             >
               Više informacija {more ? <CaretUp size={10} /> : <CaretDown size={10} />}
@@ -63,14 +64,14 @@ export default function CookieConsent() {
         {more && (
           <div className="mt-3 pt-3 border-t border-gray-100 text-[11px] text-gray-500 leading-relaxed">
             <p className="m-0 mb-1.5">
-              <strong className="text-[#0A0E17]">Neophodni kolačići</strong> — korpa, sesija i sigurnost. Uvijek aktivni.
+              <strong className="text-[#1e272e]">Neophodni kolačići</strong> — korpa, sesija i sigurnost. Uvijek aktivni.
             </p>
             <p className="m-0 mb-1.5">
-              <strong className="text-[#0A0E17]">Analitički kolačići</strong> (Google Analytics) — anonimna statistika posjeta
+              <strong className="text-[#1e272e]">Analitički kolačići</strong> (Google Analytics) — anonimna statistika posjeta
               koja nam pomaže da poboljšamo shop. Aktiviraju se samo ako prihvatite.
             </p>
             <p className="m-0">
-              Detalji u našim <Link to="/kolacici" className="text-[#0A0E17] underline">pravilima kolačića</Link>.
+              Detalji u našim <Link to="/kolacici" className="text-[#1e272e] underline">pravilima kolačića</Link>.
             </p>
           </div>
         )}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Tag } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const SEEN_KEY  = 'ph_promo_popup_seen'
 const DELAY_MS  = 12000   // iskače nakon ~12 sekundi
@@ -46,19 +47,19 @@ export default function PromoPopup() {
   return (
     <div
       className="fixed inset-0 z-[95] flex items-center justify-center p-5"
-      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+      style={BODY}
       role="dialog"
       aria-modal="true"
       aria-label={promo.title}
     >
-      <div className="absolute inset-0 bg-[#0A0E17]/60" onClick={close} style={{ animation: 'fadeIn 200ms ease' }} />
+      <div className="absolute inset-0 bg-[#1e272e]/60" onClick={close} style={{ animation: 'fadeIn 200ms ease' }} />
 
       <div
         className="relative w-full max-w-[420px] bg-white shadow-2xl overflow-hidden"
         style={{ animation: 'popupIn 260ms cubic-bezier(0.34, 1.3, 0.64, 1)' }}
       >
         <button
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-white/90 border-0 text-[#0A0E17] cursor-pointer hover:bg-white transition-colors"
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-white/90 border-0 text-[#1e272e] cursor-pointer hover:bg-white transition-colors"
           onClick={close}
           aria-label="Zatvori"
         >
@@ -79,8 +80,8 @@ export default function PromoPopup() {
             </span>
           )}
           <h3
-            className="text-2xl font-bold text-[#0A0E17] uppercase leading-tight mb-2"
-            style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+            className="text-2xl font-bold text-[#1e272e] uppercase leading-tight mb-2"
+            style={DISPLAY}
           >
             {promo.title}
           </h3>
@@ -89,11 +90,11 @@ export default function PromoPopup() {
           )}
           {promo.promo_code && (
             <p className="mb-4 text-[12px] text-gray-500">
-              Kod: <strong className="px-2 py-1 bg-gray-100 border border-dashed border-gray-300 text-[#0A0E17] font-mono tracking-wider">{promo.promo_code}</strong>
+              Kod: <strong className="px-2 py-1 bg-gray-100 border border-dashed border-gray-300 text-[#1e272e] font-mono tracking-wider">{promo.promo_code}</strong>
             </p>
           )}
           <button
-            className="w-full py-3.5 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer"
+            className="ph-cta w-full py-3.5 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors cursor-pointer"
             onClick={() => { close(); navigate(promo.link || '/kategorija/akcija') }}
           >
             Iskoristi ponudu →

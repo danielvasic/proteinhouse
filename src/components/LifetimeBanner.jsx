@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Percent } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { BODY } from '../lib/typography'
 
 const HIDE_KEY = 'ph_lifetime_banner_hidden'
 
@@ -37,12 +38,13 @@ export default function LifetimeBanner() {
 
   return (
     <button
-      className="fixed bottom-4 left-4 z-[85] flex items-center gap-2.5 pl-3 pr-8 py-2.5 bg-[#0145F2] text-white border border-white/15 shadow-[0_8px_24px_-6px_rgba(10,14,23,0.5)] cursor-pointer hover:bg-[#0136C4] transition-colors text-left"
-      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+      // Vulcan Orange — brand book tu boju drži za popuste, a ovo je trajni popust
+      className="fixed bottom-4 left-4 z-[85] flex items-center gap-2.5 pl-3 pr-8 py-2.5 bg-[#ff4103] text-white border border-white/15 shadow-[0_8px_24px_-6px_rgba(30,39,46,0.5)] cursor-pointer hover:bg-[#e03903] transition-colors text-left"
+      style={BODY}
       onClick={() => navigate(banner.link || '/kategorija/akcija')}
       aria-label={banner.text}
     >
-      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 shrink-0">
+      <span className="flex items-center justify-center w-8 h-8 bg-white/10 shrink-0">
         <Percent size={15} weight="bold" />
       </span>
       <span>

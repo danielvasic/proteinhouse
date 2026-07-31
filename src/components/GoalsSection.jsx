@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom'
+import { ArrowRight } from '@phosphor-icons/react'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { useParallax } from '../lib/useParallax'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const DEFAULTS = {
   goals_items: {
@@ -16,6 +19,48 @@ const DEFAULTS = {
   goals_img_2: '/goals/izgradnja-misica.jpg',
   goals_img_3: '/goals/energija.jpg',
   goals_img_4: '/goals/zdravlje.jpg',
+}
+
+function GoalTile({ item, image, onClick }) {
+  // Parallax ide na vanjski sloj, a zoom/hover na unutrašnji — inline transform
+  // iz hooka bi inače pregazio Tailwindov scale.
+  const parallaxRef = useParallax(0.12)
+
+  return (
+    <button
+      className="group relative aspect-[3/4] md:aspect-auto md:h-[380px] xl:h-[420px] overflow-hidden border-0 p-0 cursor-pointer bg-[#1e272e]"
+      onClick={onClick}
+      aria-label={item.label}
+    >
+      {/* Sloj je namjerno viši od pločice da pomak ne otkrije rubove */}
+      <div ref={parallaxRef} className="absolute -inset-y-[12%] inset-x-0 will-change-transform">
+        <div
+          className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-500 group-hover:scale-100"
+          style={{ backgroundImage: `url('${image}')` }}
+        />
+      </div>
+
+      <div className="absolute inset-0 bg-[#1e272e]/35 transition-colors duration-300 group-hover:bg-[#1e272e]/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1e272e]/90 via-[#1e272e]/20 to-transparent" />
+
+      <span className="absolute bottom-4 left-4 right-4 md:bottom-5 md:left-5 md:right-5 flex items-end justify-between gap-2 text-left">
+        <span
+          className="text-white text-[17px] md:text-[21px] font-bold uppercase tracking-[0.02em] leading-tight transition-transform duration-300 group-hover:-translate-y-1"
+          style={DISPLAY}
+        >
+          {item.label}
+        </span>
+        <ArrowRight
+          size={18}
+          weight="bold"
+          className="text-white shrink-0 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"
+        />
+      </span>
+
+      {/* Cyan Neon crta koja izleti na hover — brand book je drži za suptilne akcente */}
+      <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#00cec9] scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
+    </button>
+  )
 }
 
 /**
@@ -35,13 +80,16 @@ export default function GoalsSection() {
   if (items.length === 0) return null
 
   return (
-    <section className="bg-[#0A0E17]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <section className="bg-[#1e272e]" style={BODY}>
       {/* Naslov iznad pločica */}
       <div className="container py-7 md:py-9">
-        <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/50 mb-1.5 m-0">Pronađi svoje</p>
+        <div className="flex items-center gap-3 mb-1.5">
+          <span className="h-[2px] w-10 bg-[#00cec9]" />
+          <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/50 m-0">Pronađi svoje</p>
+        </div>
         <h2
           className="text-2xl md:text-3xl font-bold text-white uppercase m-0"
-          style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+          style={DISPLAY}
         >
           Kupovina po ciljevima
         </h2>
@@ -50,26 +98,12 @@ export default function GoalsSection() {
       {/* Pločice — full-bleed, bez razmaka: 2×2 na mobilnom, 4 u redu na desktopu */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-0 w-full">
         {items.map((item, i) => (
-          <button
+          <GoalTile
             key={item.label}
-            className="group relative aspect-[3/4] md:aspect-auto md:h-[380px] xl:h-[420px] overflow-hidden border-0 p-0 cursor-pointer bg-[#0A0E17]"
+            item={item}
+            image={item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}
             onClick={() => navigate(item.to)}
-            aria-label={item.label}
-          >
-            {/* Slika: default zatamnjena i lagano zumirana → na hover se posvijetli i odzumira */}
-            <div
-              className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-500 group-hover:scale-100"
-              style={{ backgroundImage: `url('${item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}')` }}
-            />
-            <div className="absolute inset-0 bg-[#0A0E17]/30 transition-colors duration-300 group-hover:bg-[#0A0E17]/5" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E17]/85 via-[#0A0E17]/15 to-transparent" />
-            <span
-              className="absolute bottom-4 left-4 md:bottom-5 md:left-5 text-white text-[17px] md:text-[21px] font-bold uppercase tracking-[0.02em] text-left leading-tight"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
-            >
-              {item.label}
-            </span>
-          </button>
+          />
         ))}
       </div>
     </section>

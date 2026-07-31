@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import { BODY, DISPLAY } from '../lib/typography'
 
 function formatDate(iso) {
   if (!iso) return ''
@@ -33,7 +34,7 @@ export default function Blog() {
         <link rel="canonical" href="https://proteinhouse.ba/blog" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
 
         {/* ── Page header ── */}
         <section className="border-b border-gray-200 bg-white">
@@ -43,8 +44,8 @@ export default function Blog() {
               <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Savjeti i vijesti</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-[#0A0E17] uppercase"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              className="text-4xl md:text-5xl font-bold text-[#1e272e] uppercase"
+              style={DISPLAY}
             >
               Blog
             </h1>
@@ -52,7 +53,7 @@ export default function Blog() {
         </section>
 
         {/* ── Posts ── */}
-        <section className="py-12 md:py-16 bg-[#F2F4F7] min-h-[400px]">
+        <section className="py-12 md:py-16 bg-[#edf1f5] min-h-[400px]">
           <div className="container">
             {loading ? (
               <div className="flex justify-center py-20">
@@ -60,7 +61,7 @@ export default function Blog() {
               </div>
             ) : posts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-                <p className="text-[15px] font-bold text-[#0A0E17] uppercase" style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}>
+                <p className="text-[15px] font-bold text-[#1e272e] uppercase" style={DISPLAY}>
                   Nema objavljenih postova
                 </p>
                 <p className="text-[13px] text-gray-400">Uskoro dolaze novi sadržaji.</p>
@@ -93,8 +94,8 @@ export default function Blog() {
                         {post.author && <> · {post.author}</>}
                       </p>
                       <h2
-                        className="text-[18px] font-bold text-[#0A0E17] leading-snug mb-3 uppercase"
-                        style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                        className="text-[18px] font-bold text-[#1e272e] leading-snug mb-3 uppercase"
+                        style={DISPLAY}
                       >
                         {post.title}
                       </h2>
@@ -103,7 +104,7 @@ export default function Blog() {
                       )}
                       <Link
                         to={`/blog/${post.slug}`}
-                        className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0A0E17] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity duration-150"
+                        className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase text-[#1e272e] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity duration-150"
                       >
                         Pročitaj više <ArrowRight size={12} weight="bold" />
                       </Link>

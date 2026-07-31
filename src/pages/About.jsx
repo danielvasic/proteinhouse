@@ -3,6 +3,7 @@ import { ShieldCheck, Truck, Star, Users, MapPin, Clock, Phone, Envelope } from 
 import { useSiteContent } from '../hooks/useSiteContent'
 import { useStores } from '../hooks/useStores'
 import { useParallax } from '../lib/useParallax'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const VALUES = [
   { Icon: ShieldCheck, title: 'Originalnost', desc: 'Svi naši proizvodi su 100% originalni s certifikatima proizvođača i garantiranom autentičnošću.' },
@@ -42,10 +43,10 @@ export default function About() {
         <link rel="canonical" href="https://proteinhouse.ba/o-nama" />
       </Helmet>
 
-      <main style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <main style={BODY}>
 
         {/* ── Hero ── */}
-        <section className="relative flex items-end min-h-[340px] md:min-h-[420px] overflow-hidden bg-[#0A0E17]">
+        <section className="relative flex items-end min-h-[340px] md:min-h-[420px] overflow-hidden bg-[#1e272e]">
           {/* Pozadinski sloj — parallax na scroll */}
           <div
             ref={heroParallax}
@@ -53,7 +54,7 @@ export default function About() {
             style={{
               backgroundImage: data.about_hero_image
                 ? `linear-gradient(105deg, rgba(10,14,23,0.94) 0%, rgba(10,14,23,0.60) 60%, rgba(10,14,23,0.20) 100%), url('${data.about_hero_image}')`
-                : 'linear-gradient(135deg, #0A0E17 0%, #0145F2 60%, #0136C4 100%)',
+                : 'linear-gradient(135deg, #1e272e 0%, #0145F2 60%, #0136C4 100%)',
             }}
           />
           <div className="absolute inset-0 ph-pattern opacity-[0.05] pointer-events-none" />
@@ -64,7 +65,7 @@ export default function About() {
             </div>
             <h1
               className="text-4xl md:text-5xl font-bold text-white uppercase leading-tight"
-              style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+              style={DISPLAY}
             >
               O nama
             </h1>
@@ -90,7 +91,7 @@ export default function About() {
                   <div key={s.label} className="bg-[#0145F2] flex flex-col items-center justify-center py-10 px-6 text-center">
                     <span
                       className="text-4xl md:text-5xl font-bold text-white leading-none mb-2"
-                      style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                      style={DISPLAY}
                     >
                       {s.value}
                     </span>
@@ -115,8 +116,8 @@ export default function About() {
                 <div key={title} className="bg-white p-8">
                   <Icon size={26} weight="duotone" color="#0145F2" className="mb-5 opacity-70" />
                   <h3
-                    className="text-[15px] font-bold text-[#0A0E17] mb-3 uppercase"
-                    style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                    className="text-[15px] font-bold text-[#1e272e] mb-3 uppercase"
+                    style={DISPLAY}
                   >
                     {title}
                   </h3>
@@ -129,7 +130,7 @@ export default function About() {
 
         {/* ── Poslovnice (samo ako postoje u bazi) ── */}
         {!storesLoading && stores.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#F2F4F7]">
+          <section className="py-14 md:py-20 bg-[#edf1f5]">
             <div className="container">
               <div className="flex items-center gap-4 mb-10">
                 <div className="h-px flex-1 bg-gray-200" />
@@ -145,8 +146,8 @@ export default function About() {
                 {stores.map((s) => (
                   <div key={s.id} className="bg-white p-8">
                     <h3
-                      className="text-xl font-bold text-[#0A0E17] mb-5 uppercase"
-                      style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                      className="text-xl font-bold text-[#1e272e] mb-5 uppercase"
+                      style={DISPLAY}
                     >
                       {s.city}
                     </h3>
@@ -180,7 +181,7 @@ export default function About() {
                           href={s.map_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] uppercase text-[#0A0E17] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity mt-1"
+                          className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] uppercase text-[#1e272e] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity mt-1"
                         >
                           <MapPin size={11} /> Prikaži na mapi
                         </a>

@@ -90,7 +90,7 @@ export default function Navigation() {
           {items.map((item, idx) => (
             <div
               key={item.key}
-              className={`flex items-center gap-3 px-4 py-3 border rounded-lg transition-colors ${item.active ? 'border-gray-200 bg-white' : 'border-gray-100 bg-[#F2F4F7] opacity-60'}`}
+              className={`flex items-center gap-3 px-4 py-3 border rounded-lg transition-colors ${item.active ? 'border-gray-200 bg-white' : 'border-gray-100 bg-[#edf1f5] opacity-60'}`}
             >
               {/* Order controls */}
               <div className="flex flex-col gap-0.5 shrink-0">

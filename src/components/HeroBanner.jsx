@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Tag, ArrowRight } from '@phosphor-icons/react'
 import { useParallax } from '../lib/useParallax'
+import { BODY, DISPLAY } from '../lib/typography'
 
 const FALLBACK = {
   eyebrow:            'ProteinHouse',
@@ -70,7 +71,7 @@ export default function HeroBanner() {
         style={{
           backgroundImage: b.image_url
             ? `linear-gradient(105deg, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.70) 52%, rgba(10,14,23,0.18) 100%), url('${b.image_url}')`
-            : 'linear-gradient(135deg, #0A0E17 0%, #101A30 55%, #0136C4 100%)',
+            : 'linear-gradient(135deg, #1e272e 0%, #101A30 55%, #0136C4 100%)',
         }}
       />
       {/* Brand pattern overlay (mozaik) — suptilno, desna strana */}
@@ -85,10 +86,11 @@ export default function HeroBanner() {
           {/* Eyebrow */}
           {b.eyebrow && (
             <div className="hidden md:flex items-center gap-3 mb-7">
-              <div className="h-px w-10 bg-white/35" />
+              {/* Cyan Neon — brand book ga drži za suptilne akcente koji razbijaju plavu monotoniju */}
+              <div className="h-[2px] w-10 bg-[#00cec9]" />
               <span
                 className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/55"
-                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                style={BODY}
               >
                 {b.eyebrow}
               </span>
@@ -98,7 +100,7 @@ export default function HeroBanner() {
           {/* Headline */}
           <h1
             className="text-[34px] md:text-6xl lg:text-[64px] font-bold text-white uppercase leading-[0.95] tracking-[-0.02em] mb-4 md:mb-7"
-            style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+            style={DISPLAY}
           >
             {titleLines.map((line, i) => (
               <span key={i}>{line}{i < titleLines.length - 1 && <br />}</span>
@@ -109,7 +111,7 @@ export default function HeroBanner() {
           {b.subtitle && (
             <p
               className="text-[13px] md:text-[15px] text-white/65 leading-relaxed mb-5 md:mb-8 max-w-[440px]"
-              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+              style={BODY}
             >
               {b.subtitle}
             </p>
@@ -119,8 +121,8 @@ export default function HeroBanner() {
           <div className="flex flex-wrap gap-3">
             {b.cta_primary_text && (
               <button
-                className="flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 bg-white text-[#0A0E17] text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
-                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                className="ph-cta flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 cursor-pointer"
+                style={BODY}
                 onClick={() => navigate(b.cta_primary_link || '/kategorija/akcija')}
               >
                 <Tag size={15} weight="fill" /> {b.cta_primary_text}
@@ -129,7 +131,7 @@ export default function HeroBanner() {
             {b.cta_secondary_text && (
               <button
                 className="flex items-center gap-2 px-6 md:px-8 py-3 md:py-3.5 border border-white/35 text-white text-[11px] md:text-[12px] font-bold tracking-[0.1em] uppercase hover:border-white/70 hover:bg-white/10 transition-all duration-150 cursor-pointer"
-                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                style={BODY}
                 onClick={() => navigate(b.cta_secondary_link || '/kategorija/proteini')}
               >
                 {b.cta_secondary_text} <ArrowRight size={14} weight="bold" />
@@ -143,13 +145,13 @@ export default function HeroBanner() {
               <div key={label}>
                 <p
                   className="text-[26px] font-bold text-white leading-none"
-                  style={{ fontFamily: "'Exo 2', system-ui, sans-serif" }}
+                  style={DISPLAY}
                 >
                   {value}
                 </p>
                 <p
                   className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/45 mt-1"
-                  style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                  style={BODY}
                 >
                   {label}
                 </p>

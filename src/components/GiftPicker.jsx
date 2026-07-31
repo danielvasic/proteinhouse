@@ -85,10 +85,10 @@ export default function GiftPicker({ subtotal, value, onChange }) {
 
   if (!eligible) {
     return (
-      <div className="border border-dashed border-[#0145F2]/40 bg-[#F2F4F7] p-5 flex items-center gap-3">
+      <div className="border border-dashed border-[#0145F2]/40 bg-[#edf1f5] p-5 flex items-center gap-3">
         <Gift size={22} weight="duotone" className="text-[#0145F2] shrink-0" />
         <p className="text-[12px] text-gray-600">
-          Još <strong className="text-[#0A0E17]">{missing.toFixed(2)} KM</strong> do besplatnog poklona
+          Još <strong className="text-[#1e272e]">{missing.toFixed(2)} KM</strong> do besplatnog poklona
           {campaign.headline ? ` — ${campaign.headline.toLowerCase()}` : ''}.
         </p>
       </div>
@@ -110,7 +110,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
       <div className="flex items-start gap-3">
         <Gift size={22} weight="duotone" className="text-[#0145F2] shrink-0 mt-0.5" />
         <div>
-          <h3 className="text-[13px] font-bold text-[#0A0E17] uppercase tracking-wide">
+          <h3 className="text-[13px] font-bold text-[#1e272e] uppercase tracking-wide">
             {campaign.headline || 'Odaberi svoj besplatni poklon'}
           </h3>
           {campaign.subtitle && <p className="text-[12px] text-gray-500 mt-1">{campaign.subtitle}</p>}
@@ -128,7 +128,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
                   key={s} type="button"
                   onClick={() => { setClothing(s === clothing ? '' : s); onChange(null) }}
                   className={`min-w-[46px] px-3 py-2 text-[12px] font-bold border transition-colors cursor-pointer ${
-                    clothing === s ? 'border-[#0145F2] bg-[#0145F2] text-white' : 'border-gray-300 text-[#0A0E17] hover:border-[#0145F2]'
+                    clothing === s ? 'border-[#0145F2] bg-[#0145F2] text-white' : 'border-gray-300 text-[#1e272e] hover:border-[#0145F2]'
                   }`}
                 >{s}</button>
               ))}
@@ -144,7 +144,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
                   key={s} type="button"
                   onClick={() => { setShoes(s === shoes ? '' : s); onChange(null) }}
                   className={`min-w-[46px] px-3 py-2 text-[12px] font-bold border transition-colors cursor-pointer ${
-                    shoes === s ? 'border-[#0145F2] bg-[#0145F2] text-white' : 'border-gray-300 text-[#0A0E17] hover:border-[#0145F2]'
+                    shoes === s ? 'border-[#0145F2] bg-[#0145F2] text-white' : 'border-gray-300 text-[#1e272e] hover:border-[#0145F2]'
                   }`}
                 >{s}</button>
               ))}
@@ -179,13 +179,13 @@ export default function GiftPicker({ subtotal, value, onChange }) {
                   <Check size={12} weight="bold" color="white" />
                 </span>
               )}
-              <div className="aspect-square bg-[#F2F4F7] mb-2 overflow-hidden">
+              <div className="aspect-square bg-[#edf1f5] mb-2 overflow-hidden">
                 {(gift.image_path || gift.image_url)
                   ? <img src={getProductImageUrl(gift)} alt="" className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center"><Gift size={24} className="text-gray-300" /></div>}
               </div>
               {gift.brand && <p className="text-[9px] font-bold tracking-[0.1em] uppercase text-gray-400">{gift.brand}</p>}
-              <p className="text-[11px] font-semibold text-[#0A0E17] leading-tight line-clamp-2">{gift.title}</p>
+              <p className="text-[11px] font-semibold text-[#1e272e] leading-tight line-clamp-2">{gift.title}</p>
               <p className="text-[10px] text-gray-400 mt-0.5">Veličina {size === NO_SIZE_KEY ? '—' : size}</p>
             </button>
           ))}
@@ -199,12 +199,12 @@ export default function GiftPicker({ subtotal, value, onChange }) {
           disabled={!clothing && !shoes}
           onClick={() => pick({ gift_product_id: null, title: campaign.mystery_label, size: null, size_type: null, mystery: true })}
           className={`w-full flex items-center gap-3 border p-4 text-left transition-colors ${
-            mysterySelected ? 'border-[#0145F2] ring-1 ring-[#0145F2] bg-[#F2F4F7]' : 'border-gray-200 hover:border-[#0145F2]'
+            mysterySelected ? 'border-[#0145F2] ring-1 ring-[#0145F2] bg-[#edf1f5]' : 'border-gray-200 hover:border-[#0145F2]'
           } disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer`}
         >
           <Sparkle size={20} weight="duotone" className="text-[#0145F2] shrink-0" />
           <div className="flex-1">
-            <p className="text-[12px] font-bold text-[#0A0E17]">{campaign.mystery_label}</p>
+            <p className="text-[12px] font-bold text-[#1e272e]">{campaign.mystery_label}</p>
             <p className="text-[11px] text-gray-500">
               {campaign.mystery_description || 'Prepusti izbor nama — poslat ćemo ti iznenađenje u tvojoj veličini.'}
             </p>
@@ -220,7 +220,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
       {value && (
         <div className="flex items-center justify-between border-t border-gray-200 pt-3">
           <p className="text-[12px] text-gray-600">
-            Odabrani poklon: <strong className="text-[#0A0E17]">{value.title}</strong>
+            Odabrani poklon: <strong className="text-[#1e272e]">{value.title}</strong>
             {value.size && ` · ${value.size}`}
           </p>
           <button

@@ -11,6 +11,7 @@ import Logo from '../../components/Logo'
 import { Button } from '../../components/ui/button'
 import { Separator } from '../../components/ui/separator'
 import { cn } from '../../lib/utils'
+import { BODY } from '../../lib/typography'
 
 const NAV = [
   { label: 'Dashboard',   to: '/admin',             icon: LayoutDashboard, exact: true },
@@ -75,7 +76,7 @@ export default function AdminLayout() {
 
   if (loading || !admin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F2F4F7]">
+      <div className="min-h-screen flex items-center justify-center bg-[#edf1f5]">
         <div className="h-10 w-10 rounded-full border-4 border-gray-200 border-t-emerald-500 animate-spin" />
       </div>
     )
@@ -84,7 +85,7 @@ export default function AdminLayout() {
   const initial = admin?.email?.[0]?.toUpperCase() ?? 'A'
 
   return (
-    <div className="min-h-screen flex bg-[#F2F4F7]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="min-h-screen flex bg-[#edf1f5]" style={BODY}>
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div

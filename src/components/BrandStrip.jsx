@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { BODY } from '../lib/typography'
 
 export default function BrandStrip() {
   const [brands,  setBrands]  = useState([])
@@ -27,7 +28,7 @@ export default function BrandStrip() {
           <div className="h-px flex-1 bg-gray-200" />
           <p
             className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400"
-            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+            style={BODY}
           >
             Naši brendovi
           </p>
