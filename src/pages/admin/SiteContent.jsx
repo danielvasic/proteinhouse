@@ -26,9 +26,16 @@ const SECTIONS = {
     label: 'Kupovina po ciljevima',
     fields: [
       { key: 'goals_img_1', label: 'Slika 1 — Mršavljenje',      type: 'image' },
+      // Pločice su uske i visoke pa se slika reže po širini. Ako je subjekt
+      // izmaknut, ovdje se pomjeri kadar: "50% 50%" je sredina, manji prvi
+      // broj pomjera ulijevo, veći udesno. Prihvata i "top" / "left" / "right".
+      { key: 'goals_focus_1', label: 'Fokus kadra 1', type: 'text', placeholder: 'center (npr. 30% 50%)' },
       { key: 'goals_img_2', label: 'Slika 2 — Izgradnja mišića', type: 'image' },
+      { key: 'goals_focus_2', label: 'Fokus kadra 2', type: 'text', placeholder: 'center (npr. 30% 50%)' },
       { key: 'goals_img_3', label: 'Slika 3 — Energija i fokus', type: 'image' },
+      { key: 'goals_focus_3', label: 'Fokus kadra 3', type: 'text', placeholder: 'center (npr. 30% 50%)' },
       { key: 'goals_img_4', label: 'Slika 4 — Zdravlje',         type: 'image' },
+      { key: 'goals_focus_4', label: 'Fokus kadra 4', type: 'text', placeholder: 'center (npr. 30% 50%)' },
     ],
   },
   lifetime: {

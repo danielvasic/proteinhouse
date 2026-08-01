@@ -2,11 +2,16 @@ import { useEffect, useRef } from 'react'
 
 /**
  * Lagani scroll-parallax za pozadinske slojeve (iOS-siguran: transform,
- * ne background-attachment). Element mora biti visi od roditelja
- * (npr. -inset-y-[14%]) da pomak ne otkrije rubove.
+ * ne background-attachment). Element mora imati visak preko roditelja
+ * (visi sloj ili scale) da pomak ne otkrije rubove.
  * Postuje prefers-reduced-motion.
+ *
+ * @param {number} speed     koliko px pomaka po px skrola
+ * @param {number} [maxShift] gornja granica pomaka u px; koristi je kad je
+ *   visak mali (npr. samo scale), da parallax ne otkrije rub umjesto da se
+ *   sloj bespotrebno povecava — povecanje sloja mijenja kadriranje slike.
  */
-export function useParallax(speed = 0.18) {
+export function useParallax(speed = 0.18, maxShift = Infinity) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -23,7 +28,8 @@ export function useParallax(speed = 0.18) {
         if (!parent) return
         const rect = parent.getBoundingClientRect()
         if (rect.bottom < 0 || rect.top > window.innerHeight) return
-        el.style.transform = `translate3d(0, ${(-rect.top * speed).toFixed(1)}px, 0)`
+        const shift = Math.max(-maxShift, Math.min(maxShift, -rect.top * speed))
+        el.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`
       })
     }
     onScroll()
@@ -34,7 +40,7 @@ export function useParallax(speed = 0.18) {
       window.removeEventListener('resize', onScroll)
       if (raf) cancelAnimationFrame(raf)
     }
-  }, [speed])
+  }, [speed, maxShift])
 
   return ref
 }

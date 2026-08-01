@@ -19,12 +19,37 @@ const DEFAULTS = {
   goals_img_2: '/goals/izgradnja-misica.jpg',
   goals_img_3: '/goals/energija.jpg',
   goals_img_4: '/goals/zdravlje.jpg',
+  // Na sve četiri fotografije lik stoji desno od sredine, a pločice su uske i
+  // visoke pa "center" odreže upravo njega. Ovo vraća lik u kadar.
+  goals_focus_1: '85% 50%',
+  goals_focus_2: '100% 50%',
+  goals_focus_3: '100% 50%',
+  goals_focus_4: '100% 50%',
 }
 
-function GoalTile({ item, image, onClick }) {
+/**
+ * Koliko piksela smije parallax pomjeriti sloj. Zoom (scale-110 → 105 na hover)
+ * ostavlja bar 2,5% viška sa svake strane; na najnižoj pločici (mobilni, ~250px)
+ * to je oko 6px, pa je toliko i granica.
+ */
+const PARALLAX_PX = 6
+
+/**
+ * Fokus kadra po pločici. Pločice su uske i visoke pa bg-cover reže po širini —
+ * ako je subjekt na fotografiji izmaknut, "center" ga izbaci iz kadra.
+ * Podesivo u Admin → Sadržaj → Kupovina po ciljevima (npr. "30% 50%", "top").
+ */
+const DEFAULT_FOCUS = 'center'
+
+function GoalTile({ item, image, focus, onClick }) {
   // Parallax ide na vanjski sloj, a zoom/hover na unutrašnji — inline transform
   // iz hooka bi inače pregazio Tailwindov scale.
-  const parallaxRef = useParallax(0.12)
+  //
+  // Sloj je NAMJERNO tačno velik kao pločica: kad je bio viši (-inset-y),
+  // bg-cover je sliku skalirao da pokrije veću visinu pa ju je jače rezao po
+  // širini i subjekti su bježali iz kadra. Višak za pomak daje zoom (scale),
+  // a pomak je ograničen na PARALLAX_PX da nikad ne otkrije rub.
+  const parallaxRef = useParallax(0.12, PARALLAX_PX)
 
   return (
     <button
@@ -32,11 +57,10 @@ function GoalTile({ item, image, onClick }) {
       onClick={onClick}
       aria-label={item.label}
     >
-      {/* Sloj je namjerno viši od pločice da pomak ne otkrije rubove */}
-      <div ref={parallaxRef} className="absolute -inset-y-[12%] inset-x-0 will-change-transform">
+      <div ref={parallaxRef} className="absolute inset-0 will-change-transform">
         <div
-          className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-500 group-hover:scale-100"
-          style={{ backgroundImage: `url('${image}')` }}
+          className="absolute inset-0 bg-cover scale-110 transition-transform duration-500 group-hover:scale-105"
+          style={{ backgroundImage: `url('${image}')`, backgroundPosition: focus }}
         />
       </div>
 
@@ -70,7 +94,8 @@ function GoalTile({ item, image, onClick }) {
 export default function GoalsSection() {
   const navigate = useNavigate()
   const { data } = useSiteContent(
-    ['goals_items', 'goals_img_1', 'goals_img_2', 'goals_img_3', 'goals_img_4'],
+    ['goals_items', 'goals_img_1', 'goals_img_2', 'goals_img_3', 'goals_img_4',
+     'goals_focus_1', 'goals_focus_2', 'goals_focus_3', 'goals_focus_4'],
     DEFAULTS
   )
   const items = (data.goals_items?.items ?? DEFAULTS.goals_items.items)
@@ -102,6 +127,7 @@ export default function GoalsSection() {
             key={item.label}
             item={item}
             image={item.image || data[`goals_img_${i + 1}`] || DEFAULTS[`goals_img_${i + 1}`]}
+            focus={item.focus || data[`goals_focus_${i + 1}`] || DEFAULT_FOCUS}
             onClick={() => navigate(item.to)}
           />
         ))}
