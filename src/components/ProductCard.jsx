@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
-import { fmtKM } from '../data/catalog'
+import { fmtKM, discountChipClass } from '../data/catalog'
 import { hasAnyStock, getVariantStock, getVariantImageSrc } from '../hooks/useProducts'
 import { BODY } from '../lib/typography'
 
@@ -65,14 +65,14 @@ export default function ProductCard({ product, bestseller = false }) {
           fontom. Bez naginjanja: nakrivljeni kvadrat je djelovao nekonzistentno
           ("zašto je jedan normalan, a drugi tiltan") i zauzimao previše prostora. */}
       {isDiscount && (
-        <div className="absolute top-3 left-3 z-10 px-2 py-1 bg-[#ff4103] text-white text-[12px] font-extrabold italic leading-none" aria-hidden="true">
+        <div className={`absolute top-3 left-3 z-10 px-2 py-1 ${discountChipClass(badge)} text-[12px] font-extrabold italic leading-none`} aria-hidden="true">
           {badge}
         </div>
       )}
 
       {/* NOVO tag */}
       {badge && !isDiscount && (
-        <div className="absolute top-3 left-3 z-10 px-2 py-0.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.1em] bg-white">
+        <div className="absolute top-3 left-3 z-10 px-2 py-0.5 bg-[#00cec9] text-[#1e272e] text-[10px] font-bold tracking-[0.1em]">
           {badge}
         </div>
       )}

@@ -6,7 +6,7 @@ import {
   ShoppingCart, House, CaretRight,
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
-import { getCategoryBySlug, fmtKM } from '../data/catalog'
+import { getCategoryBySlug, fmtKM, discountChipClass } from '../data/catalog'
 import { useProduct, getVariantStock } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
 import BrandIcon from '../components/BrandIcon'
@@ -163,7 +163,7 @@ export default function Product() {
               <div className="relative bg-[#0145F2] flex flex-col items-center p-7 md:p-10 overflow-hidden">
                 <div className="absolute inset-0 ph-pattern opacity-[0.07] pointer-events-none" />
                 {isDiscount && (
-                  <div className="absolute top-5 left-5 z-10 px-2.5 py-1.5 bg-[#ff4103] text-white text-[13px] font-extrabold italic leading-none">
+                  <div className={`absolute top-5 left-5 z-10 px-2.5 py-1.5 ${discountChipClass(product.badge)} text-[13px] font-extrabold italic leading-none`}>
                     {product.badge}
                   </div>
                 )}

@@ -30,3 +30,12 @@ export const fmtKM = (n) => {
     .replace('BAM', 'KM')
     .trim()
 }
+
+/**
+ * Boja chipa popusta (Notion "Labels"): do 50% crna brand boja, 50% i preko
+ * crvena. Bestseller je plavi, New tirkizni — ti su rijeseni u TAG_COLORS.
+ */
+export function discountChipClass(badge) {
+  const pct = parseInt(String(badge).replace(/[^0-9]/g, ''), 10) || 0
+  return pct >= 50 ? 'bg-[#ff4103] text-white' : 'bg-[#1e272e] text-white'
+}
