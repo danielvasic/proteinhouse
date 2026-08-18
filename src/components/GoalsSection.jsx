@@ -69,7 +69,7 @@ function GoalTile({ item, image, focus, onClick }) {
 
       <span className="absolute bottom-4 left-4 right-4 md:bottom-5 md:left-5 md:right-5 flex items-end justify-between gap-2 text-left">
         <span
-          className="text-white text-[17px] md:text-[21px] font-bold uppercase tracking-[0.02em] leading-tight transition-transform duration-300 group-hover:-translate-y-1"
+          className="text-white text-[17px] md:text-[21px] font-bold tracking-[0.02em] leading-tight transition-transform duration-300 group-hover:-translate-y-1"
           style={DISPLAY}
         >
           {item.label}
@@ -110,10 +110,10 @@ export default function GoalsSection() {
       <div className="container py-7 md:py-9">
         <div className="flex items-center gap-3 mb-1.5">
           <span className="h-[2px] w-10 bg-[#00cec9]" />
-          <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/50 m-0">Pronađi svoje</p>
+          <p className="text-[10px] font-bold tracking-[0.22em] text-white/50 m-0">Pronađi svoje</p>
         </div>
         <h2
-          className="text-2xl md:text-3xl font-bold text-white uppercase m-0"
+          className="text-2xl md:text-3xl font-bold text-white m-0"
           style={DISPLAY}
         >
           Kupovina po ciljevima

@@ -16,7 +16,7 @@ function FooterColumn({ col }) {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
       >
-        <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 m-0 md:mb-5">
+        <h4 className="text-[10px] font-bold tracking-[0.2em] text-white/35 m-0 md:mb-5">
           {col.heading}
         </h4>
         <CaretDown
@@ -184,7 +184,7 @@ export default function Footer() {
                     >
                       {Icon
                         ? <Icon size={17} weight="fill" />
-                        : <span className="text-[10px] font-bold uppercase">{(network || '?').slice(0, 2)}</span>
+                        : <span className="text-[10px] font-bold">{(network || '?').slice(0, 2)}</span>
                       }
                     </a>
                   )

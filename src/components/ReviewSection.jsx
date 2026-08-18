@@ -85,7 +85,7 @@ export default function ReviewSection({ product }) {
         <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
           <div>
             <h2
-              className="text-xl md:text-2xl font-bold text-[#1e272e] uppercase m-0"
+              className="text-xl md:text-2xl font-bold text-[#1e272e] m-0"
               style={DISPLAY}
             >
               Recenzije kupaca
@@ -98,7 +98,7 @@ export default function ReviewSection({ product }) {
             )}
           </div>
           <button
-            className="px-5 py-2.5 border border-[#0145F2] text-[#1e272e] bg-transparent text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all cursor-pointer"
+            className="px-5 py-2.5 border border-[#0145F2] text-[#1e272e] bg-transparent text-[11px] font-bold tracking-[0.1em] hover:bg-[#0145F2] hover:text-white transition-all cursor-pointer"
             onClick={() => { setFormOpen((o) => !o); setResult(null) }}
           >
             {formOpen ? 'Zatvori' : 'Ocijeni proizvod'}
@@ -120,21 +120,21 @@ export default function ReviewSection({ product }) {
           <form onSubmit={submit} className="border border-gray-200 bg-[#edf1f5] p-5 md:p-6 mb-8 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Broj narudžbe *</label>
+                <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Broj narudžbe *</label>
                 <input className={inputCls} required value={form.orderNumber} onChange={(e) => setForm((f) => ({ ...f, orderNumber: e.target.value }))} placeholder="npr. PH-2607-4821" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Email iz narudžbe *</label>
+                <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Email iz narudžbe *</label>
                 <input className={inputCls} required type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="vas@email.com" />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Vaše ime</label>
+                <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Vaše ime</label>
                 <input className={inputCls} value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Ime (prikazuje se uz recenziju)" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Ocjena *</label>
+                <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Ocjena *</label>
                 <div className="flex items-center gap-1 py-2">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <button
@@ -151,13 +151,13 @@ export default function ReviewSection({ product }) {
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Komentar</label>
+              <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Komentar</label>
               <textarea className={`${inputCls} resize-none`} rows={3} value={form.comment} onChange={(e) => setForm((f) => ({ ...f, comment: e.target.value }))} placeholder="Kako vam se sviđa proizvod?" />
             </div>
             <button
               type="submit"
               disabled={sending}
-              className="px-8 py-3 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] disabled:opacity-50 transition-colors cursor-pointer border-0"
+              className="px-8 py-3 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.12em] hover:bg-[#0136C4] disabled:opacity-50 transition-colors cursor-pointer border-0"
             >
               {sending ? 'Šalje se…' : 'Objavi recenziju'}
             </button>
@@ -175,7 +175,7 @@ export default function ReviewSection({ product }) {
                 <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
                   <Stars value={r.rating} size={12} />
                   <span className="text-[13px] font-bold text-[#1e272e]">{r.customer_name}</span>
-                  <span className="flex items-center gap-1 text-[10px] font-bold tracking-[0.08em] uppercase text-emerald-600">
+                  <span className="flex items-center gap-1 text-[10px] font-bold tracking-[0.08em] text-emerald-600">
                     <SealCheck size={12} weight="fill" /> Verificirana kupovina
                   </span>
                   <span className="text-[11px] text-gray-400 ml-auto">

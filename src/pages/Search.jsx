@@ -37,7 +37,7 @@ export default function Search() {
             </nav>
 
             <h1
-              className="text-3xl md:text-4xl font-bold text-[#1e272e] uppercase mb-6"
+              className="text-3xl md:text-4xl font-bold text-[#1e272e] mb-6"
               style={DISPLAY}
             >
               Pretraga
@@ -60,7 +60,7 @@ export default function Search() {
                 />
                 <button
                   type="submit"
-                  className="px-6 py-3.5 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0136C4] transition-colors duration-150 cursor-pointer border-0 shrink-0"
+                  className="px-6 py-3.5 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.1em] hover:bg-[#0136C4] transition-colors duration-150 cursor-pointer border-0 shrink-0"
                 >
                   Pretraži
                 </button>
@@ -98,7 +98,7 @@ export default function Search() {
                 </div>
                 <Link
                   to="/"
-                  className="mt-2 px-6 py-3 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150"
+                  className="mt-2 px-6 py-3 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] hover:bg-[#0145F2] hover:text-white transition-all duration-150"
                 >
                   ← Nazad na početnu
                 </Link>

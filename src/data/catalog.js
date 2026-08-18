@@ -3,16 +3,16 @@
 // Proizvodi dolaze isključivo iz Supabase tabele 'products'
 
 export const categories = [
-  { slug: 'proteini',    label: 'PROTEINI',           icon: 'Flask',    subs: ['Whey', 'Izolat', 'Kazein', 'Veganski proteini', 'Proteinski barovi', 'Napici'] },
-  { slug: 'gaineri',     label: 'GAINERI',             icon: 'Stack',    subs: ['Mass gaineri', 'Lean gaineri', 'Ugljikohidrati'] },
-  { slug: 'kreatini',    label: 'KREATINI',            icon: 'Lightning', subs: ['Kreatin monohidrat', 'Kreatin HCL', 'Kreatin blend'] },
-  { slug: 'aminokiseline', label: 'AMINOKISELINE',     icon: 'Flask',    subs: ['BCAA', 'EAA', 'Glutamin', 'Arginini', 'Beta-alanin'] },
-  { slug: 'pre-workout', label: 'PRE-WORKOUT',         icon: 'Lightning', subs: ['Stimulansi', 'Bez stimulansa', 'Pumpa'] },
-  { slug: 'vitamini',    label: 'VITAMINI I ZDRAVLJE', icon: 'Leaf',     subs: ['Multivitamini', 'Omega 3', 'Vitamin D', 'Magnezij', 'Kolagen'] },
-  { slug: 'mrsavljenje', label: 'MRŠAVLJENJE',         icon: 'Scales',   subs: ['Fat burneri', 'CLA', 'L-karnitin', 'Termogenici'] },
-  { slug: 'hrana',       label: 'ZDRAVA HRANA',        icon: 'BowlFood', subs: ['Proteinski namazi', 'Proteinske čokolade', 'Proteinska kaša'] },
-  { slug: 'oprema',      label: 'OPREMA I DODACI',     icon: 'Barbell',  subs: ['Šejkeri', 'Pojasevi', 'Rukavice', 'Torbe', 'Odjeća'] },
-  { slug: 'akcija',      label: 'AKCIJA',              icon: 'Tag',      subs: [], accent: true },
+  { slug: 'proteini',    label: 'Proteini',           icon: 'Flask',    subs: ['Whey', 'Izolat', 'Kazein', 'Veganski proteini', 'Proteinski barovi', 'Napici'] },
+  { slug: 'gaineri',     label: 'Gaineri',             icon: 'Stack',    subs: ['Mass gaineri', 'Lean gaineri', 'Ugljikohidrati'] },
+  { slug: 'kreatini',    label: 'Kreatini',            icon: 'Lightning', subs: ['Kreatin monohidrat', 'Kreatin HCL', 'Kreatin blend'] },
+  { slug: 'aminokiseline', label: 'Aminokiseline',     icon: 'Flask',    subs: ['BCAA', 'EAA', 'Glutamin', 'Arginini', 'Beta-alanin'] },
+  { slug: 'pre-workout', label: 'Pre-workout',         icon: 'Lightning', subs: ['Stimulansi', 'Bez stimulansa', 'Pumpa'] },
+  { slug: 'vitamini',    label: 'Vitamini i zdravlje', icon: 'Leaf',     subs: ['Multivitamini', 'Omega 3', 'Vitamin D', 'Magnezij', 'Kolagen'] },
+  { slug: 'mrsavljenje', label: 'Mršavljenje',         icon: 'Scales',   subs: ['Fat burneri', 'CLA', 'L-karnitin', 'Termogenici'] },
+  { slug: 'hrana',       label: 'Zdrava hrana',        icon: 'BowlFood', subs: ['Proteinski namazi', 'Proteinske čokolade', 'Proteinska kaša'] },
+  { slug: 'oprema',      label: 'Oprema i dodaci',     icon: 'Barbell',  subs: ['Šejkeri', 'Pojasevi', 'Rukavice', 'Torbe', 'Odjeća'] },
+  { slug: 'akcija',      label: 'Akcija',              icon: 'Tag',      subs: [], accent: true },
 ]
 
 // Proizvodi dolaze iz Supabase — ovaj niz je prazan

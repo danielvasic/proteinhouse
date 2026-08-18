@@ -3,8 +3,8 @@ import { useSiteContent } from '../hooks/useSiteContent'
 import { BODY } from '../lib/typography'
 
 const DEFAULT_MESSAGES = [
-  'BESPLATNA DOSTAVA ZA NARUDŽBE PREKO 100 KM',
-  '100% SIGURNA KUPOVINA',
+  'Besplatna dostava za narudžbe preko 100 KM',
+  '100% sigurna kupovina',
   'KUPI WHEY OD 150 KM → GORILLA CIPELE (250 KM) BESPLATNO',
 ]
 
@@ -31,10 +31,12 @@ export default function NewsBar() {
     if (messages.length < 2) return undefined
     const timer = setInterval(() => {
       setVisible(false)
+      // Duži, mekši fade — raniji 250ms rez je djelovao nervozno (Notion:
+      // "Top bar tranzicija — treba biti suptilnije")
       setTimeout(() => {
         setIndex((i) => (i + 1) % messages.length)
         setVisible(true)
-      }, 250)
+      }, 600)
     }, ROTATE_MS)
     return () => clearInterval(timer)
   }, [messages.length])
@@ -45,7 +47,7 @@ export default function NewsBar() {
     <div className="bg-black text-white" role="status" aria-live="polite">
       <div className="container">
         <p
-          className={`py-2 m-0 text-center text-[10px] md:text-[11px] font-bold tracking-[0.14em] uppercase transition-opacity duration-250 ${visible ? 'opacity-100' : 'opacity-0'}`}
+          className={`py-2 m-0 text-center text-[10px] md:text-[11px] font-bold tracking-[0.14em] transition-all duration-[600ms] ease-in-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-0.5'}`}
           style={BODY}
         >
           {messages[index % messages.length]}

@@ -13,7 +13,7 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
   const toggleBrand = (b) =>
     setSelectedBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])
 
-  const boxTitle = 'text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-4'
+  const boxTitle = 'text-[10px] font-bold tracking-[0.18em] text-gray-400 mb-4'
 
   return (
     <aside className="flex flex-col gap-6 min-w-[200px]" style={BODY}>
@@ -59,7 +59,7 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
           <span className="text-[12px] font-bold text-[#1e272e]">{priceMax} KM</span>
         </div>
         <button
-          className="w-full py-2.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
+          className="w-full py-2.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.12em] hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
           onClick={() => onPriceFilter?.(priceMax)}
         >
           Primijeni

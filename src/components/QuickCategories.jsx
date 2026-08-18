@@ -57,7 +57,7 @@ export default function QuickCategories() {
                 key={item.label}
                 // Podloga ostaje bijela i na hoveru — brend ikone su dvobojne
                 // pa se na plavoj pozadini ne bi vidjele.
-                className="shrink-0 flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-[11px] font-bold tracking-[0.08em] uppercase text-[#1e272e] hover:border-[#0145F2] hover:text-[#0145F2] transition-all duration-150 cursor-pointer whitespace-nowrap"
+                className="shrink-0 flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-[11px] font-bold tracking-[0.08em] text-[#1e272e] hover:border-[#0145F2] hover:text-[#0145F2] transition-all duration-150 cursor-pointer whitespace-nowrap"
                 onClick={() => navigate(item.to)}
               >
                 <BrandIcon name={brand} size={18} fallback={<Icon size={14} weight="duotone" />} />

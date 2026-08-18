@@ -8,7 +8,7 @@ const HIDE_KEY = 'ph_lifetime_banner_hidden'
 
 const KEYS = ['lifetime_banner_text', 'lifetime_banner_sub', 'lifetime_banner_link']
 const DEFAULTS = {
-  lifetime_banner_text: '−10% NA PRVU NARUDŽBU',
+  lifetime_banner_text: '−10% na prvu narudžbu',
   lifetime_banner_sub:  'Kod: PRVIH10',
   lifetime_banner_link: '/kategorija/akcija',
 }
@@ -48,7 +48,7 @@ export default function LifetimeBanner() {
         <Percent size={15} weight="bold" />
       </span>
       <span>
-        <span className="block text-[11px] font-bold tracking-[0.08em] uppercase leading-tight">{banner.text}</span>
+        <span className="block text-[11px] font-bold tracking-[0.08em] leading-tight">{banner.text}</span>
         {banner.sub && <span className="block text-[10px] text-white/55 leading-tight mt-0.5">{banner.sub}</span>}
       </span>
       <span

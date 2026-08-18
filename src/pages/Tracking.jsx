@@ -70,7 +70,7 @@ export default function Tracking() {
         <section className="py-12 bg-white min-h-[60vh]">
           <div className="container max-w-[640px]">
             <h1
-              className="text-3xl font-bold text-[#1e272e] uppercase mb-2"
+              className="text-3xl font-bold text-[#1e272e] mb-2"
               style={DISPLAY}
             >
               Praćenje pošiljke
@@ -82,18 +82,18 @@ export default function Tracking() {
             <form onSubmit={search} className="bg-white border border-gray-200 p-6 space-y-4 mb-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Broj narudžbe</label>
+                  <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Broj narudžbe</label>
                   <input className={inputCls} required value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} placeholder="npr. PH-2607-4821" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Email</label>
+                  <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Email</label>
                   <input className={inputCls} required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vas@email.com" />
                 </div>
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] disabled:opacity-50 transition-colors cursor-pointer border-0"
+                className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.12em] hover:bg-[#0136C4] disabled:opacity-50 transition-colors cursor-pointer border-0"
               >
                 <MagnifyingGlass size={14} weight="bold" />
                 {loading ? 'Tražim…' : 'Provjeri status'}
@@ -110,11 +110,11 @@ export default function Tracking() {
               <div className="bg-white border border-gray-200 p-6 md:p-8">
                 <div className="flex items-center justify-between flex-wrap gap-2 mb-8">
                   <div>
-                    <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 m-0">Narudžba</p>
+                    <p className="text-[10px] font-bold tracking-[0.16em] text-gray-400 m-0">Narudžba</p>
                     <p className="text-[16px] font-bold text-[#1e272e] m-0">{order.order_number}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 m-0">Ukupno</p>
+                    <p className="text-[10px] font-bold tracking-[0.16em] text-gray-400 m-0">Ukupno</p>
                     <p className="text-[16px] font-bold text-[#1e272e] m-0">{fmtKM(Number(order.total))}</p>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function Tracking() {
 
                 {Array.isArray(order.items) && order.items.length > 0 && (
                   <div className="mt-6 pt-5 border-t border-gray-100">
-                    <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">Artikli</p>
+                    <p className="text-[10px] font-bold tracking-[0.16em] text-gray-400 mb-3">Artikli</p>
                     <div className="space-y-2">
                       {order.items.map((it, i) => (
                         <div key={i} className="flex justify-between gap-3 text-[12px]">

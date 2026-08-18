@@ -31,12 +31,12 @@ const MOBILE_ICONS = { shop: Storefront, sportovi: Barbell, ciljevi: Target, blo
 
 // Default nav items — overridden by DB values from site_content
 const DEFAULT_NAV = [
-  { key: 'shop',     label: 'SHOP',     to: '/',                         hasMenu: true,  right: false, active: true },
-  { key: 'sportovi', label: 'SPORTOVI', to: '/kategorija/performanse',   hasMenu: false, right: false, active: true },
-  { key: 'ciljevi',  label: 'CILJEVI',  to: '/kategorija/kontrola',      hasMenu: false, right: false, active: true },
-  { key: 'blog',     label: 'BLOG',     to: '/blog',                     hasMenu: false, right: false, active: true },
-  { key: 'o-nama',   label: 'O NAMA',   to: '/o-nama',                   hasMenu: false, right: false, active: true },
-  { key: 'kontakt',  label: 'KONTAKT',  to: '/kontakt',                  hasMenu: false, right: true,  active: true },
+  { key: 'shop',     label: 'Shop',     to: '/',                         hasMenu: true,  right: false, active: true },
+  { key: 'sportovi', label: 'Sportovi', to: '/kategorija/performanse',   hasMenu: false, right: false, active: true },
+  { key: 'ciljevi',  label: 'Ciljevi',  to: '/kategorija/kontrola',      hasMenu: false, right: false, active: true },
+  { key: 'blog',     label: 'Blog',     to: '/blog',                     hasMenu: false, right: false, active: true },
+  { key: 'o-nama',   label: 'O nama',   to: '/o-nama',                   hasMenu: false, right: false, active: true },
+  { key: 'kontakt',  label: 'Kontakt',  to: '/kontakt',                  hasMenu: false, right: true,  active: true },
 ]
 
 const UTILITY_KEYS    = ['contact_phone', 'contact_email', 'contact_hours', 'footer_shipping']
@@ -44,7 +44,7 @@ const UTILITY_DEFAULT = {
   contact_phone:    '065/091-094',
   contact_email:    'podrska@proteinhouse.ba',
   contact_hours:    'PON–SUB 9:00–21:00',
-  footer_shipping:  'BESPLATNA DOSTAVA > 100 KM',
+  footer_shipping:  'Besplatna dostava > 100 KM',
 }
 
 export default function Header() {
@@ -145,7 +145,7 @@ export default function Header() {
           {NAV_ITEMS.map((n) => (
             <button
               key={n.key}
-              className={`flex items-center gap-1.5 px-[18px] py-3 md:py-[13px] text-white/75 hover:text-white text-[11px] md:text-xs font-bold tracking-[0.1em] uppercase cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-white/60 hover:bg-white/5 transition-all duration-150 bg-transparent ${n.right ? 'ml-auto' : ''}`}
+              className={`flex items-center gap-1.5 px-[18px] py-3 md:py-[13px] text-white/75 hover:text-white text-[11px] md:text-xs font-bold tracking-[0.1em] cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-white/60 hover:bg-white/5 transition-all duration-150 bg-transparent ${n.right ? 'ml-auto' : ''}`}
               onMouseEnter={n.hasMenu ? openMenu : undefined}
               onMouseLeave={n.hasMenu ? scheduleClose : undefined}
               onClick={() => navigate(n.to)}
@@ -170,7 +170,7 @@ export default function Header() {
               return (
                 <div key={c.slug}>
                   <button
-                    className="flex items-center gap-1.5 w-full text-left pb-2 mb-2.5 border-b border-gray-200 font-bold text-[12px] tracking-[0.05em] uppercase bg-transparent border-x-0 border-t-0 cursor-pointer transition-colors duration-150 text-[#1e272e] hover:text-[#1e272e]"
+                    className="flex items-center gap-1.5 w-full text-left pb-2 mb-2.5 border-b border-gray-200 font-bold text-[12px] tracking-[0.05em] bg-transparent border-x-0 border-t-0 cursor-pointer transition-colors duration-150 text-[#1e272e] hover:text-[#1e272e]"
                     style={{ fontFamily: 'Oswald, Impact, sans-serif' }}
                     onClick={() => { navigate(`/kategorija/${c.slug}`); setShopOpen(false) }}
                   >
@@ -208,7 +208,7 @@ export default function Header() {
 
           <div className="bg-[#edf1f5] border-t border-gray-200">
             <div className="mx-auto w-full max-w-[1280px] px-8 md:px-10 flex items-center gap-2.5 py-3 flex-wrap">
-              <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400">BRZI PREČAC:</span>
+              <span className="text-[10px] font-bold tracking-[0.16em] text-gray-400">BRZI PREČAC:</span>
               {[
                 { label: 'AKCIJA −70%', to: '/kategorija/akcija', Icon: Tag },
                 { label: 'NOVO', to: '/kategorija/proteini', Icon: Lightning },
@@ -216,14 +216,14 @@ export default function Header() {
               ].map(({ label, to, Icon }) => (
                 <button
                   key={label}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-[10px] font-bold tracking-[0.1em] uppercase text-[#1e272e] hover:bg-[#0145F2] hover:border-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-[10px] font-bold tracking-[0.1em] text-[#1e272e] hover:bg-[#0145F2] hover:border-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer"
                   onClick={() => { navigate(to); setShopOpen(false) }}
                 >
                   {Icon && <Icon size={12} />} {label}
                 </button>
               ))}
               <button
-                className="ml-auto flex items-center gap-1.5 px-4 py-1.5 border border-[#0145F2] text-[10px] font-bold tracking-[0.1em] uppercase text-[#1e272e] hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
+                className="ml-auto flex items-center gap-1.5 px-4 py-1.5 border border-[#0145F2] text-[10px] font-bold tracking-[0.1em] text-[#1e272e] hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
                 onClick={() => { navigate('/'); setShopOpen(false) }}
               >
                 <Storefront size={12} /> POGLEDAJ SVE PROIZVODE →
@@ -253,7 +253,7 @@ export default function Header() {
             return (
               <button
                 key={n.key}
-                className="flex items-center gap-3 px-5 py-3.5 bg-transparent border-0 border-b border-gray-100 font-bold text-[12px] tracking-[0.1em] uppercase text-[#1e272e] cursor-pointer text-left hover:bg-[#edf1f5] transition-colors"
+                className="flex items-center gap-3 px-5 py-3.5 bg-transparent border-0 border-b border-gray-100 font-bold text-[12px] tracking-[0.1em] text-[#1e272e] cursor-pointer text-left hover:bg-[#edf1f5] transition-colors"
                 onClick={() => { navigate(n.to); setMobileOpen(false) }}
               >
                 {Icon && <Icon size={17} className="text-gray-400" />} {n.label}
@@ -263,14 +263,14 @@ export default function Header() {
           })}
 
           <div className="h-px bg-gray-200 my-3 mx-5" />
-          <p className="px-5 pb-1.5 text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 m-0">Kategorije</p>
+          <p className="px-5 pb-1.5 text-[10px] font-bold tracking-[0.18em] text-gray-400 m-0">Kategorije</p>
 
           {categories.map((c) => {
             const Icon = CAT_ICONS[c.slug] || Tag
             return (
               <button
                 key={c.slug}
-                className="flex items-center gap-2.5 px-5 py-2.5 bg-transparent border-0 border-b border-gray-100 font-semibold text-xs tracking-[0.04em] uppercase cursor-pointer text-left hover:bg-[#edf1f5] transition-colors text-gray-600"
+                className="flex items-center gap-2.5 px-5 py-2.5 bg-transparent border-0 border-b border-gray-100 font-semibold text-xs tracking-[0.04em] cursor-pointer text-left hover:bg-[#edf1f5] transition-colors text-gray-600"
                 onClick={() => { navigate(`/kategorija/${c.slug}`); setMobileOpen(false) }}
               >
                 <Icon size={14} className="text-gray-400" /> {c.label}
@@ -281,7 +281,7 @@ export default function Header() {
           <div className="h-px bg-gray-200 my-3 mx-5" />
 
           <button
-            className="flex items-center gap-3 px-5 py-3.5 bg-transparent border-0 font-bold text-[12px] tracking-[0.1em] uppercase text-[#1e272e] cursor-pointer text-left hover:bg-[#edf1f5] transition-colors"
+            className="flex items-center gap-3 px-5 py-3.5 bg-transparent border-0 font-bold text-[12px] tracking-[0.1em] text-[#1e272e] cursor-pointer text-left hover:bg-[#edf1f5] transition-colors"
             onClick={() => { navigate('/nalog'); setMobileOpen(false) }}
           >
             <User size={17} weight={authUser ? 'fill' : 'regular'} className={authUser ? 'text-emerald-600' : 'text-gray-400'} /> {authUser ? 'MOJ NALOG' : 'PRIJAVA / REGISTRACIJA'}

@@ -120,7 +120,7 @@ function SuggestionList({ typed, matches, rows, chips, query, onGo }) {
       {typed && matches.length > 0 && (
         <button
           type="button"
-          className="flex items-center justify-center gap-1.5 w-full px-4 py-3.5 bg-[#edf1f5] border-0 border-t border-gray-200 text-[11px] font-bold tracking-[0.1em] uppercase text-[#1e272e] cursor-pointer hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center gap-1.5 w-full px-4 py-3.5 bg-[#edf1f5] border-0 border-t border-gray-200 text-[11px] font-bold tracking-[0.1em] text-[#1e272e] cursor-pointer hover:bg-gray-100 transition-colors"
           onClick={() => onGo(`/pretraga?q=${encodeURIComponent(query.trim())}`)}
         >
           Svi rezultati ({matches.length}) <ArrowRight size={12} weight="bold" />

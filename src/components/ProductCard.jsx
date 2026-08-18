@@ -6,7 +6,15 @@ import { fmtKM } from '../data/catalog'
 import { hasAnyStock, getVariantStock, getVariantImageSrc } from '../hooks/useProducts'
 import { BODY } from '../lib/typography'
 
-const TAG_LABELS = { bestseller: 'BESTSELLER', new: 'NOVO', gainer: 'GAINER' }
+// Color coding po tipu (Notion: "Labels/Tagovi — Color coding"):
+// bestseller = Electric Blue, novo = Cyan Neon, ostalo = Night Black;
+// popust ostaje Vulcan Orange (sticker ispod).
+const TAG_LABELS = { bestseller: 'Bestseller', new: 'Novo', gainer: 'Gainer' }
+const TAG_COLORS = {
+  Bestseller: 'bg-[#0145F2] text-white',
+  Novo:       'bg-[#00cec9] text-[#1e272e]',
+}
+const TAG_DEFAULT_COLOR = 'bg-[#1e272e] text-white'
 
 /** Kompaktan select za varijante na kartici (okus / gramaža) */
 function VariantSelect({ label, options, value, onChange }) {
@@ -43,7 +51,7 @@ export default function ProductCard({ product, bestseller = false }) {
   const inStock      = hasAnyStock(product)
   const tagChip      = (bestseller && !tags.includes('bestseller'))
     ? TAG_LABELS.bestseller
-    : tags.map((t) => TAG_LABELS[t] || t.toUpperCase()).find((t) => t !== badge)
+    : tags.map((t) => TAG_LABELS[t] || (t[0].toUpperCase() + t.slice(1))).find((t) => t !== badge)
 
   // Izbor okusa/gramaže direktno na kartici — default prva opcija
   const [flavor, setFlavor] = useState(flavors[0] ?? null)
@@ -78,7 +86,7 @@ export default function ProductCard({ product, bestseller = false }) {
       {/* NOVO tag */}
       {badge && !isDiscount && (
         <div
-          className="absolute top-3 left-3 z-10 px-2 py-0.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.1em] uppercase bg-white"
+          className="absolute top-3 left-3 z-10 px-2 py-0.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.1em] bg-white"
           style={{ transform: `rotate(${tilt * 0.5}deg)` }}
         >
           {badge}
@@ -87,14 +95,14 @@ export default function ProductCard({ product, bestseller = false }) {
 
       {/* Tag chip (bestseller, new, gainer…) */}
       {tagChip && (
-        <div className={`absolute left-3 z-10 px-2 py-0.5 bg-[#0145F2] text-white text-[9px] font-bold tracking-[0.1em] uppercase ${badge ? 'top-[68px]' : 'top-3'}`}>
+        <div className={`absolute left-3 z-10 px-2 py-0.5 ${TAG_COLORS[tagChip] ?? TAG_DEFAULT_COLOR} text-[9px] font-bold tracking-[0.1em] ${badge ? 'top-[68px]' : 'top-3'}`}>
           {tagChip}
         </div>
       )}
 
       {/* Out of stock overlay */}
       {!inStock && (
-        <div className="absolute top-3 right-3 z-10 px-2 py-0.5 bg-gray-800/80 text-white text-[10px] font-bold tracking-[0.1em] uppercase">
+        <div className="absolute top-3 right-3 z-10 px-2 py-0.5 bg-gray-800/80 text-white text-[10px] font-bold tracking-[0.1em]">
           Nema na stanju
         </div>
       )}
@@ -114,7 +122,7 @@ export default function ProductCard({ product, bestseller = false }) {
       {/* Body */}
       <div className="flex flex-col flex-1 p-4 md:p-5 pt-3">
         <p
-          className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-1"
+          className="text-[10px] font-bold tracking-[0.14em] text-gray-400 mb-1"
           style={BODY}
         >
           {brand}
@@ -152,13 +160,13 @@ export default function ProductCard({ product, bestseller = false }) {
 
           <div className="flex items-baseline gap-2 mb-3">
             {/* Snižena cijena ide u Vulcan Orange — brand book tu boju drži za popuste */}
-            <span className={`text-[17px] font-extrabold ${old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`}>{fmtKM(price)}</span>
+            <span className={`text-[19px] font-extrabold ${old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`}>{fmtKM(price)}</span>
             {old && (
               <span className="text-xs text-gray-400 line-through font-normal">{fmtKM(old)}</span>
             )}
           </div>
           <button
-            className={`w-full py-3 text-[11px] font-bold tracking-[0.1em] uppercase transition-all duration-150 ${
+            className={`w-full py-3 text-[11px] font-bold tracking-[0.1em] transition-all duration-150 ${
               canAdd
                 ? 'ph-cta cursor-pointer'
                 : 'border border-gray-200 text-gray-400 bg-[#edf1f5] cursor-not-allowed'

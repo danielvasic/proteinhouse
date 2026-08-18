@@ -40,10 +40,10 @@ export default function Novosti() {
           <div className="container py-10 md:py-14">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-10 bg-gray-300" />
-              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Šta se dešava</span>
+              <span className="text-[10px] font-bold tracking-[0.22em] text-gray-400">Šta se dešava</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-[#1e272e] uppercase"
+              className="text-4xl md:text-5xl font-bold text-[#1e272e]"
               style={DISPLAY}
             >
               Vijesti
@@ -63,7 +63,7 @@ export default function Novosti() {
               </div>
             ) : news.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-[15px] font-bold text-[#1e272e] uppercase mb-2" style={DISPLAY}>
+                <p className="text-[15px] font-bold text-[#1e272e] mb-2" style={DISPLAY}>
                   Nema vijesti
                 </p>
                 <p className="text-[13px] text-gray-400">Uskoro dolaze novosti.</p>
@@ -72,11 +72,11 @@ export default function Novosti() {
               <div className="flex flex-col gap-4">
                 {news.map((item) => (
                   <div key={item.id} className="bg-white border border-gray-200 p-7 md:p-8">
-                    <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">
+                    <p className="text-[10px] font-bold tracking-[0.16em] text-gray-400 mb-3">
                       {formatDate(item.published_at)}
                     </p>
                     <h2
-                      className="text-xl font-bold text-[#1e272e] uppercase leading-snug mb-3"
+                      className="text-xl font-bold text-[#1e272e] leading-snug mb-3"
                       style={DISPLAY}
                     >
                       {item.title}

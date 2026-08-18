@@ -110,7 +110,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
       <div className="flex items-start gap-3">
         <Gift size={22} weight="duotone" className="text-[#0145F2] shrink-0 mt-0.5" />
         <div>
-          <h3 className="text-[13px] font-bold text-[#1e272e] uppercase tracking-wide">
+          <h3 className="text-[13px] font-bold text-[#1e272e] tracking-wide">
             {campaign.headline || 'Odaberi svoj besplatni poklon'}
           </h3>
           {campaign.subtitle && <p className="text-[12px] text-gray-500 mt-1">{campaign.subtitle}</p>}
@@ -121,7 +121,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
       <div className="space-y-3">
         {offered.clothing.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500 mb-2">Veličina odjeće</p>
+            <p className="text-[10px] font-bold tracking-[0.14em] text-gray-500 mb-2">Veličina odjeće</p>
             <div className="flex flex-wrap gap-2">
               {offered.clothing.map((s) => (
                 <button
@@ -137,7 +137,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
         )}
         {offered.shoes.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500 mb-2">Broj obuće</p>
+            <p className="text-[10px] font-bold tracking-[0.14em] text-gray-500 mb-2">Broj obuće</p>
             <div className="flex flex-wrap gap-2">
               {offered.shoes.map((s) => (
                 <button
@@ -184,7 +184,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
                   ? <img src={getProductImageUrl(gift)} alt="" className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center"><Gift size={24} className="text-gray-300" /></div>}
               </div>
-              {gift.brand && <p className="text-[9px] font-bold tracking-[0.1em] uppercase text-gray-400">{gift.brand}</p>}
+              {gift.brand && <p className="text-[9px] font-bold tracking-[0.1em] text-gray-400">{gift.brand}</p>}
               <p className="text-[11px] font-semibold text-[#1e272e] leading-tight line-clamp-2">{gift.title}</p>
               <p className="text-[10px] text-gray-400 mt-0.5">Veličina {size === NO_SIZE_KEY ? '—' : size}</p>
             </button>

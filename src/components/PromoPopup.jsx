@@ -75,12 +75,12 @@ export default function PromoPopup() {
 
         <div className="p-6 text-center">
           {(promo.badge || promo.discount_percent) && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 bg-[#0145F2] text-white text-[10px] font-bold tracking-[0.14em] uppercase">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 bg-[#0145F2] text-white text-[10px] font-bold tracking-[0.14em]">
               <Tag size={11} weight="fill" /> {promo.badge || `−${promo.discount_percent}%`}
             </span>
           )}
           <h3
-            className="text-2xl font-bold text-[#1e272e] uppercase leading-tight mb-2"
+            className="text-2xl font-bold text-[#1e272e] leading-tight mb-2"
             style={DISPLAY}
           >
             {promo.title}
@@ -94,7 +94,7 @@ export default function PromoPopup() {
             </p>
           )}
           <button
-            className="ph-cta w-full py-3.5 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors cursor-pointer"
+            className="ph-cta w-full py-3.5 text-[11px] font-bold tracking-[0.12em] transition-colors cursor-pointer"
             onClick={() => { close(); navigate(promo.link || '/kategorija/akcija') }}
           >
             Iskoristi ponudu →

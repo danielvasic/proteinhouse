@@ -47,13 +47,13 @@ export default function CookieConsent() {
           </p>
           <div className="flex gap-3 shrink-0">
             <button
-              className="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-gray-500 bg-transparent text-[11px] font-bold tracking-[0.1em] uppercase hover:border-gray-400 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-gray-500 bg-transparent text-[11px] font-bold tracking-[0.1em] hover:border-gray-400 transition-colors cursor-pointer"
               onClick={() => decide('declined')}
             >
               Odbij
             </button>
             <button
-              className="flex-1 sm:flex-none px-7 py-3 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-7 py-3 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.1em] hover:bg-[#0136C4] transition-colors cursor-pointer"
               onClick={() => decide('accepted')}
             >
               Prihvati
