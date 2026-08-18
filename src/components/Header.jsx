@@ -101,14 +101,14 @@ export default function Header() {
       {/* ── Main bar ── */}
       <div className="bg-white border-b border-gray-200">
         <div className="container">
-          <div className="flex items-center gap-5 py-3 md:py-4">
+          <div className="flex items-center gap-3 md:gap-5 py-3 md:py-4">
             <Logo size="md" onClick={() => navigate('/')} />
 
-            <div className="flex-1 hidden sm:flex">
+            <div className="flex-1 min-w-0 flex">
               <SearchBox />
             </div>
 
-            <div className="ml-auto flex items-center gap-0.5">
+            <div className="ml-auto flex items-center gap-0.5 shrink-0">
               <Link to="/nalog" className={`${iconBtnCls} hidden md:flex relative`} aria-label={authUser ? 'Moj nalog' : 'Prijava'} title={authUser?.email}>
                 <User size={20} weight={authUser ? 'fill' : 'regular'} />
                 {authUser && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 border border-white" />}
@@ -134,15 +134,13 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ── Mobile search (uvijek vidljiv, odmah nudi prijedloge) ── */}
-          <div className="sm:hidden pb-3">
-            <SearchBox />
-          </div>
         </div>
       </div>
 
       {/* ── Primary nav ── */}
-      <nav className="bg-[#0145F2] relative">
+      {/* Na mobilnoj privremeno skriven — kategorije su u hamburger meniju.
+          Dogovor s klijentom, dok se ne odluči šta ide u taj red. */}
+      <nav className="bg-[#0145F2] relative hidden md:block">
         <div className="container flex items-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {NAV_ITEMS.map((n) => (
             <button

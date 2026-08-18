@@ -181,15 +181,16 @@ export default function SearchBox({ onNavigate }) {
   /* ── Mobilni: trigger + fullscreen overlay ── */
   if (isMobile) {
     return (
-      <div style={{ fontFamily: FONT }} className="flex-1">
+      <div style={{ fontFamily: FONT }} className="flex-1 min-w-0">
         <button
           type="button"
-          className="flex items-center gap-2 w-full h-10 px-3.5 bg-[#edf1f5] border border-gray-200 text-left cursor-pointer"
+          className="flex items-center gap-2 w-full min-w-0 h-10 px-3.5 bg-[#edf1f5] border border-gray-200 text-left cursor-pointer"
           onClick={() => setOpen(true)}
           aria-label="Otvori pretragu"
         >
           <MagnifyingGlass size={15} className="text-gray-400 shrink-0" />
-          <span className="text-sm text-gray-400">Pretraži proizvode, brendove…</span>
+          {/* truncate: polje je sada u istoj liniji s logom pa je znatno uže */}
+          <span className="text-sm text-gray-400 truncate">Pretraži proizvode…</span>
         </button>
 
         {open && (
@@ -234,14 +235,14 @@ export default function SearchBox({ onNavigate }) {
 
   /* ── Desktop: input + dropdown ── */
   return (
-    <div ref={rootRef} className="relative flex-1 max-w-[460px]" style={{ fontFamily: FONT }}>
+    <div ref={rootRef} className="relative flex-1 min-w-0 max-w-[460px]" style={{ fontFamily: FONT }}>
       <form
         className="flex items-center gap-2 h-10 px-3.5 bg-[#edf1f5] border border-gray-200 focus-within:border-[#0145F2] focus-within:bg-white transition-all duration-150"
         onSubmit={submit}
       >
         <MagnifyingGlass size={15} className="text-gray-400 shrink-0" />
         <input
-          className="bg-transparent flex-1 outline-none text-sm text-gray-900 placeholder:text-gray-400 min-w-0"
+          className="bg-transparent flex-1 outline-none text-sm text-gray-900 placeholder:text-gray-400 min-w-0 truncate"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
