@@ -56,7 +56,7 @@ const SOCIAL_ICONS = {
 const DEFAULT_COLUMNS = {
   columns: [
     {
-      heading: 'INFORMACIJE',
+      heading: 'Informacije',
       links: [
         { label: 'O nama',               to: '/o-nama' },
         { label: 'Kontakt',              to: '/kontakt' },
@@ -66,7 +66,7 @@ const DEFAULT_COLUMNS = {
       ],
     },
     {
-      heading: 'NALOG',
+      heading: 'Nalog',
       links: [
         { label: 'Prijava',       to: '/nalog' },
         { label: 'Registracija',  to: '/nalog/registracija' },
@@ -74,7 +74,7 @@ const DEFAULT_COLUMNS = {
       ],
     },
     {
-      heading: 'PRODAVNICA',
+      heading: 'Prodavnica',
       links: [
         { label: 'Praćenje pošiljke', to: '/pracenje' },
         { label: 'Dostava',           to: '/dostava' },

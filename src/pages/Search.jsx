@@ -37,7 +37,7 @@ export default function Search() {
             </nav>
 
             <h1
-              className="text-3xl md:text-4xl font-bold text-[#1e272e] mb-6"
+              className="text-3xl md:text-4xl font-bold text-[#1e272e] mb-6 uppercase"
               style={DISPLAY}
             >
               Pretraga

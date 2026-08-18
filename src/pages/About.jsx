@@ -64,7 +64,7 @@ export default function About() {
               <span className="text-[11px] font-bold tracking-[0.22em] text-white/55">Naša priča</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-white leading-tight"
+              className="text-4xl md:text-5xl font-bold text-white leading-tight uppercase"
               style={DISPLAY}
             >
               O nama

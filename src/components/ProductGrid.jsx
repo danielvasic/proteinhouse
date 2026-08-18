@@ -19,7 +19,7 @@ export default function ProductGrid({ title, eyebrow, products, categorySlug, ma
               <p className="text-[10px] font-bold tracking-[0.22em] text-gray-400 mb-1.5 m-0">{eyebrow}</p>
             )}
             <h2
-              className="text-2xl md:text-3xl font-bold text-[#1e272e] m-0"
+              className="text-2xl md:text-3xl font-bold text-[#1e272e] m-0 uppercase"
               style={DISPLAY}
             >
               {title}

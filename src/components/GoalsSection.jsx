@@ -113,7 +113,7 @@ export default function GoalsSection() {
           <p className="text-[10px] font-bold tracking-[0.22em] text-white/50 m-0">Pronađi svoje</p>
         </div>
         <h2
-          className="text-2xl md:text-3xl font-bold text-white m-0"
+          className="text-2xl md:text-3xl font-bold text-white m-0 uppercase"
           style={DISPLAY}
         >
           Kupovina po ciljevima

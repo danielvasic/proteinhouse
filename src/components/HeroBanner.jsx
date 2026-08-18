@@ -99,7 +99,7 @@ export default function HeroBanner() {
 
           {/* Headline */}
           <h1
-            className="text-[34px] md:text-6xl lg:text-[64px] font-bold text-white leading-[0.95] tracking-[-0.02em] mb-4 md:mb-7"
+            className="text-[34px] md:text-6xl lg:text-[64px] font-bold text-white leading-[0.95] tracking-[-0.02em] mb-4 md:mb-7 uppercase"
             style={DISPLAY}
           >
             {titleLines.map((line, i) => (

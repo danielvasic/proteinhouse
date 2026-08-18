@@ -5,7 +5,7 @@ import { BODY } from '../lib/typography'
 const DEFAULT_MESSAGES = [
   'Besplatna dostava za narudžbe preko 100 KM',
   '100% sigurna kupovina',
-  'KUPI WHEY OD 150 KM → GORILLA CIPELE (250 KM) BESPLATNO',
+  'Kupi whey od 150 KM → Gorilla cipele (250 KM) besplatno',
 ]
 
 const ROTATE_MS = 8000

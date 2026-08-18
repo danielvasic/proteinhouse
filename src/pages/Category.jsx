@@ -61,7 +61,7 @@ export default function Category() {
             </nav>
 
             <h1
-              className="text-3xl md:text-4xl font-bold text-[#1e272e]"
+              className="text-3xl md:text-4xl font-bold text-[#1e272e] uppercase"
               style={DISPLAY}
             >
               {pageTitle}

@@ -263,7 +263,7 @@ export default function Header() {
           })}
 
           <div className="h-px bg-gray-200 my-3 mx-5" />
-          <p className="px-5 pb-1.5 text-[10px] font-bold tracking-[0.18em] text-gray-400 m-0">Kategorije</p>
+          <p className="px-5 pb-1.5 text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 m-0">Kategorije</p>
 
           {categories.map((c) => {
             const Icon = CAT_ICONS[c.slug] || Tag

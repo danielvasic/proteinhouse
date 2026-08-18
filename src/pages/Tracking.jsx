@@ -70,7 +70,7 @@ export default function Tracking() {
         <section className="py-12 bg-white min-h-[60vh]">
           <div className="container max-w-[640px]">
             <h1
-              className="text-3xl font-bold text-[#1e272e] mb-2"
+              className="text-3xl font-bold text-[#1e272e] mb-2 uppercase"
               style={DISPLAY}
             >
               Praćenje pošiljke

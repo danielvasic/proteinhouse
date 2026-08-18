@@ -19,3 +19,8 @@ where slug in ('proteini','gaineri','kreatini','aminokiseline','pre-workout','vi
 
 update site_content set value = '{"text": "Besplatna dostava > 100 KM"}' where key = 'footer_shipping';
 update site_content set value = '{"text": "−10% na prvu narudžbu"}'     where key = 'lifetime_banner_text';
+
+-- Top black bar (Notion pod-task): poruke sentence case
+update site_content
+   set value = '{"text": "Besplatna dostava za narudžbe preko 100 KM\n100% sigurna kupovina\nKupi whey od 150 KM → Gorilla tenisice (250 KM) besplatno"}'
+ where key = 'news_bar_messages';

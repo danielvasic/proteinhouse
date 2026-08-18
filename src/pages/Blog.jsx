@@ -44,7 +44,7 @@ export default function Blog() {
               <span className="text-[10px] font-bold tracking-[0.22em] text-gray-400">Savjeti i vijesti</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-[#1e272e]"
+              className="text-4xl md:text-5xl font-bold text-[#1e272e] uppercase"
               style={DISPLAY}
             >
               Blog

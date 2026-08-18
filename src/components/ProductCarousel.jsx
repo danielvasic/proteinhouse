@@ -34,7 +34,7 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
               <p className="text-[10px] font-bold tracking-[0.22em] text-gray-400 mb-2">{eyebrow}</p>
             )}
             <h2
-              className="text-2xl md:text-3xl font-bold text-[#1e272e] leading-tight"
+              className="text-2xl md:text-3xl font-bold text-[#1e272e] leading-tight uppercase"
               style={DISPLAY}
             >
               {title}
