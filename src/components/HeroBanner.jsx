@@ -121,7 +121,11 @@ export default function HeroBanner() {
           <div className="flex flex-wrap gap-3">
             {b.cta_primary_text && (
               <button
-                className="ph-cta flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] transition-colors duration-150 cursor-pointer"
+                // Boja po baneru (Admin → Hero baneri): plava je standard,
+                // crvena samo za izuzetno važne akcije — Notion odluka.
+                className={`${b.cta_style === 'crveni'
+                  ? 'bg-[#ff4103] hover:bg-[#e03903] text-white border-0'
+                  : 'ph-cta'} flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] transition-colors duration-150 cursor-pointer`}
                 style={BODY}
                 onClick={() => navigate(b.cta_primary_link || '/kategorija/akcija')}
               >
