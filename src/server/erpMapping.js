@@ -156,3 +156,29 @@ export function toErpArticle(a) {
     missing_since:    null,
   }
 }
+
+/**
+ * Automatski prijedlog DODATNIH kategorija ("best educated guess").
+ *
+ * Pravila po ključnim riječima u nazivu/grupi — deterministična, besplatna i
+ * objašnjiva: uvijek se zna zašto je proizvod negdje upao. Njihov primjer
+ * "svi whey proteini po defaultu idu u mršanje" je prvo pravilo. Za slučajeve
+ * koje pravila ne hvataju postoji AI prijedlog u adminu (suggest-categories).
+ */
+const EXTRA_CATEGORY_RULES = [
+  { re: /whey|izolat|isolate|kazein|casein/i,                        cats: ['mrsavljenje'] },
+  { re: /\bcla\b|karnitin|carnitin|sagorjev|fat\s*burner|keto|dijet/i, cats: ['mrsavljenje'] },
+  { re: /kreatin|creatine|pre\s*-?work|pump\b/i,                     cats: ['performanse'] },
+  { re: /vitamin|mineral|omega|\bzma\b|magnezij|magnesium|cink|zinc|kolagen|collagen/i, cats: ['vitamini'] },
+]
+
+/** @returns {string[]} slugovi dodatnih kategorija, bez primarne */
+export function suggestExtraCategories(name, groupName, primarySlug) {
+  const hay = `${name || ''} ${groupName || ''}`
+  const out = new Set()
+  for (const { re, cats } of EXTRA_CATEGORY_RULES) {
+    if (re.test(hay)) cats.forEach((c) => out.add(c))
+  }
+  out.delete(primarySlug)
+  return [...out]
+}

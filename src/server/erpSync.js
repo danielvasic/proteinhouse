@@ -16,7 +16,7 @@
  * artikala, pa nema načina da se iz podataka zaključi šta smije na web.
  */
 import { serviceClient } from './supabaseAdmin.js'
-import { toErpArticle, sellPrice, slugify, stripHtml, splitUsage } from './erpMapping.js'
+import { toErpArticle, sellPrice, slugify, stripHtml, splitUsage, suggestExtraCategories } from './erpMapping.js'
 
 export const ERP_API = 'https://proteinhouse-api.work/api/Artikli/GetAllProducts'
 
@@ -155,6 +155,7 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
       description,
       usage_instructions: usage,
       category:       first.category_slug || 'proteini',
+      extra_categories: suggestExtraCategories(first.name, first.group_name, first.category_slug || 'proteini'),
       flavors,
       sizes,
       tags,

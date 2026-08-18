@@ -45,6 +45,8 @@ export function norm(p) {
                        .filter((entry) => entry.src),
     badge:          p.badge  || null,
     cat:            p.category ?? p.cat,
+    // Sve kategorije proizvoda: primarna + dodatne (visestruka pripadnost)
+    cats:           [p.category ?? p.cat, ...(Array.isArray(p.extra_categories) ? p.extra_categories : [])].filter(Boolean),
     description:    p.description || '',
     flavors:        Array.isArray(p.flavors) ? p.flavors : [],
     sizes:          Array.isArray(p.sizes)   ? p.sizes   : [],
@@ -135,7 +137,7 @@ export function useAllProducts() {
 export function useProductsByCategory(slug) {
   const { products, loading } = useAllProducts()
   const filtered = useMemo(
-    () => products.filter((p) => p.cat === slug),
+    () => products.filter((p) => p.cats.includes(slug)),
     [products, slug]
   )
   return { products: filtered, loading }
