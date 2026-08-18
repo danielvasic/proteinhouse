@@ -42,7 +42,7 @@ export const CATEGORY_MAP = {
 export const PRICE_SOURCE = 'cijena'
 
 /** Prefiksi brenda u nazivu artikla — skidaju se da se brend ne ponavlja. */
-const BRAND_PREFIX = ['ON', 'OST', 'BSN', 'BF', 'SW', 'MUTANT', 'PG', 'AN', 'MT']
+const BRAND_PREFIX = ['ON', 'OST', 'BSN', 'BF', 'SW', 'MUTANT', 'PG', 'AN', 'MT', 'GW', 'ISY']
 const UNIT_RE = /^(g|kg|ml|l|caps|tabs|serv|servings|softgels)$/i
 const ACRONYMS = new Set(['BCAA', 'EAA', 'CLA', 'ZMA', 'HMB', 'NO', 'L-CARNITINE'])
 
