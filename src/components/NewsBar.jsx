@@ -3,9 +3,10 @@ import { useSiteContent } from '../hooks/useSiteContent'
 import { BODY } from '../lib/typography'
 
 const DEFAULT_MESSAGES = [
-  'Besplatna dostava za narudžbe preko 100 KM',
   '100% sigurna kupovina',
-  'Kupi whey od 150 KM → Gorilla cipele (250 KM) besplatno',
+  'Besplatna dostava za narudžbe preko 149 KM',
+  // Vico: prag potrošnje, ne "kupi whey" — korpa 150+ KM → GW artikal gratis
+  'Korpa 150+ KM → Gorilla Wear artikal po izboru gratis',
 ]
 
 const ROTATE_MS = 8000
@@ -54,7 +55,7 @@ export default function NewsBar() {
         {messages.map((msg, i) => (
           <p
             key={i}
-            className={`[grid-area:1/1] py-2 m-0 text-center text-[10px] md:text-[11px] font-bold tracking-[0.14em] transition-opacity ease-in-out ${i === current ? 'opacity-100' : 'opacity-0'}`}
+            className={`[grid-area:1/1] py-2 m-0 text-center text-[11px] md:text-[12px] font-bold tracking-[0.14em] transition-opacity ease-in-out ${i === current ? 'opacity-100' : 'opacity-0'}`}
             style={{ ...BODY, transitionDuration: `${FADE_MS}ms` }}
             aria-hidden={i === current ? undefined : true}
           >

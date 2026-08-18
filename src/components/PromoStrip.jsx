@@ -13,7 +13,7 @@ const KEYS = [
 ]
 
 const DEFAULTS = {
-  promo_1_title: 'Besplatna dostava',    promo_1_sub: 'Za narudžbe preko 100 KM',
+  promo_1_title: 'Besplatna dostava',    promo_1_sub: 'Za narudžbe preko 149 KM',
   promo_2_title: '100% sigurna kupovina', promo_2_sub: 'SSL · originalni proizvodi',
   promo_3_title: 'Bodovi lojalnosti',    promo_3_sub: 'Za svaku kupovinu',
   promo_4_title: 'Poklon na izbor',      promo_4_sub: 'Pri svakoj narudžbi',

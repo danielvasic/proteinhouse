@@ -345,7 +345,7 @@ export default function Product() {
                 {/* Trust badges */}
                 <div className="grid grid-cols-2 gap-px bg-gray-200 mt-auto">
                   {[
-                    { Icon: Truck,       icon: 'paket',            title: 'Besplatna dostava', sub: 'Preko 100 KM' },
+                    { Icon: Truck,       icon: 'paket',            title: 'Besplatna dostava', sub: 'Preko 149 KM' },
                     { Icon: ShieldCheck, icon: 'placanje-potvrda', title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
                   ].map(({ Icon, icon, title, sub }) => (
                     <div key={title} className="flex items-center gap-3 bg-[#edf1f5] px-4 py-3">
