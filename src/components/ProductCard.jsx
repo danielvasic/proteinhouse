@@ -33,21 +33,13 @@ function VariantSelect({ label, options, value, onChange }) {
   )
 }
 
-function stickerTilt(id) {
-  const seed = String(id)
-    .split('')
-    .reduce((s, c) => s + c.charCodeAt(0), 0)
-  return ((seed % 11) - 5) - 4
-}
-
 export default function ProductCard({ product, bestseller = false }) {
   const navigate = useNavigate()
   const { addItem } = useCart()
   const [hover, setHover] = useState(false)
 
-  const { id, slug, brand, title, price, old, badge, rating, reviews, tags = [], flavors = [], sizes = [] } = product
+  const { slug, brand, title, price, old, badge, rating, reviews, tags = [], flavors = [], sizes = [] } = product
   const isDiscount   = badge && badge.startsWith('-')
-  const tilt         = useMemo(() => stickerTilt(id), [id])
   const inStock      = hasAnyStock(product)
   const tagChip      = (bestseller && !tags.includes('bestseller'))
     ? TAG_LABELS.bestseller
@@ -69,33 +61,25 @@ export default function ProductCard({ product, bestseller = false }) {
       onMouseLeave={() => setHover(false)}
       onClick={() => navigate(`/proizvod/${slug}`)}
     >
-      {/* Discount sticker */}
+      {/* Popust — horizontalni chip u stilu bestseller taga, samo uži i s većim
+          fontom. Bez naginjanja: nakrivljeni kvadrat je djelovao nekonzistentno
+          ("zašto je jedan normalan, a drugi tiltan") i zauzimao previše prostora. */}
       {isDiscount && (
-        <div
-          className="absolute top-3 left-3 z-10"
-          style={{ transform: `rotate(${tilt}deg)` }}
-          aria-hidden="true"
-        >
-          {/* Vulcan Orange — brand book: "super popusti" idu narančastom, ne plavom */}
-          <div className="w-[50px] h-[50px] bg-[#ff4103] flex items-center justify-center">
-            <span className="text-white text-[11px] font-extrabold tracking-tight text-center leading-tight italic">{badge}</span>
-          </div>
+        <div className="absolute top-3 left-3 z-10 px-2 py-1 bg-[#ff4103] text-white text-[12px] font-extrabold italic leading-none" aria-hidden="true">
+          {badge}
         </div>
       )}
 
       {/* NOVO tag */}
       {badge && !isDiscount && (
-        <div
-          className="absolute top-3 left-3 z-10 px-2 py-0.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.1em] bg-white"
-          style={{ transform: `rotate(${tilt * 0.5}deg)` }}
-        >
+        <div className="absolute top-3 left-3 z-10 px-2 py-0.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.1em] bg-white">
           {badge}
         </div>
       )}
 
       {/* Tag chip (bestseller, new, gainer…) */}
       {tagChip && (
-        <div className={`absolute left-3 z-10 px-2 py-0.5 ${TAG_COLORS[tagChip] ?? TAG_DEFAULT_COLOR} text-[9px] font-bold tracking-[0.1em] ${badge ? 'top-[68px]' : 'top-3'}`}>
+        <div className={`absolute left-3 z-10 px-2 py-0.5 ${TAG_COLORS[tagChip] ?? TAG_DEFAULT_COLOR} text-[9px] font-bold tracking-[0.1em] ${badge ? 'top-[42px]' : 'top-3'}`}>
           {tagChip}
         </div>
       )}

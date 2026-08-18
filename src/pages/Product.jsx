@@ -163,8 +163,8 @@ export default function Product() {
               <div className="relative bg-[#0145F2] flex flex-col items-center p-7 md:p-10 overflow-hidden">
                 <div className="absolute inset-0 ph-pattern opacity-[0.07] pointer-events-none" />
                 {isDiscount && (
-                  <div className="absolute top-5 left-5 w-[52px] h-[52px] bg-[#ff4103] flex items-center justify-center z-10">
-                    <span className="text-white text-[11px] font-extrabold italic text-center leading-tight">{product.badge}</span>
+                  <div className="absolute top-5 left-5 z-10 px-2.5 py-1.5 bg-[#ff4103] text-white text-[13px] font-extrabold italic leading-none">
+                    {product.badge}
                   </div>
                 )}
                 {product.tags?.includes('bestseller') && (
