@@ -10,7 +10,11 @@ const DEFAULT_MESSAGES = [
 ]
 
 const ROTATE_MS = 8000
-const FADE_MS   = 1100
+// Odlazeća poruka blijedi FADE_MS, dolazeća kreće tek nakon FADE_DELAY —
+// bez toga su obje na pola tranzicije istovremeno poluvidljive i slova se
+// na uskom ekranu umrse jedno preko drugog.
+const FADE_MS    = 500
+const FADE_DELAY = 450
 
 /** Iz site_content: string (jedna poruka po redu) ili {items:[…]} */
 function parseMessages(value) {
@@ -23,11 +27,10 @@ function parseMessages(value) {
 /**
  * Crni news bar na samom vrhu — rotira 3–4 poruke (Bulk stil).
  *
- * Tranzicija je pravi crossfade: stara i nova poruka su naslagane jedna preko
- * druge i pretapaju se, pa bar nikad nije prazan. Raniji "izblijedi → zamijeni
- * → pojavi se" je imao prazan međukorak koji je treperio i vukao oko (Notion:
- * "Top bar tranzicija — treba biti suptilnije"). Bez pomjeranja — samo spori
- * fade, ništa se ne kreće.
+ * Tranzicija: poruke su naslagane u isti grid-red; odlazeća izblijedi, a
+ * dolazeća se pojavi s malim zakašnjenjem — pa se tekstovi nikad ne
+ * preklapaju čitljivo, a nema ni tvrdog reza (Notion: "treba biti
+ * suptilnije"). Bez pomjeranja — samo fade.
  */
 export default function NewsBar() {
   const { data } = useSiteContent(['news_bar_messages'], { news_bar_messages: DEFAULT_MESSAGES })
@@ -56,7 +59,11 @@ export default function NewsBar() {
           <p
             key={i}
             className={`[grid-area:1/1] py-2 m-0 text-center text-[11px] md:text-[12px] font-bold tracking-[0.14em] transition-opacity ease-in-out ${i === current ? 'opacity-100' : 'opacity-0'}`}
-            style={{ ...BODY, transitionDuration: `${FADE_MS}ms` }}
+            style={{
+              ...BODY,
+              transitionDuration: `${FADE_MS}ms`,
+              transitionDelay: i === current ? `${FADE_DELAY}ms` : '0ms',
+            }}
             aria-hidden={i === current ? undefined : true}
           >
             {msg}
