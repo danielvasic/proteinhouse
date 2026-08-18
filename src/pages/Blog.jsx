@@ -41,7 +41,7 @@ export default function Blog() {
           <div className="container py-10 md:py-14">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-10 bg-gray-300" />
-              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Savjeti i vijesti</span>
+              <span className="text-[10px] font-bold tracking-[0.22em] text-gray-400">Savjeti i vijesti</span>
             </div>
             <h1
               className="text-4xl md:text-5xl font-bold text-[#1e272e] uppercase"
@@ -61,7 +61,7 @@ export default function Blog() {
               </div>
             ) : posts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-                <p className="text-[15px] font-bold text-[#1e272e] uppercase" style={DISPLAY}>
+                <p className="text-[15px] font-bold text-[#1e272e]" style={DISPLAY}>
                   Nema objavljenih postova
                 </p>
                 <p className="text-[13px] text-gray-400">Uskoro dolaze novi sadržaji.</p>
@@ -94,7 +94,7 @@ export default function Blog() {
                         {post.author && <> · {post.author}</>}
                       </p>
                       <h2
-                        className="text-[18px] font-bold text-[#1e272e] leading-snug mb-3 uppercase"
+                        className="text-[18px] font-bold text-[#1e272e] leading-snug mb-3"
                         style={DISPLAY}
                       >
                         {post.title}
@@ -104,7 +104,7 @@ export default function Blog() {
                       )}
                       <Link
                         to={`/blog/${post.slug}`}
-                        className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase text-[#1e272e] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity duration-150"
+                        className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-[#1e272e] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity duration-150"
                       >
                         Pročitaj više <ArrowRight size={12} weight="bold" />
                       </Link>

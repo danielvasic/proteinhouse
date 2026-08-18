@@ -6,7 +6,7 @@ import {
   ShoppingCart, House, CaretRight,
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
-import { getCategoryBySlug, fmtKM } from '../data/catalog'
+import { getCategoryBySlug, fmtKM, discountChipClass } from '../data/catalog'
 import { useProduct, getVariantStock } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
 import BrandIcon from '../components/BrandIcon'
@@ -31,7 +31,7 @@ function VariantSelector({ label, options, value, onChange }) {
   if (!options?.length) return null
   return (
     <div className="mb-6">
-      <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">{label}</p>
+      <p className="text-[10px] font-bold tracking-[0.16em] text-gray-400 mb-3">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((opt) => (
           <button
@@ -163,12 +163,12 @@ export default function Product() {
               <div className="relative bg-[#0145F2] flex flex-col items-center p-7 md:p-10 overflow-hidden">
                 <div className="absolute inset-0 ph-pattern opacity-[0.07] pointer-events-none" />
                 {isDiscount && (
-                  <div className="absolute top-5 left-5 w-[52px] h-[52px] bg-[#ff4103] flex items-center justify-center z-10">
-                    <span className="text-white text-[11px] font-extrabold italic text-center leading-tight">{product.badge}</span>
+                  <div className={`absolute top-5 left-5 z-10 px-2.5 py-1.5 ${discountChipClass(product.badge)} text-[13px] font-extrabold italic leading-none`}>
+                    {product.badge}
                   </div>
                 )}
                 {product.tags?.includes('bestseller') && (
-                  <div className="absolute top-5 right-5 z-10 px-3 py-1.5 bg-[#1e272e] text-white text-[10px] font-bold tracking-[0.14em] uppercase ">
+                  <div className="absolute top-5 right-5 z-10 px-3 py-1.5 bg-[#1e272e] text-white text-[10px] font-bold tracking-[0.14em] ">
                     Bestseller
                   </div>
                 )}
@@ -219,7 +219,7 @@ export default function Product() {
                         >
                           {s.value}
                         </p>
-                        <p className="text-[11px] md:text-[14px] font-bold uppercase tracking-[0.12em] text-white/60 mt-2 m-0">{s.label}</p>
+                        <p className="text-[11px] md:text-[14px] font-bold tracking-[0.12em] text-white/60 mt-2 m-0">{s.label}</p>
                         {s.sub && <p className="text-[11px] md:text-[13px] font-semibold mt-0.5 m-0">{s.sub}</p>}
                       </div>
                     ))}
@@ -230,9 +230,9 @@ export default function Product() {
               {/* Info */}
               <div className="bg-white border border-gray-200 p-7 md:p-10 flex flex-col">
 
-                <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-2">{product.brand}</p>
+                <p className="text-[10px] font-bold tracking-[0.18em] text-gray-400 mb-2">{product.brand}</p>
                 <h1
-                  className="text-2xl md:text-3xl font-bold text-[#1e272e] uppercase leading-tight mb-4"
+                  className="text-2xl md:text-3xl font-bold text-[#1e272e] leading-tight mb-4"
                   style={DISPLAY}
                 >
                   {product.title}
@@ -261,19 +261,19 @@ export default function Product() {
                   {outOfStock ? (
                     <>
                       <div className="w-2 h-2 rounded-full bg-red-500" />
-                      <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-red-500">Nema na stanju</span>
+                      <span className="text-[11px] font-bold tracking-[0.1em] text-red-500">Nema na stanju</span>
                     </>
                   ) : lowStock ? (
                     <>
                       <div className="w-2 h-2 rounded-full bg-amber-500" />
-                      <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-amber-600">
+                      <span className="text-[11px] font-bold tracking-[0.1em] text-amber-600">
                         Malo na stanju · još {currentStock} kom
                       </span>
                     </>
                   ) : (
                     <>
                       <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-gray-500">
+                      <span className="text-[11px] font-bold tracking-[0.1em] text-gray-500">
                         Na stanju · Isporuka 1–3 dana
                       </span>
                     </>
@@ -322,7 +322,7 @@ export default function Product() {
                   </div>
 
                   <button
-                    className={`order-3 sm:order-2 w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-2.5 py-3.5 sm:py-3 text-[12px] sm:text-[11px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 border-0 ${
+                    className={`order-3 sm:order-2 w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-2.5 py-3.5 sm:py-3 text-[12px] sm:text-[11px] font-bold tracking-[0.1em] transition-colors duration-150 border-0 ${
                       outOfStock
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         : 'ph-cta cursor-pointer'
@@ -345,7 +345,7 @@ export default function Product() {
                 {/* Trust badges */}
                 <div className="grid grid-cols-2 gap-px bg-gray-200 mt-auto">
                   {[
-                    { Icon: Truck,       icon: 'paket',            title: 'Besplatna dostava', sub: 'Preko 100 KM' },
+                    { Icon: Truck,       icon: 'paket',            title: 'Besplatna dostava', sub: 'Preko 149 KM' },
                     { Icon: ShieldCheck, icon: 'placanje-potvrda', title: 'Sigurna kupovina',  sub: 'SSL + originalni' },
                   ].map(({ Icon, icon, title, sub }) => (
                     <div key={title} className="flex items-center gap-3 bg-[#edf1f5] px-4 py-3">
@@ -384,7 +384,7 @@ export default function Product() {
               </p>
             </div>
             <button
-              className={`shrink-0 flex items-center gap-2 px-6 py-3 text-[11px] font-bold tracking-[0.1em] uppercase border-0 ${
+              className={`shrink-0 flex items-center gap-2 px-6 py-3 text-[11px] font-bold tracking-[0.1em] border-0 ${
                 outOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'ph-cta cursor-pointer'
               }`}
               onClick={handleAdd}
@@ -421,7 +421,7 @@ function DescriptionTabs({ product }) {
           {tabs.map((t) => (
             <button
               key={t.key}
-              className={`shrink-0 px-5 py-3 text-[11px] font-bold tracking-[0.1em] uppercase bg-transparent border-0 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
+              className={`shrink-0 px-5 py-3 text-[11px] font-bold tracking-[0.1em] bg-transparent border-0 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
                 t.key === current.key
                   ? 'border-[#0145F2] text-[#1e272e]'
                   : 'border-transparent text-gray-400 hover:text-[#0145F2]'

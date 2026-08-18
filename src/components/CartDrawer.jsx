@@ -46,7 +46,7 @@ export default function CartDrawer() {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-          <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-[#1e272e]">
+          <h2 className="text-[11px] font-bold tracking-[0.16em] text-[#1e272e]">
             Korpa · {items.length} {items.length === 1 ? 'artikal' : 'artikala'}
           </h2>
           <button
@@ -78,7 +78,7 @@ export default function CartDrawer() {
                     <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0 pr-5">
-                    <p className="text-[10px] font-bold tracking-[0.12em] uppercase text-gray-400 mb-0.5">{item.brand}</p>
+                    <p className="text-[10px] font-bold tracking-[0.12em] text-gray-400 mb-0.5">{item.brand}</p>
                     <p className="text-[12px] font-semibold text-[#1e272e] leading-snug line-clamp-2 mb-2">{item.title}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] text-gray-400">{item.qty} × {fmtKM(item.price)}</span>
@@ -120,21 +120,21 @@ export default function CartDrawer() {
 
           {/* Total */}
           <div className="flex items-center justify-between py-1">
-            <span className="text-[11px] font-bold tracking-[0.12em] uppercase text-gray-400">Ukupno</span>
+            <span className="text-[11px] font-bold tracking-[0.12em] text-gray-400">Ukupno</span>
             <span className="text-xl font-bold text-[#1e272e]" style={NUMERIC}>
               {fmtKM(totalPrice)}
             </span>
           </div>
 
           <button
-            className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors duration-150 cursor-pointer"
+            className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.12em] transition-colors duration-150 cursor-pointer"
             disabled={items.length === 0}
             onClick={() => { closeDrawer(); navigate('/checkout') }}
           >
             Nastavi do plaćanja
           </button>
           <button
-            className="w-full py-3 border border-gray-300 text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:border-gray-400 transition-colors duration-150 cursor-pointer bg-transparent"
+            className="w-full py-3 border border-gray-300 text-[#1e272e] text-[11px] font-bold tracking-[0.1em] hover:border-gray-400 transition-colors duration-150 cursor-pointer bg-transparent"
             onClick={closeDrawer}
           >
             Nastavi kupovinu

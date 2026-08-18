@@ -9,12 +9,16 @@
  * obilazak svakog fajla.
  */
 
-/** Naslovi i istaknuti brend-tekst */
+/**
+ * Naslovi i istaknuti brend-tekst.
+ * Bez textTransform: brand book propisuje UPPERCASE, ali je klijent izričito
+ * tražio uklanjanje ALL CAPS-a (ProteinHouse TO-DO: "Lowercase — Uklanjamo
+ * ALL CAPS"). Naslov se sada piše onako kako je unesen u sadržaju.
+ */
 export const DISPLAY = {
   fontFamily: "'Inter', system-ui, sans-serif",
   fontWeight: 800,
   fontStyle: 'italic',
-  textTransform: 'uppercase',
   letterSpacing: '-0.01em',
 }
 

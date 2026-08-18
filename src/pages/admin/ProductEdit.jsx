@@ -21,6 +21,7 @@ const EMPTY = {
   usage_instructions: '', composition: '', nutrition_info: '',
   hero_stats: [],
   addons: [], // [{ product_id, price }] — one-click dodaci u korpi
+  extra_categories: [], // dodatne kategorije — proizvod se prikazuje i u njima
 }
 
 const DESCRIPTION_FIELDS = ['description', 'usage_instructions', 'composition', 'nutrition_info']
@@ -308,6 +309,7 @@ export default function ProductEdit() {
         nutrition_info:     data.nutrition_info     ?? '',
         hero_stats:         Array.isArray(data.hero_stats) ? data.hero_stats : [],
         addons:             Array.isArray(data.addons)     ? data.addons     : [],
+        extra_categories:   Array.isArray(data.extra_categories) ? data.extra_categories : [],
       })
       setLoading(false)
     })
@@ -403,6 +405,37 @@ export default function ProductEdit() {
       return { ...f, images: next }
     })
 
+  const [suggesting, setSuggesting] = useState(false)
+
+  /** AI prijedlog dodatnih kategorija — označi checkboxove, admin snima. */
+  const suggestCats = async () => {
+    if (!form.title.trim()) { setAiError('Unesite naziv proizvoda prije prijedloga kategorija.'); return }
+    setAiError('')
+    setSuggesting(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/suggest-categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          brand: form.brand, title: form.title, description: form.description,
+          categories: categories.map((c) => ({ slug: c.slug, label: c.label })),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || `Greška ${res.status}`)
+      const extra = (data.slugs || []).filter((s) => s !== form.category)
+      setForm((f) => ({ ...f, extra_categories: [...new Set([...f.extra_categories, ...extra])] }))
+    } catch (err) {
+      setAiError(err.message)
+    } finally {
+      setSuggesting(false)
+    }
+  }
+
   /** Sve moguce oznake varijanti za tagovanje slike: pojedinacni okusi i gramaze */
   const variantOptions = useMemo(
     () => [...(form.flavors || []), ...(form.sizes || [])],
@@ -487,6 +520,47 @@ export default function ProductEdit() {
                 </SelectContent>
               </Select>
             </Field>
+          </CardContent>
+        </Card>
+
+        {/* ── Dodatne kategorije ── */}
+        <Card>
+          <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Dodatne kategorije</CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                Proizvod se prikazuje i u ovim kategorijama, uz primarnu. Npr. whey može ići i u Mršavljenje.
+              </p>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={suggestCats} disabled={suggesting}
+              className="flex items-center gap-1.5 shrink-0 text-violet-600 border-violet-200 hover:bg-violet-50">
+              {suggesting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+              {suggesting ? 'Predlaže…' : 'AI predloži'}
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {categories.filter((c) => c.slug !== form.category).map((c) => {
+                const on = form.extra_categories.includes(c.slug)
+                return (
+                  <button
+                    key={c.slug}
+                    type="button"
+                    onClick={() => setForm((f) => ({
+                      ...f,
+                      extra_categories: on
+                        ? f.extra_categories.filter((s) => s !== c.slug)
+                        : [...f.extra_categories, c.slug],
+                    }))}
+                    className={`px-3 py-1.5 rounded-lg border text-sm cursor-pointer transition-colors ${
+                      on ? 'border-primary bg-primary/10 text-primary font-medium' : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                )
+              })}
+            </div>
           </CardContent>
         </Card>
 

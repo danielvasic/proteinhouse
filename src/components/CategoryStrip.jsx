@@ -31,7 +31,7 @@ export default function CategoryStrip() {
         <div className="flex items-center gap-4 mb-6">
           <div className="h-px flex-1 bg-gray-200" />
           <span
-            className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400"
+            className="text-[10px] font-bold tracking-[0.22em] text-gray-400"
             style={BODY}
           >
             Istraži kolekcije
@@ -56,7 +56,7 @@ export default function CategoryStrip() {
             >
               {b.tag && (
                 <span
-                  className="absolute top-4 left-4 px-2.5 py-1 border border-white/50 text-white text-[10px] font-bold tracking-[0.14em] uppercase"
+                  className="absolute top-4 left-4 px-2.5 py-1 border border-white/50 text-white text-[10px] font-bold tracking-[0.14em]"
                   style={BODY}
                 >
                   {b.tag}
@@ -65,7 +65,7 @@ export default function CategoryStrip() {
 
               <div className="p-5 transition-transform duration-300 group-hover:-translate-y-1">
                 <h3
-                  className="text-2xl md:text-3xl font-bold text-white leading-tight mb-1 uppercase"
+                  className="text-2xl md:text-3xl font-bold text-white leading-tight mb-1"
                   style={DISPLAY}
                 >
                   {b.title}
@@ -74,7 +74,7 @@ export default function CategoryStrip() {
                   <p className="text-white/60 text-[12px] mb-4">{b.subtitle}</p>
                 )}
                 {b.cta_text && (
-                  <div className="flex items-center gap-2 text-white text-[11px] font-bold tracking-[0.12em] uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="flex items-center gap-2 text-white text-[11px] font-bold tracking-[0.12em] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     {b.cta_text} <ArrowRight size={12} weight="bold" />
                   </div>
                 )}

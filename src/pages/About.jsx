@@ -61,10 +61,10 @@ export default function About() {
           <div className="container pb-12 md:pb-16 relative">
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-white/35" />
-              <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/55">Naša priča</span>
+              <span className="text-[11px] font-bold tracking-[0.22em] text-white/55">Naša priča</span>
             </div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-white uppercase leading-tight"
+              className="text-4xl md:text-5xl font-bold text-white leading-tight uppercase"
               style={DISPLAY}
             >
               O nama
@@ -95,7 +95,7 @@ export default function About() {
                     >
                       {s.value}
                     </span>
-                    <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-white/45">{s.label}</span>
+                    <span className="text-[11px] font-bold tracking-[0.14em] text-white/45">{s.label}</span>
                   </div>
                 ))}
               </div>
@@ -108,7 +108,7 @@ export default function About() {
           <div className="container">
             <div className="flex items-center gap-4 mb-10">
               <div className="h-px flex-1 bg-gray-200" />
-              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Naše vrijednosti</span>
+              <span className="text-[10px] font-bold tracking-[0.22em] text-gray-400">Naše vrijednosti</span>
               <div className="h-px flex-1 bg-gray-200" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-gray-200">
@@ -116,7 +116,7 @@ export default function About() {
                 <div key={title} className="bg-white p-8">
                   <Icon size={26} weight="duotone" color="#0145F2" className="mb-5 opacity-70" />
                   <h3
-                    className="text-[15px] font-bold text-[#1e272e] mb-3 uppercase"
+                    className="text-[15px] font-bold text-[#1e272e] mb-3"
                     style={DISPLAY}
                   >
                     {title}
@@ -134,7 +134,7 @@ export default function About() {
             <div className="container">
               <div className="flex items-center gap-4 mb-10">
                 <div className="h-px flex-1 bg-gray-200" />
-                <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">
+                <span className="text-[10px] font-bold tracking-[0.22em] text-gray-400">
                   {stores.length === 1 ? 'Naša poslovnica' : 'Naše poslovnice'}
                 </span>
                 <div className="h-px flex-1 bg-gray-200" />
@@ -146,7 +146,7 @@ export default function About() {
                 {stores.map((s) => (
                   <div key={s.id} className="bg-white p-8">
                     <h3
-                      className="text-xl font-bold text-[#1e272e] mb-5 uppercase"
+                      className="text-xl font-bold text-[#1e272e] mb-5"
                       style={DISPLAY}
                     >
                       {s.city}
@@ -181,7 +181,7 @@ export default function About() {
                           href={s.map_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] uppercase text-[#1e272e] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity mt-1"
+                          className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] text-[#1e272e] border-b border-[#0145F2] pb-px w-fit hover:opacity-60 transition-opacity mt-1"
                         >
                           <MapPin size={11} /> Prikaži na mapi
                         </a>

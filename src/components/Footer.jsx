@@ -16,7 +16,7 @@ function FooterColumn({ col }) {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
       >
-        <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/35 m-0 md:mb-5">
+        <h4 className="text-[10px] font-bold tracking-[0.2em] text-white/35 m-0 md:mb-5">
           {col.heading}
         </h4>
         <CaretDown
@@ -56,7 +56,7 @@ const SOCIAL_ICONS = {
 const DEFAULT_COLUMNS = {
   columns: [
     {
-      heading: 'INFORMACIJE',
+      heading: 'Informacije',
       links: [
         { label: 'O nama',               to: '/o-nama' },
         { label: 'Kontakt',              to: '/kontakt' },
@@ -66,7 +66,7 @@ const DEFAULT_COLUMNS = {
       ],
     },
     {
-      heading: 'NALOG',
+      heading: 'Nalog',
       links: [
         { label: 'Prijava',       to: '/nalog' },
         { label: 'Registracija',  to: '/nalog/registracija' },
@@ -74,7 +74,7 @@ const DEFAULT_COLUMNS = {
       ],
     },
     {
-      heading: 'PRODAVNICA',
+      heading: 'Prodavnica',
       links: [
         { label: 'Praćenje pošiljke', to: '/pracenje' },
         { label: 'Dostava',           to: '/dostava' },
@@ -184,7 +184,7 @@ export default function Footer() {
                     >
                       {Icon
                         ? <Icon size={17} weight="fill" />
-                        : <span className="text-[10px] font-bold uppercase">{(network || '?').slice(0, 2)}</span>
+                        : <span className="text-[10px] font-bold">{(network || '?').slice(0, 2)}</span>
                       }
                     </a>
                   )

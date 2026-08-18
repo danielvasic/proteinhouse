@@ -12,7 +12,7 @@ const inputCls = 'w-full border border-gray-300 pl-10 pr-4 py-3.5 text-[13px] te
 function Field({ label, children }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-500">{label}</label>
+      <label className="text-[10px] font-bold tracking-[0.16em] text-gray-500">{label}</label>
       {children}
     </div>
   )
@@ -114,7 +114,7 @@ export default function Login() {
           <div className="w-full max-w-[440px]">
             <div className="mb-8 text-center">
               <UserCircle size={52} weight="duotone" className="text-[#0145F2] mx-auto mb-3" />
-              <h1 className="text-3xl font-bold text-[#1e272e] uppercase" style={DISPLAY}>
+              <h1 className="text-3xl font-bold text-[#1e272e]" style={DISPLAY}>
                 Moj nalog
               </h1>
               <p className="text-[13px] text-gray-500 mt-2">
@@ -125,20 +125,20 @@ export default function Login() {
             <div className="bg-white border border-gray-200 p-6 space-y-3">
               {admin && (
                 <button
-                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0136C4] transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#0145F2] text-white border-0 text-[11px] font-bold tracking-[0.12em] hover:bg-[#0136C4] transition-colors cursor-pointer"
                   onClick={() => navigate('/admin')}
                 >
                   <ShieldCheck size={15} weight="fill" /> Administracija
                 </button>
               )}
               <button
-                className="w-full flex items-center justify-center gap-2 py-3.5 border border-[#0145F2] text-[#0145F2] bg-transparent text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-3.5 border border-[#0145F2] text-[#0145F2] bg-transparent text-[11px] font-bold tracking-[0.12em] hover:bg-[#0145F2] hover:text-white transition-all cursor-pointer"
                 onClick={() => navigate('/pracenje')}
               >
                 <Package size={15} /> Praćenje pošiljke
               </button>
               <button
-                className="w-full flex items-center justify-center gap-2 py-3.5 border border-gray-300 text-gray-500 bg-transparent text-[11px] font-bold tracking-[0.12em] uppercase hover:border-gray-400 transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-3.5 border border-gray-300 text-gray-500 bg-transparent text-[11px] font-bold tracking-[0.12em] hover:border-gray-400 transition-colors cursor-pointer"
                 onClick={handleSignOut}
               >
                 <SignOut size={15} /> Odjava
@@ -168,13 +168,13 @@ export default function Login() {
           <div className="mb-8 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="h-px w-8 bg-gray-300" />
-              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">
+              <span className="text-[10px] font-bold tracking-[0.22em] text-gray-400">
                 {isRegister ? 'Novi nalog' : 'Dobrodošli nazad'}
               </span>
               <div className="h-px w-8 bg-gray-300" />
             </div>
             <h1
-              className="text-3xl font-bold text-[#1e272e] uppercase"
+              className="text-3xl font-bold text-[#1e272e]"
               style={DISPLAY}
             >
               {isRegister ? 'Registracija' : 'Prijava'}
@@ -217,7 +217,7 @@ export default function Login() {
                     <input className={inputCls} type="password" placeholder="••••••••" autoComplete="new-password" value={form.confirmPassword} onChange={set('confirmPassword')} required />
                   </InputWrap>
                 </Field>
-                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
+                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] hover:bg-[#0136C4] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
                   {loading ? 'Kreiranje naloga…' : 'Kreiraj nalog'}
                 </button>
               </form>
@@ -242,7 +242,7 @@ export default function Login() {
                     Zaboravljena šifra?
                   </Link>
                 </div>
-                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
+                <button type="submit" disabled={loading} className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] hover:bg-[#0136C4] disabled:opacity-50 transition-colors duration-150 cursor-pointer border-0">
                   {loading ? 'Prijavljivanje…' : 'Prijavi se'}
                 </button>
               </form>
@@ -259,17 +259,17 @@ export default function Login() {
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 border border-gray-300 text-[#1e272e] bg-white text-[12px] font-bold uppercase tracking-[0.06em] hover:border-gray-400 hover:bg-gray-50 transition-all duration-150 cursor-pointer mb-6"
+              className="w-full flex items-center justify-center gap-2.5 py-3.5 border border-gray-300 text-[#1e272e] bg-white text-[12px] font-bold tracking-[0.06em] hover:border-gray-400 hover:bg-gray-50 transition-all duration-150 cursor-pointer mb-6"
             >
               <GoogleLogo size={17} weight="bold" /> Nastavi preko Google-a
             </button>
 
             {isRegister ? (
-              <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
+              <Link to="/nalog" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.12em] hover:bg-[#0145F2] hover:text-white transition-all duration-150">
                 Imam nalog — Prijavi se
               </Link>
             ) : (
-              <Link to="/nalog/registracija" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150">
+              <Link to="/nalog/registracija" className="block w-full text-center py-3.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.12em] hover:bg-[#0145F2] hover:text-white transition-all duration-150">
                 Kreiraj nalog
               </Link>
             )}

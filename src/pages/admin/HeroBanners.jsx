@@ -11,7 +11,7 @@ import { Badge } from '../../components/ui/badge'
 
 const EMPTY = {
   eyebrow: '', title_lines: '', subtitle: '',
-  cta_primary_text: '', cta_primary_link: '/kategorija/akcija',
+  cta_primary_text: '', cta_primary_link: '/kategorija/akcija', cta_style: 'plavi',
   cta_secondary_text: '', cta_secondary_link: '/kategorija/proteini',
   image_url: '', sort_order: 0, is_active: false,
 }
@@ -109,6 +109,23 @@ function BannerForm({ item, onSave, onCancel }) {
           </Field>
           <Field label="Primarno dugme — link">
             <Input value={form.cta_primary_link} onChange={set('cta_primary_link')} placeholder="/kategorija/akcija" />
+          </Field>
+          <Field label="Primarno dugme — boja" hint="Plava je standard. Crvenu koristimo samo za izuzetno važne akcije — ako je sve crveno, ništa nije važno.">
+            <div className="flex gap-2">
+              {[['plavi', 'Plava', '#0145f2'], ['crveni', 'Crvena', '#ff4103']].map(([val, label, hex]) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, cta_style: val }))}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-colors ${
+                    (form.cta_style ?? 'plavi') === val ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <span className="w-3.5 h-3.5 rounded-full inline-block" style={{ background: hex }} />
+                  {label}
+                </button>
+              ))}
+            </div>
           </Field>
           <Field label="Sekundarno dugme — tekst">
             <Input value={form.cta_secondary_text} onChange={set('cta_secondary_text')} placeholder="Svi proteini" />

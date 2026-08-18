@@ -50,7 +50,7 @@ export default function CartAddons() {
 
   return (
     <div className="border-t border-gray-100 px-4 py-4 bg-[#edf1f5]">
-      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-3">
+      <p className="text-[10px] font-bold tracking-[0.14em] text-gray-400 mb-3">
         Dodaj uz narudžbu
       </p>
       <div className="space-y-2">

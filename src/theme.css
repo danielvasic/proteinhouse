@@ -222,24 +222,38 @@ img {
 }
 @media (max-width: 767px) { .ph-pattern { background-size: 48px 48px; } }
 
-/* Glavni CTA — Vulcan Orange.
-   Brand book 2026: narančasta je za "važna i energična naglašavanja — super
-   popusti, CTAs". Drži se za akcije koje vode do kupovine (dodaj u korpu,
-   nastavi do plaćanja, potvrdi narudžbu); plava ostaje za navigaciju,
-   filtere i pomoćne radnje da narančasta ne izgubi udarnost.
+/* Glavni CTA.
+   Brand book 2026 narančastu daje za "super popuste i CTAs", ali je klijent
+   izričito tražio da "Dodaj u korpu" bude PLAV ("NE želimo crvenu",
+   ProteinHouse TO-DO). Narančasta ostaje samo na popustima — sticker na
+   kartici, snižena cijena, lifetime banner — gdje nije bilo primjedbi.
    Boja je ovdje, a ne u Tailwind klasama, da CTA bude jedan pojam na
    jednom mjestu. */
 .ph-cta {
-  background: var(--ph-vulcan-orange);
+  background: var(--ph-electric-blue);
   color: #ffffff;
   border: 0;
 }
-.ph-cta:hover:not(:disabled) { background: #e03903; }
+.ph-cta:hover:not(:disabled) { background: #0136C4; }
 .ph-cta:disabled {
   background: var(--ph-gray-200);
   color: var(--ph-gray-500);
   cursor: not-allowed;
 }
+/* Alternativne varijante iz Notion taska "CTA — solid ili outline"
+   (poredjenje: claude.ai/code/artifact/8941315d-10f2-45ba-af56-4fa7e3aa1c0d).
+   Kad se odluci, zamijeni pravila u .ph-cta gore ovim blokom:
+
+   V2 — outline, plava slova:
+     background: #fff; color: var(--ph-electric-blue);
+     border: 1px solid var(--ph-electric-blue);
+     hover → background: var(--ph-electric-blue); color: #fff;
+
+   V3 — outline, crna slova:
+     background: #fff; color: var(--ph-night-black);
+     border: 1px solid var(--ph-electric-blue);
+     hover → background: var(--ph-electric-blue); color: #fff;
+*/
 
 /* Focus visible ring */
 :focus-visible {

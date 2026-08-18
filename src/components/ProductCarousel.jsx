@@ -31,7 +31,7 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
         <div className="flex items-end justify-between mb-8 gap-4">
           <div>
             {eyebrow && (
-              <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400 mb-2">{eyebrow}</p>
+              <p className="text-[10px] font-bold tracking-[0.22em] text-gray-400 mb-2">{eyebrow}</p>
             )}
             <h2
               className="text-2xl md:text-3xl font-bold text-[#1e272e] leading-tight uppercase"
@@ -50,7 +50,7 @@ export default function ProductCarousel({ title, eyebrow, products, categorySlug
             </button>
             {categorySlug && (
               <button
-                className="hidden sm:flex items-center gap-2 px-5 py-2.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer ml-1"
+                className="hidden sm:flex items-center gap-2 px-5 py-2.5 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer ml-1"
                 onClick={() => navigate(`/kategorija/${categorySlug}`)}
               >
                 Pogledaj sve →

@@ -134,3 +134,51 @@ export async function generateProductCopy(input) {
   }
   return result
 }
+
+/**
+ * AI prijedlog kategorija za jedan proizvod (Admin → Proizvodi → uredi).
+ * Vraća slugove IZ ZADANE liste — model ne smije izmišljati kategorije.
+ * Pravila iz erpMapping.js hvataju očite slučajeve besplatno; ovo je za
+ * ostatak ("best educated guess" na zahtjev klijenta).
+ */
+export async function suggestCategoriesAI({ brand, title, description, categories }) {
+  if (!title?.trim() || !Array.isArray(categories) || !categories.length) {
+    throw Object.assign(new Error('Potreban je naziv proizvoda i lista kategorija.'), { code: 'BAD_INPUT' })
+  }
+  const modelId = process.env.BEDROCK_MODEL_ID || DEFAULT_MODEL_ID
+  const prompt = [
+    `Proizvod iz online shopa suplemenata: ${brand || ''} ${title}`.trim(),
+    description?.trim() ? `Opis: ${description.trim().slice(0, 500)}` : null,
+    '',
+    'Dostupne kategorije (slug — naziv):',
+    ...categories.map((c) => `- ${c.slug} — ${c.label}`),
+    '',
+    'U koje SVE kategorije ovaj proizvod logično pripada? Uključi i sekundarne',
+    '(npr. whey protein pripada i u mršavljenje). Budi konzervativan — samo',
+    'kategorije koje bi kupac zaista očekivao.',
+    '',
+    'Odgovori ISKLJUČIVO validnim JSON nizom slugova iz liste, npr. ["proteini","mrsavljenje"].',
+  ].filter((l) => l !== null).join('\n')
+
+  let response
+  try {
+    response = await client().send(new ConverseCommand({
+      modelId,
+      messages: [{ role: 'user', content: [{ text: prompt }] }],
+      inferenceConfig: { maxTokens: 200 },
+    }))
+  } catch (err) {
+    console.error('Bedrock suggestCategoriesAI failed:', { name: err.name, message: err.message, modelId })
+    const detail = err.name ? `${err.name} — ${err.message}` : (err.message || 'nepoznata greška')
+    throw Object.assign(new Error(`Bedrock greška (${detail})`), { code: 'BEDROCK_ERROR' })
+  }
+
+  const raw = response.output?.message?.content?.[0]?.text?.trim() || ''
+  const jsonText = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '')
+  let parsed
+  try { parsed = JSON.parse(jsonText) } catch {
+    throw Object.assign(new Error('AI je vratio nevažeći format — pokušajte ponovo.'), { code: 'BAD_RESPONSE' })
+  }
+  const valid = new Set(categories.map((c) => c.slug))
+  return (Array.isArray(parsed) ? parsed : []).filter((s) => valid.has(s))
+}

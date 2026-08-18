@@ -27,7 +27,7 @@ export default function BrandStrip() {
         <div className="flex items-center gap-4 mb-7">
           <div className="h-px flex-1 bg-gray-200" />
           <p
-            className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400"
+            className="text-[10px] font-bold tracking-[0.22em] text-gray-400"
             style={BODY}
           >
             Naši brendovi
@@ -51,7 +51,7 @@ export default function BrandStrip() {
                   loading="lazy"
                 />
               ) : (
-                <span className="text-[12px] font-bold text-gray-400 uppercase tracking-wider">{b.name}</span>
+                <span className="text-[12px] font-bold text-gray-400 tracking-wider">{b.name}</span>
               )}
             </div>
           ))}

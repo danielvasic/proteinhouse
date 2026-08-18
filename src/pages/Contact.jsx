@@ -53,7 +53,7 @@ export default function Contact() {
           <div className="container py-10 md:py-14">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-10 bg-gray-300" />
-              <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400">Stupite u kontakt</span>
+              <span className="text-[10px] font-bold tracking-[0.22em] text-gray-400">Stupite u kontakt</span>
             </div>
             <h1
               className="text-4xl md:text-5xl font-bold text-[#1e272e] uppercase"
@@ -72,7 +72,7 @@ export default function Contact() {
               {/* Info */}
               <div className="bg-white p-8 md:p-12">
                 <h2
-                  className="text-xl font-bold text-[#1e272e] uppercase mb-2"
+                  className="text-xl font-bold text-[#1e272e] mb-2"
                   style={DISPLAY}
                 >
                   Informacije
@@ -89,7 +89,7 @@ export default function Contact() {
                         <BrandIcon name={brand} size={20} fallback={<Icon size={16} weight="duotone" color="#0145F2" />} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 mb-0.5">{label}</p>
+                        <p className="text-[10px] font-bold tracking-[0.14em] text-gray-400 mb-0.5">{label}</p>
                         <p className="text-[13px] text-[#1e272e] font-medium">{text}</p>
                       </div>
                     </div>
@@ -100,7 +100,7 @@ export default function Contact() {
               {/* Form */}
               <div className="bg-white p-8 md:p-12">
                 <h2
-                  className="text-xl font-bold text-[#1e272e] uppercase mb-8"
+                  className="text-xl font-bold text-[#1e272e] mb-8"
                   style={DISPLAY}
                 >
                   Pošalji poruku
@@ -113,7 +113,7 @@ export default function Contact() {
                 ) : (
                   <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Ime i prezime</label>
+                      <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Ime i prezime</label>
                       <input
                         className={inputCls}
                         placeholder="Vaše ime i prezime"
@@ -123,7 +123,7 @@ export default function Contact() {
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Email adresa</label>
+                      <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Email adresa</label>
                       <input
                         className={inputCls}
                         type="email"
@@ -134,7 +134,7 @@ export default function Contact() {
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Poruka</label>
+                      <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Poruka</label>
                       <textarea
                         className={`${inputCls} resize-none`}
                         placeholder="Vaša poruka…"
@@ -146,7 +146,7 @@ export default function Contact() {
                     </div>
                     <button
                       type="submit"
-                      className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] transition-colors duration-150 cursor-pointer border-0"
+                      className="mt-2 w-full py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] hover:bg-[#0136C4] transition-colors duration-150 cursor-pointer border-0"
                     >
                       Pošalji poruku
                     </button>

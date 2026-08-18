@@ -16,10 +16,10 @@ export default function ProductGrid({ title, eyebrow, products, categorySlug, ma
         <div className="flex items-end justify-between gap-4 mb-6 md:mb-8">
           <div>
             {eyebrow && (
-              <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-400 mb-1.5 m-0">{eyebrow}</p>
+              <p className="text-[10px] font-bold tracking-[0.22em] text-gray-400 mb-1.5 m-0">{eyebrow}</p>
             )}
             <h2
-              className="text-2xl md:text-3xl font-bold text-[#1e272e] uppercase m-0"
+              className="text-2xl md:text-3xl font-bold text-[#1e272e] m-0 uppercase"
               style={DISPLAY}
             >
               {title}
@@ -28,7 +28,7 @@ export default function ProductGrid({ title, eyebrow, products, categorySlug, ma
           {categorySlug && (
             <Link
               to={`/kategorija/${categorySlug}`}
-              className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] uppercase text-[#1e272e] hover:opacity-70 transition-opacity whitespace-nowrap"
+              className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold tracking-[0.1em] text-[#1e272e] hover:opacity-70 transition-opacity whitespace-nowrap"
             >
               Pogledaj sve <ArrowRight size={12} weight="bold" />
             </Link>
@@ -42,7 +42,7 @@ export default function ProductGrid({ title, eyebrow, products, categorySlug, ma
         {categorySlug && (
           <Link
             to={`/kategorija/${categorySlug}`}
-            className="sm:hidden flex items-center justify-center gap-1.5 mt-4 py-3 border border-[#0145F2] text-[11px] font-bold tracking-[0.1em] uppercase text-[#1e272e]"
+            className="sm:hidden flex items-center justify-center gap-1.5 mt-4 py-3 border border-[#0145F2] text-[11px] font-bold tracking-[0.1em] text-[#1e272e]"
           >
             Pogledaj sve <ArrowRight size={12} weight="bold" />
           </Link>

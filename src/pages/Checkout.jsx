@@ -43,7 +43,7 @@ function StepIndicator({ current }) {
             }`}>
               {i < current ? <Check size={12} weight="bold" /> : i + 1}
             </div>
-            <span className="text-[11px] font-bold tracking-[0.1em] uppercase hidden sm:inline">{label}</span>
+            <span className="text-[11px] font-bold tracking-[0.1em] hidden sm:inline">{label}</span>
           </div>
           {i < STEPS.length - 1 && <div className={`h-px w-8 md:w-16 ${i < current ? 'bg-[#0145F2]' : 'bg-gray-200'}`} />}
         </div>
@@ -57,7 +57,7 @@ function OrderSummary({ items, totalPrice, coupon, gift }) {
   const shipping = calcShipping(totalPrice - discount, coupon?.free_shipping)
   return (
     <div className="border border-gray-200 bg-white p-6 space-y-4">
-      <h3 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Pregled narudžbe</h3>
+      <h3 className="text-[11px] font-bold tracking-[0.16em] text-gray-500">Pregled narudžbe</h3>
       <div className="divide-y divide-gray-100">
         {items.map((item, idx) => (
           <div key={idx} className="flex gap-3 py-3">
@@ -65,7 +65,7 @@ function OrderSummary({ items, totalPrice, coupon, gift }) {
               <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wide">{item.brand}</p>
+              <p className="text-[11px] text-gray-400 font-bold tracking-wide">{item.brand}</p>
               <p className="text-[12px] font-semibold text-[#1e272e] leading-tight truncate">{item.title}</p>
               {item.selectedSize   && <p className="text-[10px] text-gray-400">{item.selectedSize}</p>}
               {item.selectedFlavor && <p className="text-[10px] text-gray-400">{item.selectedFlavor}</p>}
@@ -83,7 +83,7 @@ function OrderSummary({ items, totalPrice, coupon, gift }) {
             <Gift size={18} weight="duotone" className="text-[#0145F2]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] text-[#0145F2] font-bold uppercase tracking-wide">Poklon</p>
+            <p className="text-[11px] text-[#0145F2] font-bold tracking-wide">Poklon</p>
             <p className="text-[12px] font-semibold text-[#1e272e] leading-tight truncate">{gift.title}</p>
             {gift.size && <p className="text-[10px] text-gray-400">Veličina {gift.size}</p>}
           </div>
@@ -207,7 +207,7 @@ export default function Checkout() {
     return (
       <main className="container py-20 text-center" style={BODY}>
         <p className="text-[15px] text-gray-500 mb-4">Vaša korpa je prazna.</p>
-        <Link to="/" className="inline-block px-6 py-3 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white transition-all">
+        <Link to="/" className="inline-block px-6 py-3 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] hover:bg-[#0145F2] hover:text-white transition-all">
           Nastavi kupovinu
         </Link>
       </main>
@@ -341,7 +341,7 @@ export default function Checkout() {
                   ) : (
                     <div className="bg-white border border-[#0145F2]/20 p-5 space-y-3">
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Prijava</h3>
+                        <h3 className="text-[11px] font-bold tracking-[0.16em] text-gray-500">Prijava</h3>
                         <button
                           type="button"
                           onClick={() => { setLoginOpen(false); setLoginError('') }}
@@ -359,7 +359,7 @@ export default function Checkout() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Email</label>
+                          <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Email</label>
                           <div className="relative">
                             <Envelope size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
@@ -374,7 +374,7 @@ export default function Checkout() {
                           </div>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Šifra</label>
+                          <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Šifra</label>
                           <div className="relative">
                             <LockKey size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
@@ -392,7 +392,7 @@ export default function Checkout() {
                           type="button"
                           onClick={handleCheckoutLogin}
                           disabled={loginLoading}
-                          className="py-2.5 px-5 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0136C4] disabled:opacity-50 transition-colors cursor-pointer border-0 whitespace-nowrap"
+                          className="py-2.5 px-5 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.1em] hover:bg-[#0136C4] disabled:opacity-50 transition-colors cursor-pointer border-0 whitespace-nowrap"
                         >
                           {loginLoading ? 'Prijavljivanje…' : 'Prijavi se'}
                         </button>
@@ -407,56 +407,56 @@ export default function Checkout() {
                     </div>
                   )}
                   <div className="bg-white border border-gray-200 p-6 space-y-4">
-                    <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Podaci za dostavu</h2>
+                    <h2 className="text-[11px] font-bold tracking-[0.16em] text-gray-500">Podaci za dostavu</h2>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Ime *</label>
+                        <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Ime *</label>
                         <input className={inputCls(errors.firstName)} value={form.firstName} onChange={set('firstName')} placeholder="Ime" />
                         {errors.firstName && <p className="text-red-500 text-[11px]">{errors.firstName}</p>}
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Prezime *</label>
+                        <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Prezime *</label>
                         <input className={inputCls(errors.lastName)} value={form.lastName} onChange={set('lastName')} placeholder="Prezime" />
                         {errors.lastName && <p className="text-red-500 text-[11px]">{errors.lastName}</p>}
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Email *</label>
+                      <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Email *</label>
                       <input className={inputCls(errors.email)} type="email" value={form.email} onChange={set('email')} placeholder="vas@email.com" />
                       {errors.email && <p className="text-red-500 text-[11px]">{errors.email}</p>}
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Telefon *</label>
+                      <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Telefon *</label>
                       <input className={inputCls(errors.phone)} value={form.phone} onChange={set('phone')} placeholder="+387 6x xxx xxx" />
                       {errors.phone && <p className="text-red-500 text-[11px]">{errors.phone}</p>}
                     </div>
                   </div>
 
                   <div className="bg-white border border-gray-200 p-6 space-y-4">
-                    <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Adresa isporuke</h2>
+                    <h2 className="text-[11px] font-bold tracking-[0.16em] text-gray-500">Adresa isporuke</h2>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Ulica i broj *</label>
+                      <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Ulica i broj *</label>
                       <input className={inputCls(errors.address)} value={form.address} onChange={set('address')} placeholder="npr. Maršala Tita 28" />
                       {errors.address && <p className="text-red-500 text-[11px]">{errors.address}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Grad *</label>
+                        <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Grad *</label>
                         <input className={inputCls(errors.city)} value={form.city} onChange={set('city')} placeholder="Sarajevo" />
                         {errors.city && <p className="text-red-500 text-[11px]">{errors.city}</p>}
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Poštanski broj</label>
+                        <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Poštanski broj</label>
                         <input className={inputCls()} value={form.zip} onChange={set('zip')} placeholder="71000" />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold tracking-[0.14em] uppercase text-gray-500">Napomena (opciono)</label>
+                      <label className="text-[10px] font-bold tracking-[0.14em] text-gray-500">Napomena (opciono)</label>
                       <textarea className={`${inputCls()} resize-none`} rows={3} value={form.notes} onChange={set('notes')} placeholder="Npr. kat, interfon, posebna uputstva za dostavu…" />
                     </div>
                   </div>
 
-                  <button type="submit" className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] uppercase transition-colors cursor-pointer">
+                  <button type="submit" className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] transition-colors cursor-pointer">
                     Nastavi na pregled →
                   </button>
                 </form>
@@ -469,12 +469,12 @@ export default function Checkout() {
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
                 <div className="space-y-4">
                   <div className="bg-white border border-gray-200 p-6 space-y-3">
-                    <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Podaci za dostavu</h2>
+                    <h2 className="text-[11px] font-bold tracking-[0.16em] text-gray-500">Podaci za dostavu</h2>
                     <div className="grid grid-cols-2 gap-2 text-[13px]">
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Ime</p><p className="font-semibold text-[#1e272e]">{form.firstName} {form.lastName}</p></div>
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Telefon</p><p className="font-semibold text-[#1e272e]">{form.phone}</p></div>
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Email</p><p className="font-semibold text-[#1e272e]">{form.email}</p></div>
-                      <div><p className="text-gray-400 text-[10px] uppercase tracking-wide mb-0.5">Adresa</p><p className="font-semibold text-[#1e272e]">{form.address}, {form.city} {form.zip}</p></div>
+                      <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Ime</p><p className="font-semibold text-[#1e272e]">{form.firstName} {form.lastName}</p></div>
+                      <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Telefon</p><p className="font-semibold text-[#1e272e]">{form.phone}</p></div>
+                      <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Email</p><p className="font-semibold text-[#1e272e]">{form.email}</p></div>
+                      <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Adresa</p><p className="font-semibold text-[#1e272e]">{form.address}, {form.city} {form.zip}</p></div>
                     </div>
                     <button onClick={() => setStep(0)} className="text-[11px] text-gray-500 underline hover:text-[#0145F2] cursor-pointer bg-transparent border-0 p-0">Izmijeni podatke</button>
                   </div>
@@ -484,7 +484,7 @@ export default function Checkout() {
 
                   {/* Kupon */}
                   <div className="bg-white border border-gray-200 p-6 space-y-3">
-                    <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Kupon</h2>
+                    <h2 className="text-[11px] font-bold tracking-[0.16em] text-gray-500">Kupon</h2>
                     {coupon ? (
                       <div className="flex items-center gap-3 border border-[#0145F2]/30 bg-[#edf1f5] px-4 py-3">
                         <BrandIcon name="popust" size={20}
@@ -516,7 +516,7 @@ export default function Checkout() {
                             type="button"
                             onClick={applyCoupon}
                             disabled={couponBusy || !couponInput.trim()}
-                            className="px-6 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] uppercase hover:bg-[#0145F2] hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#1e272e] transition-colors cursor-pointer bg-transparent whitespace-nowrap"
+                            className="px-6 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.1em] hover:bg-[#0145F2] hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#1e272e] transition-colors cursor-pointer bg-transparent whitespace-nowrap"
                           >
                             {couponBusy ? '…' : 'Primijeni'}
                           </button>
@@ -527,7 +527,7 @@ export default function Checkout() {
                   </div>
 
                   <div className="bg-white border border-gray-200 p-6 space-y-4">
-                    <h2 className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">Način plaćanja</h2>
+                    <h2 className="text-[11px] font-bold tracking-[0.16em] text-gray-500">Način plaćanja</h2>
                     <div className="flex items-start gap-3 p-4 border-2 border-[#0145F2] bg-[#edf1f5]">
                       <div className="w-4 h-4 rounded-full border-2 border-[#0145F2] flex items-center justify-center mt-0.5 shrink-0">
                         <div className="w-2 h-2 rounded-full bg-[#0145F2]" />
@@ -555,7 +555,7 @@ export default function Checkout() {
                   <button
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] uppercase transition-colors cursor-pointer"
+                    className="ph-cta w-full py-4 text-[11px] font-bold tracking-[0.14em] transition-colors cursor-pointer"
                   >
                     {submitting ? 'Obrađuje se…' : '✓ Potvrdi narudžbu'}
                   </button>
@@ -571,7 +571,7 @@ export default function Checkout() {
                   <Check size={28} weight="bold" color="white" />
                 </div>
                 <h1
-                  className="text-3xl font-bold text-[#1e272e] uppercase mb-3"
+                  className="text-3xl font-bold text-[#1e272e] mb-3"
                   style={DISPLAY}
                 >
                   Hvala na narudžbi!
@@ -583,7 +583,7 @@ export default function Checkout() {
                   Potvrdu ćemo poslati na <strong>{form.email}</strong>. Isporuka 1–3 radna dana.
                 </p>
                 <div className="border border-gray-200 bg-white p-6 text-left mb-6 space-y-2">
-                  <p className="text-[10px] font-bold tracking-[0.16em] uppercase text-gray-400 mb-3">Detalji narudžbe</p>
+                  <p className="text-[10px] font-bold tracking-[0.16em] text-gray-400 mb-3">Detalji narudžbe</p>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Broj narudžbe</span><span className="font-bold text-[#1e272e]">{orderNum}</span></div>
                   <div className="flex justify-between text-[13px]"><span className="text-gray-500">Dostava na</span><span className="font-semibold">{form.address}, {form.city}</span></div>
                   {placed?.gift && (
@@ -600,13 +600,13 @@ export default function Checkout() {
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <Link
                     to={`/pracenje?narudzba=${encodeURIComponent(orderNum)}`}
-                    className="inline-block px-8 py-4 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0145F2] hover:text-white transition-colors"
+                    className="inline-block px-8 py-4 border border-[#0145F2] text-[#1e272e] text-[11px] font-bold tracking-[0.14em] hover:bg-[#0145F2] hover:text-white transition-colors"
                   >
                     Prati pošiljku
                   </Link>
                   <Link
                     to="/"
-                    className="inline-block px-8 py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0136C4] transition-colors"
+                    className="inline-block px-8 py-4 bg-[#0145F2] text-white text-[11px] font-bold tracking-[0.14em] hover:bg-[#0136C4] transition-colors"
                   >
                     Nastavi kupovinu →
                   </Link>

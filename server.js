@@ -47,6 +47,21 @@ async function createServer() {
     }
   })
 
+  // AI prijedlog kategorija — dev ekvivalent netlify/functions/suggest-categories.mjs
+  app.post('/api/suggest-categories', express.json(), async (req, res) => {
+    try {
+      const token = req.get('authorization')?.replace(/^Bearer\s+/i, '')
+      const admin = await verifyAdmin(token)
+      if (!admin) return res.status(401).json({ error: 'Neautorizovano.' })
+
+      const { suggestCategoriesAI } = await import('./src/server/bedrock.js')
+      res.status(200).json({ slugs: await suggestCategoriesAI(req.body || {}) })
+    } catch (err) {
+      const statusCode = err.code === 'BAD_INPUT' ? 400 : err.code === 'NOT_CONFIGURED' ? 501 : 500
+      res.status(statusCode).json({ error: err.message || 'Greška pri predlaganju kategorija.' })
+    }
+  })
+
   // Handle all routes with SSR
   app.use('*', async (req, res) => {
     try {
