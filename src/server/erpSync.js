@@ -229,3 +229,69 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
     throw err
   }
 }
+
+const IMG_BASE = 'https://weberp-api.com/images/'
+
+/**
+ * Postepeno prebacivanje ERP slika u naš storage.
+ *
+ * Nacrti pri stvaranju dobiju hotlink na weberp server (da se odmah vide);
+ * ovo skida sliku i uploaduje je u bucket product-images, pa postavlja
+ * image_path — koji pri prikazu ima prednost nad image_url. Ograničeno po
+ * prolazu da stane u timeout funkcije; vrti se dok red ne presuši, poslije
+ * čega je svaki prolaz no-op.
+ */
+export async function runImageSync({ limit = 40 } = {}) {
+  const supabase = serviceClient()
+
+  const { data: prods, error } = await supabase
+    .from('products')
+    .select('id, erp_skus')
+    .is('image_path', null)
+    .eq('images', '[]')
+    .neq('erp_skus', '{}')
+    .limit(limit)
+  if (error) throw error
+  const candidates = (prods ?? []).filter((p) => p.erp_skus?.length)
+  if (!candidates.length) return { uploaded: 0, failed: 0, done: true }
+
+  const { data: arts, error: aErr } = await supabase
+    .from('erp_articles')
+    .select('sku, image_path')
+    .in('sku', candidates.map((p) => p.erp_skus[0]))
+  if (aErr) throw aErr
+  const imgBySku = new Map(arts.map((a) => [a.sku, a.image_path]))
+
+  let uploaded = 0, failed = 0
+  const one = async (p) => {
+    const remote = imgBySku.get(p.erp_skus[0])
+    if (!remote) { failed++; return }
+    try {
+      const res = await fetch(IMG_BASE + remote)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const buf = Buffer.from(await res.arrayBuffer())
+      const contentType = res.headers.get('content-type') || 'image/png'
+      const ext = contentType.includes('jpeg') ? 'jpg' : contentType.includes('webp') ? 'webp' : 'png'
+      const path = `erp/${p.erp_skus[0]}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('product-images')
+        .upload(path, buf, { contentType, upsert: true })
+      if (upErr) throw upErr
+      const { error: dbErr } = await supabase
+        .from('products')
+        .update({ image_path: path })
+        .eq('id', p.id)
+      if (dbErr) throw dbErr
+      uploaded++
+    } catch (err) {
+      console.error('erp-images:', p.erp_skus[0], err.message)
+      failed++
+    }
+  }
+
+  // Po 5 paralelno — 40 slika stane u timeout, a ne guši ni weberp ni storage.
+  for (let i = 0; i < candidates.length; i += 5) {
+    await Promise.all(candidates.slice(i, i + 5).map(one))
+  }
+  return { uploaded, failed, done: candidates.length < limit }
+}
