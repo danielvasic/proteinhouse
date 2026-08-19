@@ -12,7 +12,7 @@
  *   createLimit — koliko novih nacrta smije nastati u ovom prolazu
  */
 import { verifyAdmin } from '../../src/server/supabaseAdmin.js'
-import { runErpSync } from '../../src/server/erpSync.js'
+import { runErpSync, runImageSync } from '../../src/server/erpSync.js'
 
 export default async (req) => {
   const json = (body, status = 200) =>
@@ -27,6 +27,12 @@ export default async (req) => {
   try { body = await req.json() } catch { /* prazno tijelo je uredu */ }
 
   try {
+    // { "images": true, "imageLimit": 40 } → samo prebacivanje slika
+    if (body.images === true) {
+      return json(await runImageSync({
+        limit: Number.isFinite(body.imageLimit) ? Math.max(1, body.imageLimit) : 40,
+      }))
+    }
     const result = await runErpSync({
       triggerSource: 'manual',
       dryRun: body.dryRun === true,
