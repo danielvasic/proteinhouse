@@ -132,29 +132,33 @@ export default function HeroBanner() {
           dolje desno, manja, a tekst dobija desni padding da se ne sudare.
           Na desktopu desna trećina s radijalnim sjajem da proizvod "sjedne"
           na pozadinu umjesto da izgleda nalijepljen. */}
+      {/* Desktop: proizvod se namjerno podvlači POD tekst (veći od svoje
+          kolone + translate ulijevo) — jedna kompozicija umjesto dva
+          izolirana otoka. Tekstualna kolona je iznad njega (z-10). Na
+          mobilnom slika nije ovdje nego u toku sadržaja, pored CTA. */}
       {!isImageOnly && b.fg_image_url && (
         <div
           key={`fg-${index}`}
-          className="absolute inset-y-0 right-0 w-[46%] md:w-1/3 flex items-end md:items-center justify-end md:justify-center pb-3 md:pb-0 pr-2 md:pr-0 pointer-events-none"
+          className="hidden md:flex absolute inset-y-0 right-0 w-[46%] items-center justify-center pointer-events-none"
           style={{ animation: 'heroFade 400ms ease' }}
         >
           <div
-            className="hidden md:block absolute inset-0"
-            style={{ background: 'radial-gradient(closest-side at 50% 55%, rgba(1,69,242,0.28), transparent 72%)' }}
+            className="absolute inset-0"
+            style={{ background: 'radial-gradient(closest-side at 45% 55%, rgba(1,69,242,0.30), transparent 72%)' }}
           />
           <img
             src={b.fg_image_url}
             alt=""
-            className="relative max-h-[54%] md:max-h-[78%] max-w-[92%] md:max-w-[84%] object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]"
+            className="relative max-h-[94%] max-w-[124%] -translate-x-[10%] object-contain drop-shadow-[0_28px_56px_rgba(0,0,0,0.6)]"
           />
         </div>
       )}
 
       {!isImageOnly && (
-      <div className="container w-full relative">
+      <div className="container w-full relative z-10">
         <div
           key={index}
-          className={`max-w-[620px] py-8 md:py-16 ${b.fg_image_url ? 'pr-[34%] md:pr-0' : ''}`}
+          className="max-w-[620px] py-8 md:py-16"
           style={{ animation: 'heroFade 400ms ease' }}
         >
 
@@ -182,6 +186,12 @@ export default function HeroBanner() {
             ))}
           </h1>
 
+          {/* Na mobilnom su podnaslov, cijena i CTA lijeva kolona, a slika
+              proizvoda desna — u toku sadržaja, oslonjena na dno reda, pa
+              nema lebdenja u praznom prostoru. Na desktopu slika živi u
+              apsolutnoj koloni iznad, a ovaj red je običan blok. */}
+          <div className={b.fg_image_url ? 'flex items-end gap-3 md:block' : ''}>
+          <div className={b.fg_image_url ? 'flex-1 min-w-0' : ''}>
           {/* Body */}
           {b.subtitle && (
             <p
@@ -254,6 +264,16 @@ export default function HeroBanner() {
                 </button>
               )
             })()}
+          </div>
+          </div>
+
+          {b.fg_image_url && (
+            <img
+              src={b.fg_image_url}
+              alt=""
+              className="md:hidden w-[38%] shrink-0 self-end object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.55)]"
+            />
+          )}
           </div>
 
           {/* Stats — samo desktop, mobilni banner mora biti kratak */}
