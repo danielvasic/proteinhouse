@@ -142,10 +142,11 @@ export function toErpArticle(a) {
     flavor:           parsed.flavor,
     price:            Number(a.cijena) || 0,
     price_discount:   a.cijenaHH ? Number(a.cijenaHH) : null,
-    // ERP za sada ne šalje stanje ni na jednom artiklu — ostaje null dok ne
-    // isporuče endpoint za skladište, da se null ne pomiješa s "nema na stanju".
-    qty:              a.kolicina ?? null,
-    min_qty:          a.minKolicina ?? null,
+    // Stanje NE dolazi iz ovog artikla: list endpointi ne pune kolicina, a
+    // pravi lager stiže iz GetArtikliSaStanjem i mirrorArticles ga upisuje
+    // preko ovog polja. null znači "nepoznato", nikad "nema na stanju".
+    qty:              null,
+    min_qty:          null,
     image_path:       a.slikaPath || null,
     description_html: a.opisArtikla || null,
     is_top:           !!a.isTopProizvod,

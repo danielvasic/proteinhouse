@@ -18,22 +18,61 @@
 import { serviceClient } from './supabaseAdmin.js'
 import { toErpArticle, sellPrice, slugify, stripHtml, splitUsage, suggestExtraCategories } from './erpMapping.js'
 
-export const ERP_API = 'https://proteinhouse-api.work/api/Artikli/GetAllProducts'
+// WebShopRobMat API (kolovoz 2026) — stari GetAllProducts je ugašen 25.8. i
+// vraća 404. Ogledalo se puni s GetByKlijent jer je jedini endpoint s potpunom
+// slikom (1689 artikala, bez IsWeb filtera — IsWeb u ERP-u ionako nitko ne
+// održava). Stanje skladišta postoji isključivo na GetArtikliSaStanjem, koji
+// vraća podskup (1120), pa se koristi kao overlay preko ogledala: artikal bez
+// retka u overlayu zadržava qty=null ("nepoznato"), nikad 0.
+export const ERP_BASE = process.env.ERP_API_BASE || 'https://proteinhouse-api.work/api'
 
 const BATCH = 500
 
 /** Dohvati sve artikle iz ERP-a. */
 export async function fetchArticles(signal) {
-  const res = await fetch(ERP_API, { headers: { Accept: 'application/json' }, signal })
+  const res = await fetch(`${ERP_BASE}/Artikli/GetByKlijent`, {
+    headers: { Accept: 'application/json' }, signal,
+  })
   if (!res.ok) throw new Error(`ERP API ${res.status}`)
   const data = await res.json()
   if (!Array.isArray(data)) throw new Error('ERP API nije vratio niz artikala.')
   return data
 }
 
+/**
+ * Stanje skladišta po šifri artikla.
+ *
+ * Paginirano namjerno: dokumentacija upozorava da se stanje računa
+ * sekvencijalno po grupama artikala, pa getAll=true traje znatno duže od
+ * stranica od 200 (maksimum koji API prima).
+ */
+export async function fetchStockBySku(signal) {
+  const stock = new Map()
+  let page = 1
+  let totalPages = 1
+  do {
+    const res = await fetch(
+      `${ERP_BASE}/Artikli/GetArtikliSaStanjem?page=${page}&pageSize=200`,
+      { headers: { Accept: 'application/json' }, signal },
+    )
+    if (!res.ok) throw new Error(`ERP stanje ${res.status} (page ${page})`)
+    const data = await res.json()
+    totalPages = data.totalPages || 1
+    for (const a of data.artikli ?? []) {
+      const sku = String(a.sifraArtikla ?? '').trim()
+      if (sku) stock.set(sku, Number(a.ukupnaKolicinaNaSkladistu) || 0)
+    }
+    page++
+  } while (page <= totalPages)
+  return stock
+}
+
 /** Faza 1: upiši sve artikle u ogledalo i označi one koji su nestali. */
-export async function mirrorArticles(supabase, articles) {
+export async function mirrorArticles(supabase, articles, stockBySku = new Map()) {
   const rows = articles.map(toErpArticle).filter((r) => r.sku)
+  for (const r of rows) {
+    r.qty = stockBySku.has(r.sku) ? stockBySku.get(r.sku) : null
+  }
 
   for (let i = 0; i < rows.length; i += BATCH) {
     const { error } = await supabase
@@ -71,6 +110,35 @@ function priceFor(articles) {
 }
 
 /**
+ * Stanje za proizvod iz njegovih ERP artikala.
+ *
+ * Vraća { stock, stock_variants } u obliku koji getVariantStock očekuje:
+ * ključ "{flavor}|{size}" / "{flavor}" / "{size}", vrijednost { qty, sku }.
+ *
+ * SPAJA se s postojećim stock_variants umjesto da ih zamijeni: hasAnyStock za
+ * proizvod s varijantama gleda isključivo stock_variants, pa bi ključ koji
+ * ERP ne pokriva (admin je preimenovao okus, parser je drukčije rastavio
+ * naziv) nakon zamjene nestao i proizvod bi preko noći postao "nema na
+ * stanju". Ovako ERP osvježava ono što prepoznaje, a ručni unosi za
+ * nepokrivene ključeve prežive.
+ */
+function stockFor(articles, existingVariants) {
+  const variants = { ...(existingVariants || {}) }
+  let total = 0
+  for (const a of articles) {
+    if (a.qty == null) continue
+    const qty = Math.max(0, Math.floor(Number(a.qty)))
+    total += qty
+    const key = a.flavor && a.size ? `${a.flavor}|${a.size}`
+              : a.flavor           ? a.flavor
+              : a.size             ? a.size
+              : null
+    if (key) variants[key] = { qty, sku: a.sku }
+  }
+  return { stock: total, stock_variants: variants }
+}
+
+/**
  * Faza 2: uskladi katalog s ogledalom.
  * @param {number} createLimit koliko novih proizvoda smije nastati u jednom
  *   prolazu; prvi backfill je ~800 grupa pa se raspoređuje kroz više prolaza
@@ -82,7 +150,7 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
   if (aErr) throw aErr
 
   const { data: products, error: pErr } = await supabase
-    .from('products').select('id, slug, erp_skus, erp_sync_price, price, old_price, badge')
+    .from('products').select('id, slug, erp_skus, erp_sync_price, erp_sync_stock, price, old_price, badge, stock, stock_variants')
   if (pErr) throw pErr
 
   const bySku = new Map()
@@ -90,23 +158,45 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
 
   // ── Osvježi postojeće ──
   let updated = 0
+  let stockUpdated = 0
   const claimed = new Set()
   for (const p of products) {
     const mine = (p.erp_skus ?? []).map((s) => bySku.get(s)).filter(Boolean)
     for (const s of p.erp_skus ?? []) claimed.add(s)
-    if (!mine.length || !p.erp_sync_price) continue
+    if (!mine.length) continue
 
-    const next = priceFor(mine)
-    if (!next) continue
-    const same = Number(p.price) === next.price &&
-      (p.old_price == null ? null : Number(p.old_price)) === next.old_price &&
-      (p.badge || null) === next.badge
-    if (same) continue
+    const patch = {}
+
+    if (p.erp_sync_price) {
+      const next = priceFor(mine)
+      if (next) {
+        const same = Number(p.price) === next.price &&
+          (p.old_price == null ? null : Number(p.old_price)) === next.old_price &&
+          (p.badge || null) === next.badge
+        if (!same) Object.assign(patch, next)
+      }
+    }
+
+    // Stanje ide samo uz eksplicitni pristanak po proizvodu (erp_sync_stock,
+    // default false): pogrešno stanje ne košta krivu cifru nego blokira
+    // kupovinu, pa se uključuje tek kad se provjeri da se ključevi varijanti
+    // proizvoda poklapaju s onim što ERP parser izvuče.
+    if (p.erp_sync_stock && mine.some((a) => a.qty != null)) {
+      const next = stockFor(mine, p.stock_variants)
+      const same = Number(p.stock) === next.stock &&
+        JSON.stringify(p.stock_variants || {}) === JSON.stringify(next.stock_variants)
+      if (!same) {
+        Object.assign(patch, next)
+        stockUpdated++
+      }
+    }
+
+    if (!Object.keys(patch).length) continue
 
     if (!dryRun) {
       const { error } = await supabase
         .from('products')
-        .update({ ...next, erp_synced_at: new Date().toISOString() })
+        .update({ ...patch, erp_synced_at: new Date().toISOString() })
         .eq('id', p.id)
       if (error) throw error
     }
@@ -176,7 +266,7 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
     }
   }
 
-  return { updated, created: drafts.length, remaining: Math.max(0, groups.size - drafts.length) }
+  return { updated, stockUpdated, created: drafts.length, remaining: Math.max(0, groups.size - drafts.length) }
 }
 
 /**
@@ -195,14 +285,27 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
 
   try {
     const articles = await fetchArticles()
-    const mirror = dryRun ? { upserted: 0, wentMissing: 0 } : await mirrorArticles(supabase, articles)
+    // Pad dohvata stanja ne smije oboriti cijeli sync — cijene i katalog su
+    // vredniji od svježeg lagera, pa se u tom slučaju qty samo ne mijenja.
+    let stockBySku = new Map()
+    let stockError = null
+    try {
+      stockBySku = await fetchStockBySku()
+    } catch (err) {
+      stockError = String(err.message || err)
+      console.error('erp-sync: stanje skladišta nedostupno:', stockError)
+    }
+    const mirror = dryRun ? { upserted: 0, wentMissing: 0 } : await mirrorArticles(supabase, articles, stockBySku)
     const recon  = await reconcileProducts(supabase, { createLimit, dryRun })
 
     const result = {
       fetched: articles.length,
+      stockFetched: stockBySku.size,
+      stockError,
       upserted: mirror.upserted,
       wentMissing: mirror.wentMissing,
       productsUpdated: recon.updated,
+      stockUpdated: recon.stockUpdated,
       productsCreated: recon.created,
       remainingToMap: recon.remaining,
       dryRun,

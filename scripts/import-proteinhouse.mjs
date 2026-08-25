@@ -34,7 +34,7 @@ function loadEnv() {
 }
 loadEnv()
 
-const API   = 'https://proteinhouse-api.work/api/Artikli/GetAllProducts'
+const API   = 'https://proteinhouse-api.work/api/Artikli/GetByKlijent'
 const IMG   = 'https://weberp-api.com/images/'
 
 // Slike sa starog sajta su samo 255px — za ove slugove koristimo sluzbene
