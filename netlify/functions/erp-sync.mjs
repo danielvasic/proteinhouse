@@ -1,35 +1,26 @@
 /**
  * Sinhronizacija s ERP-om — svaki sat.
  *
- * Povlači sve artikle iz proteinhouse-api.work u erp_articles (sirovo ogledalo)
- * i osvježava cijene u katalogu. Novi artikli ulaze kao neaktivni nacrti.
+ * Ova funkcija je samo raspored: okine erp-sync-background i odmah završi.
+ * Scheduled funkcije imaju limit od 30 sekundi, a sync na novom API-ju
+ * (ogledalo ~2600 artikala + stanje skladišta + backfill nacrta) traje duže,
+ * pa pravi posao živi u background funkciji s limitom od 15 minuta.
  *
- * Logika je u src/server/erpSync.js; ovdje je samo raspored.
  * Za ručnu provjeru koristi /api/erp-sync-test (admin) — Netlify scheduled
  * funkcije se u produkciji ne mogu pozvati preko HTTP-a.
- *
- * Env: SUPABASE_SERVICE_ROLE_KEY (piše mimo RLS-a).
  */
-import { runErpSync } from '../../src/server/erpSync.js'
-import { pushPendingOrders } from '../../src/server/erpOrders.js'
-
 export default async () => {
+  const base = process.env.URL || 'http://localhost:8888'
   try {
-    // Prvi backfill je ~800 novih grupa; raspoređuje se kroz nekoliko prolaza
-    // da funkcija ne padne na timeoutu. U ustaljenom radu ostaje blizu nule.
-    const r = await runErpSync({ triggerSource: 'schedule', createLimit: 200 })
-    // Metla za narudžbe koje checkout nije uspio odmah poslati (mreža, ERP
-    // nedostupan) — pad metle ne smije oboriti sync koji je već prošao.
-    try {
-      r.orders = await pushPendingOrders({ limit: 20 })
-    } catch (err) {
-      r.orders = { error: String(err.message || err) }
-    }
-    console.log('erp-sync:', JSON.stringify(r))
-    return new Response(JSON.stringify(r), { headers: { 'Content-Type': 'application/json' } })
+    // Background funkcija vrati 202 čim primi zahtjev; posao teče dalje bez nas.
+    const res = await fetch(`${base}/.netlify/functions/erp-sync-background`, { method: 'POST' })
+    console.log('erp-sync: background okinut,', res.status)
+    return new Response(JSON.stringify({ triggered: true, status: res.status }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (err) {
-    console.error('erp-sync:', err)
-    return new Response(String(err.message || err), { status: err.code === 'NOT_CONFIGURED' ? 501 : 500 })
+    console.error('erp-sync: okidanje nije uspjelo:', err)
+    return new Response(String(err.message || err), { status: 500 })
   }
 }
 

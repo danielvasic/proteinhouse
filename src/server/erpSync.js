@@ -48,27 +48,54 @@ export async function fetchArticles(signal) {
  */
 export async function fetchStockBySku(signal) {
   const stock = new Map()
-  let page = 1
-  let totalPages = 1
-  do {
+  const getPage = async (page) => {
     const res = await fetch(
       `${ERP_BASE}/Artikli/GetArtikliSaStanjem?page=${page}&pageSize=200`,
       { headers: { Accept: 'application/json' }, signal },
     )
     if (!res.ok) throw new Error(`ERP stanje ${res.status} (page ${page})`)
-    const data = await res.json()
-    totalPages = data.totalPages || 1
+    return res.json()
+  }
+
+  const first = await getPage(1)
+  const totalPages = first.totalPages || 1
+  const consume = (data) => {
     for (const a of data.artikli ?? []) {
       const sku = String(a.sifraArtikla ?? '').trim()
       if (sku) stock.set(sku, Number(a.ukupnaKolicinaNaSkladistu) || 0)
     }
-    page++
-  } while (page <= totalPages)
+  }
+  consume(first)
+
+  // Po tri stranice odjednom: dovoljno brzo (~3 s umjesto ~8), a ne guši
+  // ERP koji stanje racuna sekvencijalno po zahtjevu.
+  const rest = []
+  for (let p = 2; p <= totalPages; p++) rest.push(p)
+  for (let i = 0; i < rest.length; i += 3) {
+    const datas = await Promise.all(rest.slice(i, i + 3).map(getPage))
+    datas.forEach(consume)
+  }
   return stock
+}
+
+/**
+ * Supabase REST vraca najvise 1000 redaka po upitu — ogledalo je vece od
+ * toga, pa svako "procitaj sve" mora kroz range stranice.
+ */
+async function selectAll(query, pageSize = 1000) {
+  const out = []
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await query.range(from, from + pageSize - 1)
+    if (error) throw error
+    out.push(...(data ?? []))
+    if (!data || data.length < pageSize) break
+  }
+  return out
 }
 
 /** Faza 1: upiši sve artikle u ogledalo i označi one koji su nestali. */
 export async function mirrorArticles(supabase, articles, stockBySku = new Map()) {
+  const syncStartedAt = new Date().toISOString()
   const rows = articles.map(toErpArticle).filter((r) => r.sku)
   for (const r of rows) {
     r.qty = stockBySku.has(r.sku) ? stockBySku.get(r.sku) : null
@@ -82,13 +109,15 @@ export async function mirrorArticles(supabase, articles, stockBySku = new Map())
   }
 
   // Artikal koji više ne dolazi iz API-ja ne brišemo — narudžbe i proizvodi se
-  // i dalje mogu referisati na tu šifru. Samo ga označimo.
-  const seen = rows.map((r) => r.sku)
+  // i dalje mogu referisati na tu šifru. Samo ga označimo. Umjesto NOT IN s
+  // hiljadama šifri (URL od 30+ KB), prisutne prepoznajemo po last_seen_at
+  // koji je upsert upravo postavio: sve starije od početka ovog prolaza nije
+  // stiglo iz API-ja.
   const { data: gone, error: goneErr } = await supabase
     .from('erp_articles')
     .update({ missing_since: new Date().toISOString() })
     .is('missing_since', null)
-    .not('sku', 'in', `(${seen.map((s) => `"${s}"`).join(',')})`)
+    .lt('last_seen_at', syncStartedAt)
     .select('sku')
   if (goneErr) throw goneErr
 
@@ -145,13 +174,17 @@ function stockFor(articles, existingVariants) {
  *   da funkcija ne padne na timeoutu.
  */
 export async function reconcileProducts(supabase, { createLimit = 200, dryRun = false } = {}) {
-  const { data: articles, error: aErr } = await supabase
-    .from('erp_articles').select('*').is('missing_since', null)
-  if (aErr) throw aErr
+  // selectAll jer REST vraca najvise 1000 redaka, a ogledalo ih ima ~2600 —
+  // bez ovoga reconcile vidi samo prvi dio abecede i "izgubi" ostatak.
+  const articles = await selectAll(
+    supabase.from('erp_articles')
+      .select('sku, erp_id, name, brand, group_name, category_slug, base_name, size, flavor, price, price_discount, qty, image_path, description_html, is_top, is_new')
+      .is('missing_since', null).order('sku'))
 
-  const { data: products, error: pErr } = await supabase
-    .from('products').select('id, slug, erp_skus, erp_sync_price, erp_sync_stock, price, old_price, badge, stock, stock_variants')
-  if (pErr) throw pErr
+  const products = await selectAll(
+    supabase.from('products')
+      .select('id, slug, erp_skus, erp_sync_price, erp_sync_stock, price, old_price, badge, stock, stock_variants')
+      .order('id'))
 
   const bySku = new Map()
   for (const a of articles) bySku.set(a.sku, a)
@@ -159,6 +192,7 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
   // ── Osvježi postojeće ──
   let updated = 0
   let stockUpdated = 0
+  const pendingUpdates = []
   const claimed = new Set()
   for (const p of products) {
     const mine = (p.erp_skus ?? []).map((s) => bySku.get(s)).filter(Boolean)
@@ -192,15 +226,23 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
     }
 
     if (!Object.keys(patch).length) continue
-
-    if (!dryRun) {
-      const { error } = await supabase
-        .from('products')
-        .update({ ...patch, erp_synced_at: new Date().toISOString() })
-        .eq('id', p.id)
-      if (error) throw error
-    }
+    pendingUpdates.push({ id: p.id, patch })
     updated++
+  }
+
+  // Svaki update je zaseban HTTP poziv prema Supabaseu; serijski bi za
+  // stotine promjena (prvi prolaz s cijenama s novog API-ja) trajali
+  // minutama. Po 8 paralelno je red velicine brze, a ne guši PostgREST.
+  if (!dryRun) {
+    for (let i = 0; i < pendingUpdates.length; i += 8) {
+      await Promise.all(pendingUpdates.slice(i, i + 8).map(async ({ id, patch }) => {
+        const { error } = await supabase
+          .from('products')
+          .update({ ...patch, erp_synced_at: new Date().toISOString() })
+          .eq('id', id)
+        if (error) throw error
+      }))
+    }
   }
 
   // ── Nove grupe → nacrti ──
