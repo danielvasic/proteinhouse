@@ -303,7 +303,12 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
 
   if (!dryRun && drafts.length) {
     for (let i = 0; i < drafts.length; i += BATCH) {
-      const { error } = await supabase.from('products').insert(drafts.slice(i, i + BATCH))
+      // ignoreDuplicates: sudar na slugu (npr. prolaz koji se preklopio s
+      // prethodnim) preskoci taj nacrt umjesto da atomicni batch insert
+      // obori cijeli sync — nacrt ionako nastane u sljedecem prolazu.
+      const { error } = await supabase
+        .from('products')
+        .upsert(drafts.slice(i, i + BATCH), { onConflict: 'slug', ignoreDuplicates: true })
       if (error) throw error
     }
   }
