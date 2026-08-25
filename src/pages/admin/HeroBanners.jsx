@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Plus, Pencil, Trash2, Image, Save, X, RefreshCw, Star, StarOff, Upload } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import StripBanners from './Banners'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -10,6 +11,7 @@ import { Card, CardContent } from '../../components/ui/card'
 import { Badge } from '../../components/ui/badge'
 
 const EMPTY = {
+  layout: 'produkt',
   eyebrow: '', title_lines: '', subtitle: '',
   cta_primary_text: '', cta_primary_link: '/kategorija/akcija', cta_style: 'plavi',
   cta_secondary_text: '', cta_secondary_link: '/kategorija/proteini',
@@ -36,6 +38,7 @@ function BannerForm({ item, onSave, onCancel }) {
   const fgFileRef = useRef(null)
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
+  const isImageOnly = (form.layout ?? 'produkt') === 'slika'
 
   const handleUpload = (field) => async (e) => {
     const file = e.target.files?.[0]
@@ -61,6 +64,7 @@ function BannerForm({ item, onSave, onCancel }) {
     setError('')
     setSaving(true)
     try {
+      if (isImageOnly && !form.image_url) throw new Error('Baner "samo slika" mora imati pozadinsku sliku.')
       const payload = { ...form, sort_order: parseInt(form.sort_order) || 0, updated_at: new Date().toISOString() }
       if (item?.id) {
         const { error: err } = await supabase.from('hero_banners').update(payload).eq('id', item.id)
@@ -87,14 +91,33 @@ function BannerForm({ item, onSave, onCancel }) {
       {error && <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Eyebrow tekst" hint="Mala linija iznad naslova">
-            <Input value={form.eyebrow} onChange={set('eyebrow')} placeholder="Black Friday 2026" />
+        {/* Vrsta slajda — "samo slika" sakrije sva tekstualna polja da forma
+            ne pretrpava: admin slaze gotov vizual u sliku i doda link. */}
+        <Field label="Vrsta banera">
+          <div className="flex gap-2">
+            {[['slika', 'Samo slika'], ['produkt', 'Produktni baner']].map(([val, label]) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, layout: val }))}
+                className={`px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-colors ${
+                  (form.layout ?? 'produkt') === val ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </Field>
+
+        {isImageOnly ? (
+          <Field label="Link (opciono)" hint="Klik na baner vodi ovdje — npr. /kategorija/akcija">
+            <Input value={form.cta_primary_link ?? ''} onChange={set('cta_primary_link')} placeholder="/kategorija/akcija" />
           </Field>
-          <Field label="Redosljed">
-            <Input type="number" value={form.sort_order} onChange={set('sort_order')} />
-          </Field>
-        </div>
+        ) : (<>
+        <Field label="Eyebrow tekst" hint="Mala linija iznad naslova">
+          <Input value={form.eyebrow} onChange={set('eyebrow')} placeholder="Black Friday 2026" />
+        </Field>
 
         <Field label="Naslov (/ za novi red)" hint="Primjer: Naruči za/**150+ KM.**/Gorilla Wear **poklon** je tvoj. — tekst između ** dobija plavu podlogu">
           <Input value={form.title_lines} onChange={set('title_lines')} placeholder="Snaga u/svakoj/mjerici" required />
@@ -169,6 +192,7 @@ function BannerForm({ item, onSave, onCancel }) {
             <Input value={form.cta_secondary_link} onChange={set('cta_secondary_link')} placeholder="/kategorija/proteini" />
           </Field>
         </div>
+        </>)}
 
         <Field label="Pozadinska slika">
           <div className="flex gap-3 items-start">
@@ -188,6 +212,12 @@ function BannerForm({ item, onSave, onCancel }) {
             </div>
           </div>
         </Field>
+
+        <div className="w-32">
+          <Field label="Redosljed">
+            <Input type="number" value={form.sort_order} onChange={set('sort_order')} />
+          </Field>
+        </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
           <div className="flex items-center gap-2">
@@ -251,8 +281,8 @@ export default function HeroBanners() {
         <div className="flex items-center gap-3">
           <Image size={20} className="text-muted-foreground" />
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Hero baneri</h2>
-            <p className="text-sm text-muted-foreground">Upravljajte hero sekcijom početne stranice. Samo jedan može biti aktivan.</p>
+            <h2 className="text-xl font-bold text-gray-900">Baneri</h2>
+            <p className="text-sm text-muted-foreground">Hero rotacija na vrhu naslovnice — svaki slajd je ili samo slika ili složeni produktni baner. Aktivni se vrte po redosljedu.</p>
           </div>
         </div>
         {!editing && (
@@ -311,8 +341,11 @@ create policy "Public read" on hero_banners for select using (true);`}</pre>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <p className="font-semibold text-sm text-gray-900 truncate">
-                        {b.title_lines?.replace(/\//g, ' ')}
+                        {b.layout === 'slika'
+                          ? (b.title_lines?.replace(/\//g, ' ') || 'Slika bez teksta')
+                          : b.title_lines?.replace(/\//g, ' ')}
                       </p>
+                      {b.layout === 'slika' && <Badge variant="secondary">Samo slika</Badge>}
                       {b.is_active && <Badge variant="emerald">Aktivan</Badge>}
                     </div>
                     {b.eyebrow && <p className="text-xs text-muted-foreground">{b.eyebrow}</p>}
@@ -341,6 +374,13 @@ create policy "Public read" on hero_banners for select using (true);`}</pre>
           )}
         </CardContent>
       </Card>
+
+      {/* Kartice u traci ispod hero-a — ranije zasebna sekcija "Baneri" u
+          navigaciji; ista tabela (banners), samo živi ovdje da su svi baneri
+          naslovnice na jednom mjestu. */}
+      <div className="pt-4 border-t border-gray-200">
+        <StripBanners embedded />
+      </div>
     </div>
   )
 }
