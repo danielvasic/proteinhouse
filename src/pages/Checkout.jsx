@@ -261,6 +261,13 @@ export default function Checkout() {
       }
       const { error } = await supabase.from('orders').insert(payload)
       if (error) throw error
+      // Proslijedi narudžbu ERP-u u pozadini — kupac ne čeka, a ako poziv
+      // propadne, satna metla uz erp-sync je pokupi (orders.erp_order_id).
+      fetch('/api/erp-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_number: orderNumber }),
+      }).catch(() => {})
       trackEvent('purchase', {
         ecommerce: {
           transaction_id: orderNumber,
