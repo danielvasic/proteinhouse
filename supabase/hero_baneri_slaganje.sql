@@ -10,3 +10,9 @@ alter table hero_banners
   add column if not exists old_price_text text,
   add column if not exists usp_lines      text,
   add column if not exists fg_image_url   text;
+
+-- Spajanje admin sekcija "Hero baneri" i "Baneri" u jednu: svaki slajd hero
+-- rotacije je ili cista slika (layout='slika' — samo pozadina, opciono link)
+-- ili slozeni produktni baner (layout='produkt' — naslov, cijena, USP...).
+alter table hero_banners
+  add column if not exists layout text not null default 'produkt';

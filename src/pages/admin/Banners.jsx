@@ -15,7 +15,7 @@ const EMPTY = {
   image_url: '', is_active: true, sort_order: 0,
 }
 
-export default function Banners() {
+export default function Banners({ embedded = false } = {}) {
   const [banners, setBanners] = useState([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -77,8 +77,14 @@ export default function Banners() {
     <div className="space-y-5 animate-fade-in">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Baneri</h2>
-          <p className="text-sm text-muted-foreground">Promotivni baneri i oglasi (bočni paneli, kampanje)</p>
+          <h2 className={embedded ? 'text-base font-bold text-gray-900' : 'text-xl font-bold text-gray-900'}>
+            {embedded ? 'Kartice ispod hero-a' : 'Baneri'}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {embedded
+              ? 'Tri manje promo kartice u traci na naslovnici, odmah ispod hero rotacije.'
+              : 'Promotivni baneri i oglasi (bočni paneli, kampanje)'}
+          </p>
         </div>
         <Button onClick={openNew} className="flex items-center gap-2">
           <Plus size={16} /> Novi baner
