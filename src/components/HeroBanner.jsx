@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Tag, ArrowRight, Truck, Gift, SealCheck } from '@phosphor-icons/react'
+import { Tag, ArrowRight, Truck, Gift, SealCheck, ShoppingCart, Lightning } from '@phosphor-icons/react'
 import { useParallax } from '../lib/useParallax'
 import { BODY, DISPLAY } from '../lib/typography'
 
@@ -37,6 +37,17 @@ function renderTitleLine(line) {
       ? <span key={i} className="bg-[#0136C4] text-white px-[0.18em] box-decoration-clone">{part}</span>
       : <span key={i}>{part}</span>
   )
+}
+
+/** Ikone CTA dugmadi — kljucevi su ono što admin snima u cta_*_icon. */
+const CTA_ICONS = {
+  tag:      Tag,
+  poklon:   Gift,
+  dostava:  Truck,
+  korpa:    ShoppingCart,
+  munja:    Lightning,
+  strelica: ArrowRight,
+  bez:      null,
 }
 
 /**
@@ -117,25 +128,35 @@ export default function HeroBanner() {
         />
       )}
 
-      {/* Slika proizvoda — desna trećina, tekst lijevo ostaje čitljiv preko
-          gradijenta. Samo desktop: na mobilnom bi se tukla s tekstom. */}
+      {/* Slika proizvoda — po Slavenovom mockupu vidljiva i na mobilnom:
+          dolje desno, manja, a tekst dobija desni padding da se ne sudare.
+          Na desktopu desna trećina s radijalnim sjajem da proizvod "sjedne"
+          na pozadinu umjesto da izgleda nalijepljen. */}
       {!isImageOnly && b.fg_image_url && (
         <div
           key={`fg-${index}`}
-          className="hidden md:flex absolute inset-y-0 right-0 w-1/3 items-center justify-center pointer-events-none"
+          className="absolute inset-y-0 right-0 w-[46%] md:w-1/3 flex items-end md:items-center justify-end md:justify-center pb-3 md:pb-0 pr-2 md:pr-0 pointer-events-none"
           style={{ animation: 'heroFade 400ms ease' }}
         >
+          <div
+            className="hidden md:block absolute inset-0"
+            style={{ background: 'radial-gradient(closest-side at 50% 55%, rgba(1,69,242,0.28), transparent 72%)' }}
+          />
           <img
             src={b.fg_image_url}
             alt=""
-            className="max-h-[76%] max-w-[84%] object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]"
+            className="relative max-h-[54%] md:max-h-[78%] max-w-[92%] md:max-w-[84%] object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]"
           />
         </div>
       )}
 
       {!isImageOnly && (
       <div className="container w-full relative">
-        <div key={index} className="max-w-[620px] py-8 md:py-16" style={{ animation: 'heroFade 400ms ease' }}>
+        <div
+          key={index}
+          className={`max-w-[620px] py-8 md:py-16 ${b.fg_image_url ? 'pr-[34%] md:pr-0' : ''}`}
+          style={{ animation: 'heroFade 400ms ease' }}
+        >
 
           {/* Eyebrow */}
           {b.eyebrow && (
@@ -153,7 +174,7 @@ export default function HeroBanner() {
 
           {/* Headline */}
           <h1
-            className="text-[34px] md:text-6xl lg:text-[64px] font-bold text-white leading-[0.95] tracking-[-0.02em] mb-4 md:mb-7 uppercase"
+            className={`${b.fg_image_url ? 'text-[27px]' : 'text-[34px]'} md:text-6xl lg:text-[64px] font-bold text-white leading-[0.95] tracking-[-0.02em] mb-4 md:mb-7 uppercase`}
             style={DISPLAY}
           >
             {titleLines.map((line, i) => (
@@ -203,30 +224,36 @@ export default function HeroBanner() {
             </div>
           )}
 
-          {/* CTAs */}
+          {/* CTAs — ikone se biraju u adminu po baneru */}
           <div className="flex flex-wrap gap-3">
-            {b.cta_primary_text && (
-              <button
-                // Boja po baneru (Admin → Hero baneri): plava je standard,
-                // crvena samo za izuzetno važne akcije — Notion odluka.
-                className={`${b.cta_style === 'crveni'
-                  ? 'bg-[#ff4103] hover:bg-[#e03903] text-white border-0'
-                  : 'ph-cta'} flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] transition-colors duration-150 cursor-pointer`}
-                style={BODY}
-                onClick={() => navigate(b.cta_primary_link || '/kategorija/akcija')}
-              >
-                <Tag size={15} weight="fill" /> {b.cta_primary_text}
-              </button>
-            )}
-            {b.cta_secondary_text && (
-              <button
-                className="flex items-center gap-2 px-6 md:px-8 py-3 md:py-3.5 border border-white/35 text-white text-[11px] md:text-[12px] font-bold tracking-[0.1em] hover:border-white/70 hover:bg-white/10 transition-all duration-150 cursor-pointer"
-                style={BODY}
-                onClick={() => navigate(b.cta_secondary_link || '/kategorija/proteini')}
-              >
-                {b.cta_secondary_text} <ArrowRight size={14} weight="bold" />
-              </button>
-            )}
+            {b.cta_primary_text && (() => {
+              const PrimaryIcon = CTA_ICONS[b.cta_primary_icon ?? 'tag'] ?? Tag
+              return (
+                <button
+                  // Boja po baneru (Admin → Baneri): plava je standard,
+                  // crvena samo za izuzetno važne akcije — Notion odluka.
+                  className={`${b.cta_style === 'crveni'
+                    ? 'bg-[#ff4103] hover:bg-[#e03903] text-white border-0'
+                    : 'ph-cta'} flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] transition-colors duration-150 cursor-pointer`}
+                  style={BODY}
+                  onClick={() => navigate(b.cta_primary_link || '/kategorija/akcija')}
+                >
+                  {PrimaryIcon && <PrimaryIcon size={15} weight="fill" />} {b.cta_primary_text}
+                </button>
+              )
+            })()}
+            {b.cta_secondary_text && (() => {
+              const SecondaryIcon = CTA_ICONS[b.cta_secondary_icon ?? 'strelica'] ?? ArrowRight
+              return (
+                <button
+                  className="flex items-center gap-2 px-6 md:px-8 py-3 md:py-3.5 border border-white/35 text-white text-[11px] md:text-[12px] font-bold tracking-[0.1em] hover:border-white/70 hover:bg-white/10 transition-all duration-150 cursor-pointer"
+                  style={BODY}
+                  onClick={() => navigate(b.cta_secondary_link || '/kategorija/proteini')}
+                >
+                  {b.cta_secondary_text} {SecondaryIcon && <SecondaryIcon size={14} weight="bold" />}
+                </button>
+              )
+            })()}
           </div>
 
           {/* Stats — samo desktop, mobilni banner mora biti kratak */}

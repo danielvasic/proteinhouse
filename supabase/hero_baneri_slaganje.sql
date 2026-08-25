@@ -16,3 +16,9 @@ alter table hero_banners
 -- ili slozeni produktni baner (layout='produkt' — naslov, cijena, USP...).
 alter table hero_banners
   add column if not exists layout text not null default 'produkt';
+
+-- Ikona na CTA dugmadima se bira u adminu umjesto da je zapecena u kod
+-- (tag/poklon/dostava/korpa/munja/strelica/bez).
+alter table hero_banners
+  add column if not exists cta_primary_icon   text not null default 'tag',
+  add column if not exists cta_secondary_icon text not null default 'strelica';
