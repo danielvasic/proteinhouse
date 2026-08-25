@@ -1,7 +1,39 @@
 import { useEffect, useRef, useState } from 'react'
 import { Plus, Pencil, Trash2, Image, Save, X, RefreshCw, Star, StarOff, Upload } from 'lucide-react'
+import { Tag, ArrowRight, Truck, Gift, ShoppingCart, Lightning } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import StripBanners from './Banners'
+
+/** Iste ikone koje javni baner poznaje — kljucevi se snimaju u bazu. */
+const CTA_ICON_CHOICES = [
+  ['tag',      Tag,          'Oznaka'],
+  ['poklon',   Gift,         'Poklon'],
+  ['dostava',  Truck,        'Dostava'],
+  ['korpa',    ShoppingCart, 'Korpa'],
+  ['munja',    Lightning,    'Munja'],
+  ['strelica', ArrowRight,   'Strelica'],
+  ['bez',      null,         'Bez ikone'],
+]
+
+function IconPicker({ value, fallback, onPick }) {
+  return (
+    <div className="flex gap-1.5 flex-wrap">
+      {CTA_ICON_CHOICES.map(([key, Icon, label]) => (
+        <button
+          key={key}
+          type="button"
+          title={label}
+          onClick={() => onPick(key)}
+          className={`w-9 h-9 rounded-lg border flex items-center justify-center cursor-pointer transition-colors ${
+            (value ?? fallback) === key ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 hover:border-gray-300 text-gray-500'
+          }`}
+        >
+          {Icon ? <Icon size={16} weight="fill" /> : <span className="text-[10px] font-medium">—</span>}
+        </button>
+      ))}
+    </div>
+  )
+}
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -17,6 +49,7 @@ const EMPTY = {
   cta_secondary_text: '', cta_secondary_link: '/kategorija/proteini',
   image_url: '', sort_order: 0, is_active: false,
   price_text: '', old_price_text: '', usp_lines: '', fg_image_url: '',
+  cta_primary_icon: 'tag', cta_secondary_icon: 'strelica',
 }
 
 function Field({ label, hint, children }) {
@@ -167,6 +200,14 @@ function BannerForm({ item, onSave, onCancel }) {
           </Field>
           <Field label="Primarno dugme — link">
             <Input value={form.cta_primary_link} onChange={set('cta_primary_link')} placeholder="/kategorija/akcija" />
+          </Field>
+          <Field label="Primarno dugme — ikona">
+            <IconPicker value={form.cta_primary_icon} fallback="tag"
+              onPick={(key) => setForm((f) => ({ ...f, cta_primary_icon: key }))} />
+          </Field>
+          <Field label="Sekundarno dugme — ikona">
+            <IconPicker value={form.cta_secondary_icon} fallback="strelica"
+              onPick={(key) => setForm((f) => ({ ...f, cta_secondary_icon: key }))} />
           </Field>
           <Field label="Primarno dugme — boja" hint="Plava je standard. Crvenu koristimo samo za izuzetno važne akcije — ako je sve crveno, ništa nije važno.">
             <div className="flex gap-2">
