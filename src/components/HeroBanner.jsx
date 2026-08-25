@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Tag, ArrowRight } from '@phosphor-icons/react'
+import { Tag, ArrowRight, Truck, Gift, SealCheck } from '@phosphor-icons/react'
 import { useParallax } from '../lib/useParallax'
 import { BODY, DISPLAY } from '../lib/typography'
 
@@ -23,6 +23,33 @@ const STATS = [
 
 const SLIDE_MS  = 6500
 const MAX_SLIDES = 3
+
+/**
+ * Dio naslova između ** dobija plavu podlogu (Slavenovi mockupi — "150+ KM."
+ * i "poklon" na plavoj pločici). Split s capture grupom vraća naizmjenično
+ * običan/označen tekst, pa su neparni indeksi uvijek označeni dio.
+ */
+function renderTitleLine(line) {
+  const parts = line.split(/\*\*(.+?)\*\*/g)
+  if (parts.length === 1) return line
+  return parts.map((part, i) =>
+    i % 2 === 1
+      ? <span key={i} className="bg-[#0136C4] text-white px-[0.18em] box-decoration-clone">{part}</span>
+      : <span key={i}>{part}</span>
+  )
+}
+
+/**
+ * Ikona za USP red po ključnoj riječi — dostava vozi kamion, poklon nosi
+ * poklon, ušteda/popust oznaku; sve ostalo dobija kvačicu. Pravila su
+ * namjerno po značenju a ne po tačnom tekstu, da novi baneri rade bez koda.
+ */
+function uspIcon(line) {
+  if (/dostav/i.test(line))                  return Truck
+  if (/poklon|gift/i.test(line))             return Gift
+  if (/u[šs]ted|popust|%|akcij/i.test(line)) return Tag
+  return SealCheck
+}
 
 export default function HeroBanner() {
   const navigate = useNavigate()
@@ -80,6 +107,22 @@ export default function HeroBanner() {
         style={{ maskImage: 'linear-gradient(90deg, transparent 0%, black 60%)', WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 60%)' }}
       />
 
+      {/* Slika proizvoda — desna trećina, tekst lijevo ostaje čitljiv preko
+          gradijenta. Samo desktop: na mobilnom bi se tukla s tekstom. */}
+      {b.fg_image_url && (
+        <div
+          key={`fg-${index}`}
+          className="hidden md:flex absolute inset-y-0 right-0 w-1/3 items-center justify-center pointer-events-none"
+          style={{ animation: 'heroFade 400ms ease' }}
+        >
+          <img
+            src={b.fg_image_url}
+            alt=""
+            className="max-h-[76%] max-w-[84%] object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]"
+          />
+        </div>
+      )}
+
       <div className="container w-full relative">
         <div key={index} className="max-w-[620px] py-8 md:py-16" style={{ animation: 'heroFade 400ms ease' }}>
 
@@ -103,7 +146,7 @@ export default function HeroBanner() {
             style={DISPLAY}
           >
             {titleLines.map((line, i) => (
-              <span key={i}>{line}{i < titleLines.length - 1 && <br />}</span>
+              <span key={i}>{renderTitleLine(line)}{i < titleLines.length - 1 && <br />}</span>
             ))}
           </h1>
 
@@ -115,6 +158,38 @@ export default function HeroBanner() {
             >
               {b.subtitle}
             </p>
+          )}
+
+          {/* Cjenovni blok (mockup 2 — istaknuta akcija topsellera) */}
+          {b.price_text && (
+            <div className="flex items-baseline gap-3 mb-5 md:mb-8">
+              <span
+                className="text-[30px] md:text-[44px] font-bold text-white leading-none"
+                style={DISPLAY}
+              >
+                {b.price_text}
+              </span>
+              {b.old_price_text && (
+                <span className="text-[15px] md:text-[19px] text-white/45 line-through" style={BODY}>
+                  {b.old_price_text}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* USP redovi — samo desktop, mobilni banner mora biti kratak */}
+          {b.usp_lines && (
+            <div className="hidden md:flex flex-col gap-2.5 mb-8">
+              {b.usp_lines.split('\n').map((s) => s.trim()).filter(Boolean).map((line, i) => {
+                const Icon = uspIcon(line)
+                return (
+                  <div key={i} className="flex items-center gap-2.5">
+                    <Icon size={17} weight="fill" className="text-[#00cec9] shrink-0" />
+                    <span className="text-[13px] text-white/80" style={BODY}>{line}</span>
+                  </div>
+                )
+              })}
+            </div>
           )}
 
           {/* CTAs */}

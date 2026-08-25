@@ -14,6 +14,7 @@ const EMPTY = {
   cta_primary_text: '', cta_primary_link: '/kategorija/akcija', cta_style: 'plavi',
   cta_secondary_text: '', cta_secondary_link: '/kategorija/proteini',
   image_url: '', sort_order: 0, is_active: false,
+  price_text: '', old_price_text: '', usp_lines: '', fg_image_url: '',
 }
 
 function Field({ label, hint, children }) {
@@ -32,10 +33,11 @@ function BannerForm({ item, onSave, onCancel }) {
   const [uploading, setUploading] = useState(false)
   const [error,     setError]     = useState('')
   const fileRef = useRef(null)
+  const fgFileRef = useRef(null)
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
-  const handleUpload = async (e) => {
+  const handleUpload = (field) => async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
@@ -48,7 +50,7 @@ function BannerForm({ item, onSave, onCancel }) {
       setError(`Upload error: ${uploadErr.message}`)
     } else {
       const { data } = supabase.storage.from('product-images').getPublicUrl(path)
-      setForm((f) => ({ ...f, image_url: data.publicUrl }))
+      setForm((f) => ({ ...f, [field]: data.publicUrl }))
     }
     setUploading(false)
     e.target.value = ''
@@ -94,13 +96,46 @@ function BannerForm({ item, onSave, onCancel }) {
           </Field>
         </div>
 
-        <Field label="Naslov (/ za novi red)" hint="Primjer: Snaga u/svakoj/mjerici">
+        <Field label="Naslov (/ za novi red)" hint="Primjer: Naruči za/**150+ KM.**/Gorilla Wear **poklon** je tvoj. — tekst između ** dobija plavu podlogu">
           <Input value={form.title_lines} onChange={set('title_lines')} placeholder="Snaga u/svakoj/mjerici" required />
         </Field>
 
         <Field label="Podnaslov">
           <Textarea value={form.subtitle} onChange={set('subtitle')} rows={2}
             placeholder="Do −70% na izabrane proteinske formule. Besplatna dostava na sve narudžbe preko 100 KM." />
+        </Field>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Cijena (opciono)" hint="Veliki cjenovni blok, npr. za istaknutu akciju topsellera">
+            <Input value={form.price_text ?? ''} onChange={set('price_text')} placeholder="189,95 KM" />
+          </Field>
+          <Field label="Stara cijena (opciono)" hint="Prikazuje se precrtana pored cijene">
+            <Input value={form.old_price_text ?? ''} onChange={set('old_price_text')} placeholder="209,00 KM" />
+          </Field>
+        </div>
+
+        <Field label="USP stavke (opciono)" hint="Jedan red = jedna stavka s ikonom. Ikona se bira sama: dostava → kamion, poklon → poklon, ušteda → oznaka.">
+          <Textarea value={form.usp_lines ?? ''} onChange={set('usp_lines')} rows={2}
+            placeholder={'Uštedi 19,05 KM i ostvari besplatnu dostavu.\nOvom kupnjom odmah otključavaš i Gorilla Wear poklon.'} />
+        </Field>
+
+        <Field label="Slika proizvoda (opciono)" hint="Prikazuje se u DESNOJ TREĆINI banera — tekst lijevo ostaje čitljiv preko gradijenta. PNG s prozirnom pozadinom najbolje radi.">
+          <div className="flex gap-3 items-start">
+            {form.fg_image_url && (
+              <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-gray-900">
+                <img src={form.fg_image_url} alt="" className="w-full h-full object-contain" onError={(e) => e.target.style.display='none'} />
+              </div>
+            )}
+            <div className="flex-1 space-y-2">
+              <Input value={form.fg_image_url ?? ''} onChange={set('fg_image_url')} placeholder="https://... ili uploaduj ispod" />
+              <div className="flex gap-2">
+                <input ref={fgFileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload('fg_image_url')} />
+                <Button type="button" variant="outline" size="sm" onClick={() => fgFileRef.current?.click()} disabled={uploading} className="flex items-center gap-1.5">
+                  {uploading ? <><RefreshCw size={12} className="animate-spin" /> Uploaduje…</> : <><Upload size={12} /> Upload slike</>}
+                </Button>
+              </div>
+            </div>
+          </div>
         </Field>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -145,7 +180,7 @@ function BannerForm({ item, onSave, onCancel }) {
             <div className="flex-1 space-y-2">
               <Input value={form.image_url} onChange={set('image_url')} placeholder="https://... ili uploaduj ispod" />
               <div className="flex gap-2">
-                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload('image_url')} />
                 <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex items-center gap-1.5">
                   {uploading ? <><RefreshCw size={12} className="animate-spin" /> Uploaduje…</> : <><Upload size={12} /> Upload slike</>}
                 </Button>
