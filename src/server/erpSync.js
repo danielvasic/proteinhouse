@@ -36,6 +36,12 @@ import { toErpArticle, sellPrice, slugify, stripHtml, splitUsage, suggestExtraCa
 // poznatoj vrijednosti (trigger erp_articles_keep_known u bazi).
 export const ERP_BASE = process.env.ERP_API_BASE || 'https://proteinhouse-api.work/api'
 
+// Stanje skladišta smije živjeti na drugom hostu od kataloga. Stari API je
+// vraćen jer o njemu ovisi stara stranica dok nova ne krene, a novi (s
+// endpointom za lager) je preseljen drugdje — pa se izvori mogu razdvojiti
+// bez izmjene koda. Ako nije postavljeno, koristi se isti host kao katalog.
+export const ERP_STOCK_BASE = process.env.ERP_STOCK_API_BASE || ERP_BASE
+
 const BATCH = 500
 
 /** Brend kad ga ERP ne pošalje — ujedno oznaka da nacrt treba popraviti. */
@@ -89,7 +95,7 @@ export async function fetchStockBySku(signal) {
   const stock = new Map()
   const getPage = async (page) => {
     const res = await fetch(
-      `${ERP_BASE}/Artikli/GetArtikliSaStanjem?page=${page}&pageSize=200`,
+      `${ERP_STOCK_BASE}/Artikli/GetArtikliSaStanjem?page=${page}&pageSize=200`,
       { headers: { Accept: 'application/json' }, signal },
     )
     if (!res.ok) throw new Error(`ERP stanje ${res.status} (page ${page})`)
@@ -216,7 +222,7 @@ function stockFor(articles, existingVariants) {
  *   prolazu; prvi backfill je ~800 grupa pa se raspoređuje kroz više prolaza
  *   da funkcija ne padne na timeoutu.
  */
-export async function reconcileProducts(supabase, { createLimit = 200, dryRun = false } = {}) {
+export async function reconcileProducts(supabase, { createLimit = 200, dryRun = false, degraded = false } = {}) {
   // selectAll jer REST vraca najvise 1000 redaka, a ogledalo ih ima ~2600 —
   // bez ovoga reconcile vidi samo prvi dio abecede i "izgubi" ostatak.
   const articles = await selectAll(
@@ -317,6 +323,14 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
   let created = 0
   const drafts = []
 
+  // Iz osakaćenog odgovora se ne stvaraju NOVI proizvodi — tako je 27.8.
+  // nastalo 2128 nacrta bez brenda, kategorije i slike. Cijene i stanje
+  // postojećih se i dalje osvježe; katalog samo ne raste dok izvor ne
+  // prizdravi.
+  if (degraded) {
+    return { updated, stockUpdated, healed, created: 0, remaining: groups.size, skippedDegraded: true }
+  }
+
   for (const [, mine] of groups) {
     if (created >= createLimit) break
     const first = mine[0]
@@ -401,7 +415,7 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
       console.error('erp-sync: stanje skladišta nedostupno:', stockError)
     }
     const mirror = dryRun ? { upserted: 0, wentMissing: 0 } : await mirrorArticles(supabase, articles, stockBySku)
-    const recon  = await reconcileProducts(supabase, { createLimit, dryRun })
+    const recon  = await reconcileProducts(supabase, { createLimit, dryRun, degraded })
 
     const result = {
       fetched: articles.length,
