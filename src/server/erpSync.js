@@ -18,25 +18,70 @@
 import { serviceClient } from './supabaseAdmin.js'
 import { toErpArticle, sellPrice, slugify, stripHtml, splitUsage, suggestExtraCategories } from './erpMapping.js'
 
-// WebShopRobMat API (kolovoz 2026) — stari GetAllProducts je ugašen 25.8. i
-// vraća 404. Ogledalo se puni s GetByKlijent jer je jedini endpoint s potpunom
-// slikom (1689 artikala, bez IsWeb filtera — IsWeb u ERP-u ionako nitko ne
-// održava). Stanje skladišta postoji isključivo na GetArtikliSaStanjem, koji
-// vraća podskup (1120), pa se koristi kao overlay preko ogledala: artikal bez
-// retka u overlayu zadržava qty=null ("nepoznato"), nikad 0.
+// ERP API se dvaput mijenjao i vraćao (25.8. je GetAllProducts nestao, 27.8.
+// se vratio), pa se izvor bira po onome što endpoint STVARNO vrati, ne po
+// pretpostavci:
+//
+//   GetAllProducts — potpuni zapisi (brend, grupa, slika, opis). Kad radi,
+//                    ovo je izvor; to je i endpoint namijenjen webshopu.
+//   GetByKlijent   — više šifri (3958 vs 1349), ali "skeleton": bez brenda,
+//                    grupe, slike i opisa. Rezerva, samo ako prvi padne.
+//
+// Zašto redoslijed, a ne "više redaka pobjeđuje": 27.8. je GetByKlijent vratio
+// 3958 praznih zapisa i time obrisao brend/kategoriju/sliku cijelom ogledalu.
+// Više redaka bez sadržaja je gori izvor od manje redaka sa sadržajem.
+//
+// Stanje skladišta trenutno NE POSTOJI ni na jednom endpointu — GetArtikliSaStanjem
+// je ugašen s povratkom starog API-ja. Dok se ne vrati, qty ostaje na zadnjoj
+// poznatoj vrijednosti (trigger erp_articles_keep_known u bazi).
 export const ERP_BASE = process.env.ERP_API_BASE || 'https://proteinhouse-api.work/api'
+
+// Stanje skladišta smije živjeti na drugom hostu od kataloga. Stari API je
+// vraćen jer o njemu ovisi stara stranica dok nova ne krene, a novi (s
+// endpointom za lager) je preseljen drugdje — pa se izvori mogu razdvojiti
+// bez izmjene koda. Ako nije postavljeno, koristi se isti host kao katalog.
+export const ERP_STOCK_BASE = process.env.ERP_STOCK_API_BASE || ERP_BASE
 
 const BATCH = 500
 
-/** Dohvati sve artikle iz ERP-a. */
+/** Brend kad ga ERP ne pošalje — ujedno oznaka da nacrt treba popraviti. */
+const FALLBACK_BRAND = 'ProteinHouse'
+
+/** Ima li odgovor stvarni sadržaj ili su to prazne ljušture? */
+function looksComplete(rows) {
+  if (!rows.length) return false
+  const sample = rows.slice(0, 200)
+  const withBrand = sample.filter((r) => r.nazivProizvodjaca || r.nazivGrupe).length
+  return withBrand / sample.length > 0.5
+}
+
+/**
+ * Dohvati artikle iz ERP-a. Vraća { rows, source } da se u dnevniku vidi
+ * odakle su podaci došli — bez toga se ovakav obrt primijeti tek po šteti.
+ */
 export async function fetchArticles(signal) {
-  const res = await fetch(`${ERP_BASE}/Artikli/GetByKlijent`, {
-    headers: { Accept: 'application/json' }, signal,
-  })
-  if (!res.ok) throw new Error(`ERP API ${res.status}`)
-  const data = await res.json()
-  if (!Array.isArray(data)) throw new Error('ERP API nije vratio niz artikala.')
-  return data
+  const tryOne = async (path) => {
+    const res = await fetch(`${ERP_BASE}/Artikli/${path}`, {
+      headers: { Accept: 'application/json' }, signal,
+    })
+    if (!res.ok) throw new Error(`ERP API ${path} ${res.status}`)
+    const data = await res.json()
+    if (!Array.isArray(data)) throw new Error(`ERP API ${path} nije vratio niz.`)
+    return data
+  }
+
+  let firstError = null
+  try {
+    const rows = await tryOne('GetAllProducts')
+    if (looksComplete(rows)) return { rows, source: 'GetAllProducts' }
+    firstError = `GetAllProducts vratio ${rows.length} praznih zapisa`
+  } catch (err) {
+    firstError = String(err.message || err)
+  }
+
+  console.warn('erp-sync: GetAllProducts neupotrebljiv —', firstError, '→ GetByKlijent')
+  const rows = await tryOne('GetByKlijent')
+  return { rows, source: 'GetByKlijent', degraded: !looksComplete(rows) }
 }
 
 /**
@@ -50,7 +95,7 @@ export async function fetchStockBySku(signal) {
   const stock = new Map()
   const getPage = async (page) => {
     const res = await fetch(
-      `${ERP_BASE}/Artikli/GetArtikliSaStanjem?page=${page}&pageSize=200`,
+      `${ERP_STOCK_BASE}/Artikli/GetArtikliSaStanjem?page=${page}&pageSize=200`,
       { headers: { Accept: 'application/json' }, signal },
     )
     if (!res.ok) throw new Error(`ERP stanje ${res.status} (page ${page})`)
@@ -97,8 +142,12 @@ async function selectAll(query, pageSize = 1000) {
 export async function mirrorArticles(supabase, articles, stockBySku = new Map()) {
   const syncStartedAt = new Date().toISOString()
   const rows = articles.map(toErpArticle).filter((r) => r.sku)
+  // Kad stanje uopće nije stiglo (endpoint ugašen), qty se NE dira — inače bi
+  // jedan pad obrisao zadnje poznato stanje cijelom katalogu. Kad jest stiglo,
+  // artikal bez retka u overlayu ostaje "nepoznato" umjesto da postane 0.
   for (const r of rows) {
-    r.qty = stockBySku.has(r.sku) ? stockBySku.get(r.sku) : null
+    r.qty = stockBySku.size ? (stockBySku.get(r.sku) ?? null) : undefined
+    if (r.qty === undefined) delete r.qty
   }
 
   for (let i = 0; i < rows.length; i += BATCH) {
@@ -173,17 +222,17 @@ function stockFor(articles, existingVariants) {
  *   prolazu; prvi backfill je ~800 grupa pa se raspoređuje kroz više prolaza
  *   da funkcija ne padne na timeoutu.
  */
-export async function reconcileProducts(supabase, { createLimit = 200, dryRun = false } = {}) {
+export async function reconcileProducts(supabase, { createLimit = 200, dryRun = false, degraded = false } = {}) {
   // selectAll jer REST vraca najvise 1000 redaka, a ogledalo ih ima ~2600 —
   // bez ovoga reconcile vidi samo prvi dio abecede i "izgubi" ostatak.
   const articles = await selectAll(
     supabase.from('erp_articles')
-      .select('sku, erp_id, name, brand, group_name, category_slug, base_name, size, flavor, price, price_discount, qty, image_path, description_html, is_top, is_new')
+      .select('sku, erp_id, name, brand, group_name, category_slug, base_name, size, flavor, price, price_discount, qty, image_path, description_html, is_top, is_new, is_web')
       .is('missing_since', null).order('sku'))
 
   const products = await selectAll(
     supabase.from('products')
-      .select('id, slug, erp_skus, erp_sync_price, erp_sync_stock, price, old_price, badge, stock, stock_variants')
+      .select('id, slug, erp_skus, erp_sync_price, erp_sync_stock, price, old_price, badge, stock, stock_variants, brand, title, category, is_active')
       .order('id'))
 
   const bySku = new Map()
@@ -192,6 +241,7 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
   // ── Osvježi postojeće ──
   let updated = 0
   let stockUpdated = 0
+  let healed = 0
   const pendingUpdates = []
   const claimed = new Set()
   for (const p of products) {
@@ -225,6 +275,20 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
       }
     }
 
+    // Samoizlječenje: nacrt je nastao dok je ERP vraćao osakaćene zapise, pa
+    // je ostao bez brenda (fallback "ProteinHouse") i s kategorijom iz
+    // fallbacka. Kad se pravi podaci vrate, popravi ga — ali samo dok je
+    // nacrt i dok ga niko nije preuzeo, da se ručne izmjene ne gaze.
+    if (!p.is_active && p.brand === FALLBACK_BRAND) {
+      const src = mine.find((a) => a.brand) || mine[0]
+      if (src?.brand) {
+        patch.brand = src.brand
+        if (src.base_name) patch.title = src.base_name
+        if (src.category_slug) patch.category = src.category_slug
+        healed++
+      }
+    }
+
     if (!Object.keys(patch).length) continue
     pendingUpdates.push({ id: p.id, patch })
     updated++
@@ -247,9 +311,20 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
 
   // ── Nove grupe → nacrti ──
   // Grupišemo po brendu i nazivu bez gramaže/okusa, isto kao jednokratni uvoz.
+  //
+  // Novi ERP API (kolovoz 2026) konačno održava isWeb: 1571 od 3958 artikala
+  // je označeno za web, i baš za njih postoji stanje skladišta. Ranije je
+  // isWeb bio false na svemu pa se nije mogao koristiti, i katalog je zato
+  // pokupio 2609 artikala koji na web ne idu. Sada filtriramo po ERP-ovoj
+  // vlastitoj oznaci umjesto da nagađamo.
+  //
+  // Ako oznaka ikad opet zamre (nula označenih), filter se sam isključuje —
+  // bolje previše nacrta nego prazan katalog.
+  const anyWebFlag = articles.some((a) => a.is_web)
   const groups = new Map()
   for (const a of articles) {
     if (claimed.has(a.sku)) continue
+    if (anyWebFlag && !a.is_web) continue
     const key = `${a.brand || '—'}|${a.base_name || a.name}`
     if (!groups.has(key)) groups.set(key, [])
     groups.get(key).push(a)
@@ -259,10 +334,18 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
   let created = 0
   const drafts = []
 
+  // Iz osakaćenog odgovora se ne stvaraju NOVI proizvodi — tako je 27.8.
+  // nastalo 2128 nacrta bez brenda, kategorije i slike. Cijene i stanje
+  // postojećih se i dalje osvježe; katalog samo ne raste dok izvor ne
+  // prizdravi.
+  if (degraded) {
+    return { updated, stockUpdated, healed, created: 0, remaining: groups.size, skippedDegraded: true }
+  }
+
   for (const [, mine] of groups) {
     if (created >= createLimit) break
     const first = mine[0]
-    const brand = first.brand || 'ProteinHouse'
+    const brand = first.brand || FALLBACK_BRAND
     const base  = first.base_name || first.name
 
     let slug = slugify(`${brand} ${base}`)
@@ -313,7 +396,12 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
     }
   }
 
-  return { updated, stockUpdated, created: drafts.length, remaining: Math.max(0, groups.size - drafts.length) }
+  return {
+    updated, stockUpdated, healed,
+    created: drafts.length,
+    remaining: Math.max(0, groups.size - drafts.length),
+    webFiltered: anyWebFlag,
+  }
 }
 
 /**
@@ -331,7 +419,7 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
   }
 
   try {
-    const articles = await fetchArticles()
+    const { rows: articles, source, degraded } = await fetchArticles()
     // Pad dohvata stanja ne smije oboriti cijeli sync — cijene i katalog su
     // vredniji od svježeg lagera, pa se u tom slučaju qty samo ne mijenja.
     let stockBySku = new Map()
@@ -343,16 +431,20 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
       console.error('erp-sync: stanje skladišta nedostupno:', stockError)
     }
     const mirror = dryRun ? { upserted: 0, wentMissing: 0 } : await mirrorArticles(supabase, articles, stockBySku)
-    const recon  = await reconcileProducts(supabase, { createLimit, dryRun })
+    const recon  = await reconcileProducts(supabase, { createLimit, dryRun, degraded })
 
     const result = {
       fetched: articles.length,
+      source,
+      degraded: !!degraded,
       stockFetched: stockBySku.size,
       stockError,
       upserted: mirror.upserted,
       wentMissing: mirror.wentMissing,
       productsUpdated: recon.updated,
       stockUpdated: recon.stockUpdated,
+      healed: recon.healed,
+      webFiltered: recon.webFiltered,
       productsCreated: recon.created,
       remainingToMap: recon.remaining,
       dryRun,
@@ -366,6 +458,9 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
         went_missing: result.wentMissing,
         products_created: result.productsCreated,
         products_updated: result.productsUpdated,
+        source: result.source,
+        stock_fetched: result.stockFetched,
+        stock_error: stockError,
         ok: true,
       }).eq('id', runId)
     }

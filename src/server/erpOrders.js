@@ -115,9 +115,9 @@ export function buildNarudzba(order, stavke) {
     KupacId:       null, // ERP kreira kupca iz podataka ispod
     ImePrezime:    order.customer_name,
     NazivKupca:    order.customer_name,
-    // NarudzbaVM nema polje za poštanski broj — jedino mjesto gdje ne propada
-    Adresa:        [order.shipping_address, order.shipping_zip].filter(Boolean).join(', '),
+    Adresa:        order.shipping_address ?? '',
     Grad:          order.shipping_city ?? '',
+    Zip:           order.shipping_zip ?? '',
     Telefon:       order.customer_phone ?? '',
     Email:         order.customer_email ?? '',
     DatumNarudzbe: order.created_at ?? new Date().toISOString(),
