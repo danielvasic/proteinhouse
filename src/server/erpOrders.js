@@ -26,9 +26,17 @@ import { ERP_BASE } from './erpSync.js'
 
 /**
  * Web status → ERP IDstatus (GET /GetStatusi: 1 Kreiranje, 2 Na čekanju,
- * 3 Odobrena, 4 Otkazana, 5 Odbijena). "Kreiranje" zvuči kao nacrt usred
- * kreiranja, pa nova web narudžba ulazi kao "Na čekanju"; za isporučenu ERP
- * nema svoj status, pa ostaje na najbližem "Odobrena".
+ * 3 Odobrena, 4 Otkazana, 5 Odbijena).
+ *
+ * PAŽNJA — ERP ovo trenutno IGNORIŠE. Testirano 27.08.2026. na dev API-ju
+ * (narudžbe 1233 i 1234): šta god pošaljemo u IDstatus, zapis završi na
+ * 1 "Kreiranje". Isto vrijedi za DatumNarudzbe — ERP upiše vlastito vrijeme
+ * unosa — i za NazivVelicine na stavci, koji se ne sačuva.
+ *
+ * Polja se svejedno šalju: bezopasna su i proradit će sama ako Haris doda
+ * podršku. Ali ne oslanjaj se na to da status prelazi na ERP stranu, i ne
+ * gradi logiku na pretpostavci da ćemo narudžbu moći kasnije pomjeriti —
+ * rute za promjenu statusa (UpdateStatus/Update/Delete) ne postoje.
  */
 const STATUS_MAP = {
   'nova':       { id: 2, naziv: 'Na čekanju' },
