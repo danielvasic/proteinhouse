@@ -227,7 +227,7 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
   // bez ovoga reconcile vidi samo prvi dio abecede i "izgubi" ostatak.
   const articles = await selectAll(
     supabase.from('erp_articles')
-      .select('sku, erp_id, name, brand, group_name, category_slug, base_name, size, flavor, price, price_discount, qty, image_path, description_html, is_top, is_new')
+      .select('sku, erp_id, name, brand, group_name, category_slug, base_name, size, flavor, price, price_discount, qty, image_path, description_html, is_top, is_new, is_web')
       .is('missing_since', null).order('sku'))
 
   const products = await selectAll(
@@ -311,9 +311,20 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
 
   // ── Nove grupe → nacrti ──
   // Grupišemo po brendu i nazivu bez gramaže/okusa, isto kao jednokratni uvoz.
+  //
+  // Novi ERP API (kolovoz 2026) konačno održava isWeb: 1571 od 3958 artikala
+  // je označeno za web, i baš za njih postoji stanje skladišta. Ranije je
+  // isWeb bio false na svemu pa se nije mogao koristiti, i katalog je zato
+  // pokupio 2609 artikala koji na web ne idu. Sada filtriramo po ERP-ovoj
+  // vlastitoj oznaci umjesto da nagađamo.
+  //
+  // Ako oznaka ikad opet zamre (nula označenih), filter se sam isključuje —
+  // bolje previše nacrta nego prazan katalog.
+  const anyWebFlag = articles.some((a) => a.is_web)
   const groups = new Map()
   for (const a of articles) {
     if (claimed.has(a.sku)) continue
+    if (anyWebFlag && !a.is_web) continue
     const key = `${a.brand || '—'}|${a.base_name || a.name}`
     if (!groups.has(key)) groups.set(key, [])
     groups.get(key).push(a)
@@ -385,7 +396,12 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
     }
   }
 
-  return { updated, stockUpdated, healed, created: drafts.length, remaining: Math.max(0, groups.size - drafts.length) }
+  return {
+    updated, stockUpdated, healed,
+    created: drafts.length,
+    remaining: Math.max(0, groups.size - drafts.length),
+    webFiltered: anyWebFlag,
+  }
 }
 
 /**
@@ -428,6 +444,7 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
       productsUpdated: recon.updated,
       stockUpdated: recon.stockUpdated,
       healed: recon.healed,
+      webFiltered: recon.webFiltered,
       productsCreated: recon.created,
       remainingToMap: recon.remaining,
       dryRun,
