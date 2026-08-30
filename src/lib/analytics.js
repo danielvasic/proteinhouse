@@ -34,11 +34,56 @@ export function getConsent() {
 
 export function setConsent(value) {
   try { localStorage.setItem(CONSENT_KEY, value) } catch { /* private mode */ }
+  // Update ide i na odbijanje — Google mora znati da je odluka donesena,
+  // inače čeka wait_for_update pa svejedno pretpostavi odbijeno.
+  consentModeUpdate(value === 'accepted')
   if (value === 'accepted') loadTags()
 }
 
 let gtmLoaded = false
 let pixelLoaded = false
+let consentModeSpreman = false
+
+/**
+ * Consent Mode v2.
+ *
+ * Nije dovoljno samo ne učitati tag. Google traži da mu se stanje privole
+ * javi izričito: prvo "default" sa svime odbijenim (mora ići PRIJE nego se
+ * ijedan Google tag učita), pa "update" kad korisnik odluči. Bez toga Google
+ * tretira posjete kao potpuno nepoznate umjesto da ih modelira, a od ožujka
+ * 2024. bez ovih signala remarketing u EU ne radi.
+ *
+ * ad_user_data i ad_personalization su dodani u v2 — v1 je imao samo
+ * ad_storage i analytics_storage.
+ */
+function gtag() {
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push(arguments)
+}
+
+export function consentModeDefault() {
+  if (consentModeSpreman || typeof window === 'undefined') return
+  consentModeSpreman = true
+  gtag('consent', 'default', {
+    ad_storage:            'denied',
+    ad_user_data:          'denied',
+    ad_personalization:    'denied',
+    analytics_storage:     'denied',
+    functionality_storage: 'granted',  // košarica i jezik rade i bez privole
+    security_storage:      'granted',
+    wait_for_update:       500,        // ms da korisnik stigne kliknuti
+  })
+}
+
+function consentModeUpdate(prihvaceno) {
+  const v = prihvaceno ? 'granted' : 'denied'
+  gtag('consent', 'update', {
+    ad_storage:         v,
+    ad_user_data:       v,
+    ad_personalization: v,
+    analytics_storage:  v,
+  })
+}
 
 export function loadGTM() {
   const { gtm_id } = mjerenje()
@@ -86,5 +131,9 @@ export function trackEvent(event, params = {}) {
 
 /** Inicijalizacija pri učitavanju stranice — poštuje ranije dat consent. */
 export function initAnalytics() {
-  if (getConsent() === 'accepted') loadTags()
+  // Redoslijed je bitan: default mora biti u dataLayeru prije ijednog taga.
+  consentModeDefault()
+  const odluka = getConsent()
+  if (odluka) consentModeUpdate(odluka === 'accepted')
+  if (odluka === 'accepted') loadTags()
 }

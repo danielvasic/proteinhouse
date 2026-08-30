@@ -6,6 +6,7 @@ import {
   ShoppingCart, House, CaretRight,
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
+import { trackEvent } from '../lib/analytics'
 import { getCategoryBySlug, fmtKM, discountChipClass } from '../data/catalog'
 import { useProduct, getVariantStock } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
@@ -60,6 +61,27 @@ export default function Product() {
   const [flavor, setFlavor] = useState(null)
   const [size,   setSize]   = useState(null)
   const [activeIdx, setActiveIdx] = useState(0)
+
+  // view_item — jednom po proizvodu, ne na svaku promjenu okusa ili galerije.
+  // Google i Meta ovaj događaj koriste za remarketing publike, pa ponavljanje
+  // za isti pregled napuhalo bi brojke.
+  useEffect(() => {
+    if (!product) return
+    trackEvent('view_item', {
+      ecommerce: {
+        currency: 'BAM',
+        value: Number(product.price),
+        items: [{
+          item_id:    product.id,
+          item_name:  product.title,
+          item_brand: product.brand,
+          item_category: product.category,
+          price:      Number(product.price),
+          quantity:   1,
+        }],
+      },
+    })
+  }, [product?.id])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Galerija: prebaci na sliku vezanu za izabrani okus/gramažu (ako postoji)
   useEffect(() => {

@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 const EMPTY = {
   brand: '', title: '', slug: '', price: '', old_price: '',
+  gtin: '', mpn: '', google_kategorija: '',
   description: '', category: 'proteini', image_url: '', image_path: '',
   images: [], // [{path?, url?, variant: null|okus|gramaza|"okus|gramaza"}]
   badge: '', is_active: true, flavors: [], sizes: [], sort_order: 0,
@@ -289,6 +290,9 @@ export default function ProductEdit() {
         ...EMPTY,
         ...data,
         old_price:      data.old_price      ?? '',
+        gtin:              data.gtin              ?? '',
+        mpn:               data.mpn               ?? '',
+        google_kategorija: data.google_kategorija ?? '',
         flavors:        data.flavors        ?? [],
         sizes:          data.sizes          ?? [],
         image_path:     data.image_path     ?? '',
@@ -451,6 +455,9 @@ export default function ProductEdit() {
         ...form,
         price:      parseFloat(form.price),
         old_price:  form.old_price ? parseFloat(form.old_price) : null,
+        gtin:              form.gtin?.trim()              || null,
+        mpn:               form.mpn?.trim()               || null,
+        google_kategorija: form.google_kategorija?.trim() || null,
         sort_order: parseInt(form.sort_order) || 0,
         hero_stats: (form.hero_stats || []).filter((s) => s?.value?.trim()),
         updated_at: new Date().toISOString(),
@@ -605,6 +612,34 @@ export default function ProductEdit() {
                 placeholder="npr. new, gainer, best buy…"
                 hint="Enter za dodavanje — prikazuju se kao oznake na kartici proizvoda"
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Feed za reklame ── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Feed za reklame</CardTitle>
+            <p className="text-xs text-muted-foreground pt-1">
+              Polja koja Google Merchant Center i Meta katalog traže za dinamičke reklame.
+              Nisu obavezna, ali bez barkoda Google proizvod slabije rangira. Feed je na
+              <code className="mx-1 px-1 bg-gray-100 rounded">/feed.xml</code>.
+            </p>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Barkod (GTIN/EAN)" hint="S ambalaže. Google ovo najviše voli.">
+              <Input value={form.gtin} onChange={set('gtin')} placeholder="5901330085321" />
+            </Field>
+            <Field label="Šifra proizvođača (MPN)" hint="Rezerva kad barkod ne postoji">
+              <Input value={form.mpn} onChange={set('mpn')} placeholder="OV-BCAA-811-200" />
+            </Field>
+            <div className="md:col-span-2">
+              <Field
+                label="Google kategorija"
+                hint='Puna putanja, npr. "Health & Beauty > Health Care > Fitness & Nutrition > Nutritional Supplements". Ako je ostaviš praznu, Google pogađa sam — često krivo.'
+              >
+                <Input value={form.google_kategorija} onChange={set('google_kategorija')} placeholder="Health & Beauty > Health Care > …" />
+              </Field>
             </div>
           </CardContent>
         </Card>

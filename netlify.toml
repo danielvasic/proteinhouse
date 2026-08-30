@@ -20,6 +20,14 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
+# Feed proizvoda za Google Merchant Center i Meta katalog. Zaseban unos jer
+# obje platforme traze URL s .xml nastavkom, a /api/* pravilo iznad bi
+# proslijedilo "feed.xml" kao ime funkcije i promasilo.
+[[redirects]]
+  from = "/feed.xml"
+  to = "/.netlify/functions/feed"
+  status = 200
+
 # Static assets in dist/client are served directly by Netlify CDN (fast, cached, no function hit).
 # Every other URL is an SSR rewrite — the browser URL stays the same (status 200).
 [[redirects]]

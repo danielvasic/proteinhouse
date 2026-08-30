@@ -135,6 +135,24 @@ export default function Checkout() {
     })
   }, [])
 
+  // begin_checkout — jednom po dolasku na checkout s punom korpom. Ovisi o
+  // broju stavki, ne o cijeloj korpi: mijenjanje količine na checkoutu nije
+  // novi početak naplate.
+  const brojStavki = items.length
+  useEffect(() => {
+    if (!brojStavki) return
+    trackEvent('begin_checkout', {
+      ecommerce: {
+        currency: 'BAM',
+        value: totalPrice,
+        items: items.map((i) => ({
+          item_id: i.id, item_name: i.title, item_brand: i.brand,
+          price: Number(i.price), quantity: i.qty,
+        })),
+      },
+    })
+  }, [brojStavki > 0])   // eslint-disable-line react-hooks/exhaustive-deps
+
   const prefillFromUser = (u) => {
     setUser(u)
     const meta = u.user_metadata || {}
