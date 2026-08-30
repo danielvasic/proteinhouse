@@ -6,6 +6,7 @@ import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { supabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
+import { zaNarudzbu } from '../lib/atribucija'
 import { calcShipping } from '../lib/shipping'
 import GiftPicker from '../components/GiftPicker'
 import BrandIcon from '../components/BrandIcon'
@@ -248,6 +249,8 @@ export default function Checkout() {
         })),
         p_coupon_code: coupon?.code ?? null,
         p_gift:        gift ?? null,
+        // Klik ID-evi s reklame; null ako posjetitelj nije prihvatio kolačiće.
+        p_atribucija:  zaNarudzbu(),
       })
       if (error) throw error
 

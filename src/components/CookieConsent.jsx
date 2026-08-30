@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { getConsent, setConsent, initAnalytics } from '../lib/analytics'
+import { zabiljeziDolazak, promoviraj } from '../lib/atribucija'
 import { BODY } from '../lib/typography'
 
 /**
@@ -13,6 +14,9 @@ export default function CookieConsent() {
   const [more,    setMore]    = useState(false)
 
   useEffect(() => {
+    // Klik ID s reklame stigne samo na prvoj otvorenoj stranici — hvata se
+    // prije nego posjetitelj išta odluči, ali do privole ostaje u sesiji.
+    zabiljeziDolazak()
     initAnalytics()
     if (!getConsent()) setVisible(true)
   }, [])
@@ -21,6 +25,9 @@ export default function CookieConsent() {
 
   const decide = (value) => {
     setConsent(value)
+    // Na prihvat ono što je skupljeno u sesiji prelazi u kolačić od 90 dana,
+    // pa atribucija preživi i ako se kupac vrati sutra.
+    if (value === 'accepted') promoviraj()
     setVisible(false)
   }
 
