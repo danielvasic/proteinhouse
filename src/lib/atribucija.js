@@ -124,6 +124,14 @@ export function zaNarudzbu() {
   const a = getAtribucija()
   const fbp = citajKolacic('_fbp')
   if (fbp) a.fbp = fbp
+  // GA4 client_id iz _ga kolačića (oblik GA1.1.<client_id>). Bez njega bi
+  // Measurement Protocol svaku narudžbu pripisao novom korisniku i server-side
+  // kupovina se ne bi spojila s onim što je posjetitelj radio na sajtu.
+  const ga = citajKolacic('_ga')
+  if (ga) {
+    const dio = ga.split('.').slice(2).join('.')
+    if (dio) a.ga_client = dio
+  }
   // Pixel je mogao postaviti svoj _fbc točnije nego mi (npr. klik na drugoj
   // stranici u istoj sesiji) — ako postoji, njegov ima prednost.
   const fbc = citajKolacic('_fbc')
