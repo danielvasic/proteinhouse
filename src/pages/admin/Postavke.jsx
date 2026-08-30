@@ -28,6 +28,26 @@ const SECTIONS = {
       { key: 'footer_copyright', label: 'Copyright tekst',          type: 'text',     placeholder: 'ProteinHouse d.o.o. Sva prava zadržana.' },
     ],
   },
+  mjerenje: {
+    label: 'Mjerenje',
+    opis: 'ID-evi za Google i Meta. Vrijede od sljedećeg učitavanja stranice — nije potreban novi deploy.',
+    fields: [
+      { key: 'mjerenje_gtm_id', label: 'Google Tag Manager — ID kontejnera', type: 'text',
+        placeholder: 'GTM-XXXXXXX', pomoc: 'Radi odmah čim ga upišeš. Učitava se tek nakon što posjetitelj prihvati kolačiće.' },
+      { key: 'mjerenje_meta_pixel_id', label: 'Meta Pixel — ID', type: 'text',
+        placeholder: '1234567890', pomoc: 'Radi odmah. Upiši ga OVDJE samo ako Pixel nije već postavljen unutar GTM kontejnera — inače bi se svaki događaj brojao dvaput.' },
+      { key: 'mjerenje_ga4_id', label: 'Google Analytics 4 — Measurement ID', type: 'text',
+        placeholder: 'G-XXXXXXXXXX', pomoc: 'Spremljeno za kasnije. GA4 se obično vodi kroz GTM, pa ovo popuni samo ako ti Friday 13 kaže.' },
+      { key: 'mjerenje_google_ads_id', label: 'Google Ads — Conversion ID', type: 'text',
+        placeholder: 'AW-123456789', pomoc: 'Spremljeno za kasnije — koristit će ga server-side slanje konverzija.' },
+      { key: 'mjerenje_google_ads_label', label: 'Google Ads — Conversion Label', type: 'text',
+        placeholder: 'AbC-D_efG', pomoc: 'Spremljeno za kasnije.' },
+      { key: 'meta_capi_token', label: 'Meta Conversions API — token', type: 'password', tajna: true,
+        placeholder: 'EAAG…', pomoc: 'TAJNA. Spremljeno za kasnije, kad napravimo server-side slanje. Čuva se odvojeno od ostalih postavki i nikad ne izlazi na stranicu.' },
+      { key: 'meta_test_event_code', label: 'Meta — Test Event Code', type: 'password', tajna: true,
+        placeholder: 'TEST12345', pomoc: 'TAJNA. Samo za testiranje u Meta Events Manageru, obriši kad završiš.' },
+    ],
+  },
   seo: {
     label: 'SEO & Meta',
     fields: [
@@ -46,9 +66,15 @@ export default function Postavke() {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.from('site_content').select('key, value')
+      // Tajne su u zasebnoj tablici koju smije čitati samo admin; ako upit
+      // padne (npr. sesija istekla), ostale postavke se svejedno prikažu.
+      const [{ data }, { data: tajne }] = await Promise.all([
+        supabase.from('site_content').select('key, value'),
+        supabase.from('ad_secrets').select('key, value'),
+      ])
       const map = {}
       ;(data ?? []).forEach((r) => { map[r.key] = r.value?.text ?? r.value ?? '' })
+      ;(tajne ?? []).forEach((r) => { map[r.key] = r.value ?? '' })
       setContent(map)
       setLoading(false)
     }
@@ -59,12 +85,24 @@ export default function Postavke() {
     setSaving((s) => ({ ...s, [sectionKey]: true }))
     try {
       const section = SECTIONS[sectionKey]
-      const upserts = section.fields.map((f) => ({
-        key: f.key,
-        value: { text: content[f.key] ?? '' },
-        updated_at: new Date().toISOString(),
-      }))
-      await supabase.from('site_content').upsert(upserts, { onConflict: 'key' })
+      const sada = new Date().toISOString()
+      // Tajne u ad_secrets (samo admin čita), sve ostalo u site_content koji
+      // je javno čitljiv jer ga SSR treba za prikaz stranice.
+      const javna = section.fields.filter((f) => !f.tajna)
+      const tajna = section.fields.filter((f) => f.tajna)
+
+      if (javna.length) {
+        await supabase.from('site_content').upsert(
+          javna.map((f) => ({ key: f.key, value: { text: content[f.key] ?? '' }, updated_at: sada })),
+          { onConflict: 'key' },
+        )
+      }
+      if (tajna.length) {
+        await supabase.from('ad_secrets').upsert(
+          tajna.map((f) => ({ key: f.key, value: content[f.key] ?? '', updated_at: sada })),
+          { onConflict: 'key' },
+        )
+      }
       setSaved((s) => ({ ...s, [sectionKey]: true }))
       setTimeout(() => setSaved((s) => ({ ...s, [sectionKey]: false })), 2500)
     } finally {
@@ -107,7 +145,7 @@ export default function Postavke() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">{section.label}</CardTitle>
-                <CardDescription>Izmjene se automatski čuvaju po sekciji.</CardDescription>
+                <CardDescription>{section.opis ?? 'Izmjene se automatski čuvaju po sekciji.'}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {section.fields.map((field) => (
@@ -122,10 +160,17 @@ export default function Postavke() {
                       />
                     ) : (
                       <Input
+                        type={field.type === 'password' ? 'password' : 'text'}
+                        autoComplete={field.type === 'password' ? 'new-password' : undefined}
                         value={content[field.key] ?? ''}
                         onChange={(e) => setContent((c) => ({ ...c, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
                       />
+                    )}
+                    {field.pomoc && (
+                      <p className={`text-[11px] leading-relaxed ${field.tajna ? 'text-amber-700' : 'text-muted-foreground'}`}>
+                        {field.pomoc}
+                      </p>
                     )}
                   </div>
                 ))}

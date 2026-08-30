@@ -82,6 +82,46 @@ async function prefetchMeta(url, origin) {
   return null // fall through to Helmet (works for static pages)
 }
 
+// ─── Postavke mjerenja (GTM, Pixel…) ───────────────────────────────────────
+// Ubacuju se u <head> kao globalna varijabla da ih analytics.js pročita u
+// runtime. Ranije su bile VITE_ varijable koje Vite zapeče u bundle, pa ih
+// klijent nije mogao promijeniti bez novog builda.
+//
+// SAMO javni ID-evi. Tajne (Meta CAPI token i sl.) žive u tablici ad_secrets
+// koju anonimni ključ ne smije čitati — ovdje bi završile u izvoru stranice.
+const JAVNI_KLJUCEVI = {
+  mjerenje_gtm_id:           'gtm_id',
+  mjerenje_ga4_id:           'ga4_id',
+  mjerenje_meta_pixel_id:    'meta_pixel_id',
+  mjerenje_google_ads_id:    'google_ads_id',
+  mjerenje_google_ads_label: 'google_ads_label',
+}
+
+async function fetchMjerenje() {
+  const { data } = await supabase
+    .from('site_content')
+    .select('key, value')
+    .in('key', Object.keys(JAVNI_KLJUCEVI))
+  const out = {}
+  for (const red of data ?? []) {
+    const polje = JAVNI_KLJUCEVI[red.key]
+    const vrijednost = String(red.value?.text ?? red.value ?? '').trim()
+    if (polje && vrijednost) out[polje] = vrijednost
+  }
+  return out
+}
+
+/**
+ * Serijalizacija u <script>. JSON.stringify nije dovoljan: vrijednost koja
+ * sadrži "</script>" bi zatvorila tag i pretvorila ostatak u HTML. Zato se
+ * "<" pobjegne u \u003c — JSON to i dalje čita ispravno.
+ */
+function mjerenjeScript(cfg) {
+  if (!Object.keys(cfg).length) return ''
+  const json = JSON.stringify(cfg).replace(/</g, '\\u003c')
+  return `<script>window.__PH_MJERENJE__=${json}</script>`
+}
+
 // ─── Build raw <head> HTML from meta object ────────────────────────────────
 function esc(s) {
   return String(s ?? '')
@@ -120,7 +160,12 @@ export async function render(url, origin) {
   const helmetContext = {}
 
   // Pre-fetch before renderToString (data hooks can't run async during render)
-  const pageMeta = await prefetchMeta(url, origin).catch(() => null)
+  // Postavke mjerenja idu usporedo — neovisne su o stranici, pa ne produžuju
+  // odgovor; ako upit padne, stranica se svejedno renderira bez mjerenja.
+  const [pageMeta, mjerenjeCfg] = await Promise.all([
+    prefetchMeta(url, origin).catch(() => null),
+    fetchMjerenje().catch(() => ({})),
+  ])
 
   const html = renderToString(
     <HelmetProvider context={helmetContext}>
@@ -149,5 +194,5 @@ export async function render(url, origin) {
       : ''
   }
 
-  return { html, head }
+  return { html, head: head + mjerenjeScript(mjerenjeCfg) }
 }
