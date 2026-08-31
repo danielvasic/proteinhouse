@@ -174,7 +174,7 @@ async function main() {
 
   console.log(`${primijeni ? 'PRIMJENJUJEM' : 'PREGLED (nista se ne upisuje)'} — ${proizvodi.length} proizvoda\n`)
 
-  const stat = { podignuto: 0, preskoceno: 0, palo: 0 }
+  const stat = { podignuto: 0, vecDobra: 0, bezIzvora: 0, palo: 0 }
   const promjene = []
 
   for (const p of proizvodi) {
@@ -182,7 +182,7 @@ async function main() {
     try {
       const { url: izvorUrl, odakle } = await nadjiIzvor(p, { ov: ovKatalog, bf: bfKatalog, gw: gwKatalog })
       if (!izvorUrl) {
-        stat.preskoceno++
+        stat.bezIzvora++
         console.log(`  -  ${ime.padEnd(44)} nema izvora`)
         continue
       }
@@ -198,7 +198,7 @@ async function main() {
 
       const dobitak = staro.w ? novo.w / staro.w : Infinity
       if (dobitak < MIN_DOBITAK) {
-        stat.preskoceno++
+        stat.vecDobra++
         console.log(`  =  ${ime.padEnd(44)} ${staro.w}px, izvor ${novo.w}px — nije vrijedno`)
         continue
       }
@@ -246,7 +246,10 @@ async function main() {
     }
   }
 
-  console.log(`\npodignuto ${stat.podignuto}  preskoceno ${stat.preskoceno}  palo ${stat.palo}`)
+  // Namjerno razdvojeno: 'vec dobra' je gotov posao, 'bez izvora' je ono
+  // sto jos treba rijesiti. U jednom broju ta dva izgledaju kao isti problem.
+  console.log(`\npodignuto ${stat.podignuto}   vec dobra ${stat.vecDobra}   `
+    + `BEZ IZVORA ${stat.bezIzvora}   palo ${stat.palo}`)
   console.log('* = objavljen proizvod')
 
   const sShopifyja = promjene.filter((x) => x.izvor === 2).length
