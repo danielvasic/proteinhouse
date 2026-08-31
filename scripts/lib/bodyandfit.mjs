@@ -24,10 +24,21 @@ import { razlozi, pronadji } from './poklapanje.mjs'
 const UA = 'Mozilla/5.0 (compatible; ProteinHouse/1.0; +https://proteinhouse.ba)'
 const BAZA = 'https://www.bodyandfit.com/en-gb/products.json'
 
-/** Nasi nazivi brendova → kako se zovu kod njih (podniz, mala slova). */
+/**
+ * Nasi nazivi brendova → kako se zovu kod njih (podniz, mala slova).
+ *
+ * Body&Fit preprodaje puno brendova, pa jedan izvor pokriva vise nasih.
+ * Swanson je najveci ulov: 141 njihov proizvod, a kod nas 114 bez ijedne
+ * druge moguce fotografije.
+ */
 export const VENDORI = {
-  'Body&Fit':       ['body & fit'],
-  'Swanson Health': ['swanson'],
+  'Body&Fit':            ['body & fit'],
+  'Swanson Health':      ['swanson'],
+  'Optimum Nutrition':   ['optimum nutrition'],
+  'Mutant':              ['mutant'],
+  'BSN':                 ['bsn'],
+  'Universal Nutrition': ['universal'],
+  'Scivation':           ['scivation'],
 }
 
 let kesirano = null
@@ -70,6 +81,11 @@ export function nadjiSliku(katalog, brend, naslov, velicina = '') {
   const podskup = katalog.filter((k) => trazeni.some((v) => k.vendor.includes(v)))
   if (!podskup.length) return null
 
-  const m = pronadji(podskup, naslov, velicina)
+  // Ime brenda se izbacuje iz oba naziva: njihov ga naslov nosi ('Mutant
+  // Whey'), nas ne — brend nam je zasebna kolona.
+  // 'Sci' i 'Uni' su ERP-ovi prefiksi u NASIM nazivima (Sci Xtend, Uni ZMA).
+  const m = pronadji(podskup, naslov, velicina, 0.7, {
+    izbaci: [...trazeni, brend, 'sci', 'uni', 'opti'],
+  })
   return m ? { url: m.slika, ocjena: m.ocjena, naslov: m.slug } : null
 }

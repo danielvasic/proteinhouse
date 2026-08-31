@@ -9,10 +9,13 @@ const SINONIM = {
   tablets: 'tab', tablet: 'tab', tabs: 'tab', tab: 'tab',
   capsules: 'cap', capsule: 'cap', caps: 'cap', cap: 'cap',
   gram: 'g', grams: 'g', g: 'g', kg: 'kg', ml: 'ml', l: 'l', mg: 'mg',
+  // Pakiranje po broju porcija: nas ERP pise '30 serv', drugi 'servings'.
+  serv: 'serv', servings: 'serv', serving: 'serv', portions: 'serv',
+  softgels: 'cap', softgel: 'cap', packs: 'pack', pack: 'pack',
 }
 // Rijeci koje ne razlikuju proizvode — u slugu su svuda ili nigdje.
 const SUVISNO = new Set(['ostrovit', 'vege', 'vega', 'r', 'the', 'and', 'plus'])
-const JEDINICE = new Set(['g', 'kg', 'ml', 'l', 'tab', 'cap', 'mg'])
+const JEDINICE = new Set(['g', 'kg', 'ml', 'l', 'tab', 'cap', 'mg', 'serv', 'pack'])
 const OKUSI = new Set([
   'orange', 'lemon', 'cherry', 'peach', 'natural', 'chocolate', 'vanilla',
   'strawberry', 'raspberry', 'mango', 'coconut', 'almond', 'banana', 'apple',
@@ -78,8 +81,16 @@ function poklapaSe(skup, token) {
  * Nadji proizvod u njihovom katalogu.
  * @returns {{url, slug, ocjena}|null} — null kad nije siguran
  */
-export function pronadji(katalog, naslov, velicina = '', prag = 0.7) {
+/**
+ * @param {object} opt
+ * @param {string[]} opt.izbaci  rijeci koje treba maknuti iz OBA naziva —
+ *        obicno ime brenda, koje njihov naslov nosi a nas ne (brend nam je
+ *        zasebna kolona). Bez toga 'Whey' i 'Mutant Whey' daju 0.50.
+ */
+export function pronadji(katalog, naslov, velicina = '', prag = 0.7, opt = {}) {
+  const izbaci = new Set((opt.izbaci ?? []).flatMap((x) => razlozi(x).ime))
   const q = razlozi(`${naslov} ${velicina}`)
+  for (const x of izbaci) q.ime.delete(x)
   if (!q.ime.size) return null
 
   let naj = null, najOcjena = 0
@@ -92,9 +103,18 @@ export function pronadji(katalog, naslov, velicina = '', prag = 0.7) {
     if (!mjereSlazu(q.mjere, k.mjere)) continue
     if (!k.ime.size) continue
 
+    const kime = new Set([...k.ime].filter((x) => !izbaci.has(x)))
+    if (!kime.size) continue
+
     let pogodaka = 0
-    for (const x of q.ime) if (poklapaSe(k.ime, x)) pogodaka++
-    const ocjena = pogodaka / Math.max(q.ime.size, k.ime.size)
+    for (const x of q.ime) if (poklapaSe(kime, x)) pogodaka++
+    // Tezinski: vaznije je da je NASE ime pronadjeno nego da se njihovo
+    // potrosi. Njihovi naslovi nose opisne dodatke ('Gold Standard 100%
+    // Whey Protein' za nas 'Gold Whey'), ali cetvrtina tezine na njihovoj
+    // pokrivenosti sprjecava da kratko ime pokupi bilo sto duze.
+    let obrnuto = 0
+    for (const x of kime) if (poklapaSe(q.ime, x)) obrnuto++
+    const ocjena = (pogodaka / q.ime.size) * 0.75 + (obrnuto / kime.size) * 0.25
     if (ocjena > najOcjena) { najOcjena = ocjena; naj = k }
   }
   return najOcjena >= prag ? { ...naj, ocjena: najOcjena } : null

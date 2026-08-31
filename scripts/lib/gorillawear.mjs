@@ -32,57 +32,127 @@ import axios from 'axios'
 const UA = 'Mozilla/5.0 (compatible; ProteinHouse/1.0; +https://proteinhouse.ba)'
 const IZVOR = 'https://urbangymwear.co.uk/collections/gorilla-wear/products.json'
 
-const BOJE = {
-  crna: 'black', crni: 'black', crno: 'black', bijela: 'white', bijeli: 'white',
-  siva: 'grey', sivi: 'grey', plava: 'blue', plavi: 'blue', crvena: 'red',
-  crveno: 'red', zuta: 'yellow', zuto: 'yellow', zelena: 'green', zeleni: 'green',
-  bez: 'beige', lila: 'lilac', maslinasto: 'army', maslinasta: 'army',
-  roza: 'pink', smedja: 'brown', narandzasta: 'orange', tirkizna: 'turquoise',
-}
+/**
+ * Boje po KORIJENU, ne po punom obliku. Bosanski pridjev se sklanja po rodu
+ * i broju — crna/crni/crno/crne, maslinasta/maslinasti/maslinaste — pa je
+ * popis punih oblika uvijek nepotpun. 'crn' hvata sve.
+ */
+const BOJE_KORIJEN = [
+  ['crn', 'black'], ['bijel', 'white'], ['bjel', 'white'], ['siv', 'grey'],
+  ['plav', 'blue'], ['crven', 'red'], ['zut', 'yellow'], ['zelen', 'green'],
+  ['bez', 'beige'], ['lila', 'lilac'], ['maslinast', 'army'], ['roza', 'pink'],
+  ['smedj', 'brown'], ['narandzast', 'orange'], ['ljubicast', 'purple'],
+  ['violet', 'purple'], ['zlatn', 'gold'], ['tirkizn', 'turquoise'],
+  ['maskiran', 'camo'], ['bordo', 'burgundy'],
+]
 const ENG_BOJE = new Set([
   'black', 'white', 'grey', 'gray', 'blue', 'red', 'yellow', 'green', 'beige',
   'lilac', 'army', 'pink', 'brown', 'orange', 'burgundy', 'navy', 'melange',
-  'olive', 'purple', 'camo', 'turquoise', 'khaki', 'cream',
+  'olive', 'purple', 'camo', 'turquoise', 'khaki', 'cream', 'gold', 'anthracite',
 ])
+function bojaOd(t) {
+  if (ENG_BOJE.has(t)) return t
+  for (const [k, v] of BOJE_KORIJEN) if (t.startsWith(k)) return v
+  return null
+}
 
 /** Unutar skupine je isti predmet; izmedju skupina nije. */
 const SKUPINE = [
   ['hoodie', 'sweatshirt', 'sweater', 'jumper'],
-  ['shorts'], ['pants'], ['shirt'], ['leggings'], ['tank'],
-  ['jacket'], ['vest'], ['bra'], ['shoes'], ['cap'],
+  ['shorts'], ['pants'], ['shirt'], ['leggings'],
+  // Tank top i sportski top su kod nas cesto isto; kod njih 'Tank Top' i
+  // 'Sports Bra'. Drzimo ih u istoj skupini da se ne promase.
+  ['tank', 'bra'],
+  ['jacket'], ['vest'], ['shoes'], ['cap'], ['grips'], ['shaker'], ['dress'], ['towel'], ['belt'], ['bag'], ['socks'], ['gloves'],
 ]
-const ODJECA = {
-  dukserica: 'hoodie', duks: 'hoodie', hoodie: 'hoodie',
-  sweatshirt: 'sweatshirt', sweater: 'sweater', jumper: 'jumper',
-  majica: 'shirt', shirt: 'shirt', tshirt: 'shirt', tee: 'shirt', top: 'shirt',
-  sorc: 'shorts', sorts: 'shorts', shorts: 'shorts', sweatshorts: 'shorts',
-  hlace: 'pants', pants: 'pants', sweatpants: 'pants', joggers: 'pants', trousers: 'pants',
-  tajice: 'leggings', leggings: 'leggings', tights: 'leggings',
-  tenkerica: 'tank', tank: 'tank', singlet: 'tank',
-  prsluk: 'vest', vest: 'vest', jakna: 'jacket', jacket: 'jacket',
-  kapa: 'cap', cap: 'cap', beanie: 'cap',
-  patike: 'shoes', shoes: 'shoes', sneakers: 'shoes',
+/** Odjevni predmeti, isto po korijenu zbog deklinacije. */
+const ODJECA_KORIJEN = [
+  ['dukseric', 'hoodie'], ['duks', 'hoodie'], ['hoodie', 'hoodie'],
+  ['sweatshirt', 'sweatshirt'], ['sweater', 'sweater'], ['jumper', 'jumper'],
+  ['majic', 'shirt'], ['shirt', 'shirt'], ['tshirt', 'shirt'], ['tee', 'shirt'],
+  ['sorc', 'shorts'], ['sorts', 'shorts'], ['shorts', 'shorts'], ['sweatshorts', 'shorts'],
+  ['hlac', 'pants'], ['pants', 'pants'], ['sweatpants', 'pants'], ['joggers', 'pants'],
+  ['trousers', 'pants'],
+  ['tajic', 'leggings'], ['leggings', 'leggings'], ['tights', 'leggings'],
+  ['tenkeric', 'tank'], ['tank', 'tank'], ['singlet', 'tank'],
+  ['prsluk', 'vest'], ['vest', 'vest'],
+  ['jakn', 'jacket'], ['jacket', 'jacket'],
+  ['haljin', 'dress'], ['dress', 'dress'],
+  ['kapa', 'cap'], ['beanie', 'cap'],
+  ['patik', 'shoes'], ['shoes', 'shoes'], ['sneakers', 'shoes'],
+  ['griper', 'grips'], ['grips', 'grips'], ['straps', 'grips'],
+  ['shaker', 'shaker'], ['boca', 'shaker'], ['bottle', 'shaker'],
+  ['pesk', 'towel'], ['rucnik', 'towel'], ['towel', 'towel'],
+  ['kais', 'belt'], ['belt', 'belt'], ['pojas', 'belt'],
+  ['torb', 'bag'], ['bag', 'bag'], ['ruksak', 'bag'], ['backpack', 'bag'],
+  ['carap', 'socks'], ['socks', 'socks'],
+  ['rukavic', 'gloves'], ['gloves', 'gloves'],
+  ['rashguard', 'shirt'],
+]
+/**
+ * Kratke rijeci se poklapaju TOCNO, ne po prefiksu. Prefiks od tri slova
+ * pogadja nazive modela:
+ *   'bra' → 'Branson' se citao kao grudnjak
+ *   'top' → 'High Tops' (tenisice) se citalo kao majica
+ *   'cap' → 'Capri', 'tee' → bilo sto na 'tee'
+ */
+const ODJECA_TOCNO = { top: 'tank', bra: 'bra', cap: 'cap', tee: 'shirt' }
+
+function odjecaOd(t) {
+  if (ODJECA_TOCNO[t]) return ODJECA_TOCNO[t]
+  for (const [k, v] of ODJECA_KORIJEN) if (t.startsWith(k)) return v
+  return null
 }
-// Rijeci koje ne razlikuju proizvode.
-const SUM = new Set(['gorilla', 'wear', 'oversized', 'zip', 'crop', 'cropped',
-  'old', 'school', 'the', 'and', 'sleeveless', 'hooded'])
+
+/**
+ * Opisni dodaci koji ne razlikuju proizvod.
+ *
+ * Vecina je s NJIHOVE strane — 'Elmira V-Neck T-Shirt', 'Hilton Seamless
+ * Sports Bra' — i bez izbacivanja napuhu njihov skup pa poklapanje padne.
+ * Ostatak je nas: 'D. Dio' (donji dio trenerke), 'S.'/'T.' (svijetlo/tamno).
+ *
+ * PAZI sto se dodaje ovdje: 'Classic', 'Smart', 'Lifting' i 'High Tops' su
+ * kod nas NAZIVI MODELA, ne opisi. Kad su bili na ovom popisu, ti proizvodi
+ * su ostajali bez ijednog tokena imena pa se nisu mogli poklopiti.
+ */
+const SUM = new Set(['gorilla', 'wear', 'oversized', 'zip', 'zipped', 'crop',
+  'cropped', 'old', 'school', 'the', 'and', 'sleeveless', 'hooded', 'seamless',
+  'performance', 'hybrid', 'pro', 'neck', 'v', 'sl', 'long', 'sleeve',
+  'sports', 'sport', 'track', 'za', 'boks', 'd', 'g', 'dio', 's', 't',
+  'svjetlo', 'svijetlo', 'tamno', 'trenerka', 'trenerke'])
 
 const bezKvacica = (s) => String(s).normalize('NFD')
   .replace(/[̀-ͯ]/g, '').replace(/đ/g, 'dj')
 
+/**
+ * Trenerka se kod nas prodaje u dva dijela: 'D. Dio' je donji (hlace),
+ * 'G. Dio' gornji (jakna ili dukserica). Bez ovoga se 'Trenerka G. Dio
+ * Wenden' poklopio s njihovim 'Wenden Track Pants' — donjim dijelom.
+ * Za gornji dio se dopustaju oba tipa jer ga zovu i jakna i dukserica.
+ */
+function dioTrenerke(tekst) {
+  if (/\btrenerk/i.test(tekst)) {
+    if (/\bd\.?\s*dio\b/i.test(tekst)) return ['pants']
+    if (/\bg\.?\s*dio\b/i.test(tekst)) return ['jacket', 'hoodie']
+  }
+  return null
+}
+
 export function razlozi(s) {
+  const izTrenerke = dioTrenerke(String(s))
   const t = bezKvacica(s).toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/)
-    .map((x) => BOJE[x] ?? x)
     .filter((x) => x && !SUM.has(x))
 
   const boje = [], vrste = [], model = []
   for (const x of t) {
-    if (ENG_BOJE.has(x)) boje.push(x)
-    else if (ODJECA[x]) vrste.push(ODJECA[x])
-    else model.push(x)
+    const b = bojaOd(x)
+    if (b) { boje.push(b); continue }
+    const o = odjecaOd(x)
+    if (o) { vrste.push(o); continue }
+    model.push(x)
   }
-  return { boje: new Set(boje), vrste, model: new Set(model) }
+  return { boje: new Set(boje), vrste: izTrenerke ?? vrste, model: new Set(model) }
 }
 
 const skupinaOd = (v) => SKUPINE.findIndex((g) => g.includes(v))
@@ -127,7 +197,10 @@ export function nadjiSliku(katalog, naslov, _velicina = '') {
 
     let bojaPogodak = 0
     for (const x of q.boje) if (k.boje.has(x)) bojaPogodak++
-    const ocjena = (modela / Math.max(q.model.size, k.model.size)) * 0.6
+    // Boduje se koliko je NASEG modela pronadjeno, ne omjer prema njihovom
+    // skupu. Njihovi naslovi nose opisne dodatke koje mi nemamo; kaznjavanje
+    // po max() je odbijalo tocna poklapanja poput 'Elmira' → 'Elmira V-Neck'.
+    const ocjena = (modela / q.model.size) * 0.6
       + (q.boje.size ? bojaPogodak / q.boje.size : 1) * 0.4
     if (ocjena > najOcjena) { najOcjena = ocjena; naj = k }
   }
