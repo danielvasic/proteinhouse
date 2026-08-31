@@ -257,6 +257,29 @@ img {
 }
 
 /**
+ * Outline na TAMNOJ podlozi — hero baner.
+ *
+ * Pozadina je prozirna, ne bijela: bijela ispuna na tamnom baneru izgleda
+ * kao puno bijelo dugme, a ne kao outline.
+ *
+ * Slova ostaju bijela jer i plava i narančasta gube kontrast na tamnoplavoj
+ * pozadini banera — boju nosi rub. Na hover se ispuni tom bojom, pa je
+ * odgovor na klik jasan.
+ */
+.ph-cta--tamno {
+  background: transparent;
+  color: #ffffff;
+  border-color: var(--ph-electric-blue);
+}
+.ph-cta--tamno:hover:not(:disabled) {
+  background: var(--ph-electric-blue);
+  color: #ffffff;
+}
+/* Narančasta se po Notion odluci koristi samo za izuzetno važne akcije. */
+.ph-cta--tamno-crveni { border-color: var(--ph-vulcan-orange); }
+.ph-cta--tamno-crveni:hover:not(:disabled) { background: var(--ph-vulcan-orange); }
+
+/**
  * Puna varijanta, za mjesta gdje outline nije dovoljno jak.
  *
  * Outline je po dogovoru default, ali dugme koje zavrsava kupovinu treba

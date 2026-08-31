@@ -262,11 +262,13 @@ export default function HeroBanner() {
               const PrimaryIcon = CTA_ICONS[b.cta_primary_icon ?? 'tag'] ?? Tag
               return (
                 <button
-                  // Boja po baneru (Admin → Baneri): plava je standard,
-                  // crvena samo za izuzetno važne akcije — Notion odluka.
-                  className={`${b.cta_style === 'crveni'
-                    ? 'bg-[#ff4103] hover:bg-[#e03903] text-white border-0'
-                    : 'ph-cta'} flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] transition-colors duration-150 cursor-pointer`}
+                  // Outline i ovdje, ali u varijanti za tamnu podlogu —
+                  // prozirna pozadina umjesto bijele. Boja po baneru
+                  // (Admin → Baneri): plava je standard, narančasta samo za
+                  // izuzetno važne akcije, Notion odluka.
+                  className={`ph-cta ph-cta--tamno ${
+                    b.cta_style === 'crveni' ? 'ph-cta--tamno-crveni' : ''
+                  } flex items-center gap-2.5 px-6 md:px-8 py-3 md:py-3.5 text-[11px] md:text-[12px] font-bold tracking-[0.1em] transition-colors duration-150 cursor-pointer`}
                   style={BODY}
                   onClick={() => navigate(b.cta_primary_link || '/kategorija/akcija')}
                 >
