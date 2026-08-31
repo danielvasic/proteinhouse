@@ -30,6 +30,7 @@ import { createClient } from '@supabase/supabase-js'
 import sharp from 'sharp'
 import { ucitajKatalog as ovKatalogUcitaj, pronadji as ovPronadji, slikaSaStranice } from './lib/ostrovit.mjs'
 import { ucitajKatalog as bfKatalogUcitaj, nadjiSliku as bfNadjiSliku, VENDORI as BF_BRENDOVI } from './lib/bodyandfit.mjs'
+import { ucitajKatalog as gwKatalogUcitaj, nadjiSliku as gwNadjiSliku } from './lib/gorillawear.mjs'
 import { readFileSync, writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -123,6 +124,10 @@ async function nadjiIzvor(p, katalozi) {
     const m = bfNadjiSliku(katalozi.bf, p.brand, p.title, vel)
     if (m?.url) return { url: m.url, odakle: `bodyandfit.com (${m.ocjena.toFixed(2)}) — ${m.naslov}` }
   }
+  if (p.brand === 'Gorilla Wear' && katalozi.gw) {
+    const m = gwNadjiSliku(katalozi.gw, p.title)
+    if (m?.url) return { url: m.url, odakle: `urbangymwear (${m.ocjena.toFixed(2)}) — ${m.naslov}` }
+  }
   return { url: null, odakle: null }
 }
 
@@ -159,6 +164,12 @@ async function main() {
     bfKatalog = await bfKatalogUcitaj()
     console.log(`${bfKatalog.length} proizvoda`)
   }
+  let gwKatalog = null
+  if (treba((p) => p.brand === 'Gorilla Wear')) {
+    process.stdout.write('ucitavam Gorilla Wear katalog… ')
+    gwKatalog = await gwKatalogUcitaj()
+    console.log(`${gwKatalog.length} proizvoda`)
+  }
   console.log()
 
   console.log(`${primijeni ? 'PRIMJENJUJEM' : 'PREGLED (nista se ne upisuje)'} — ${proizvodi.length} proizvoda\n`)
@@ -169,7 +180,7 @@ async function main() {
   for (const p of proizvodi) {
     const ime = `${p.brand ?? ''} ${p.title}`.trim().slice(0, 42)
     try {
-      const { url: izvorUrl, odakle } = await nadjiIzvor(p, { ov: ovKatalog, bf: bfKatalog })
+      const { url: izvorUrl, odakle } = await nadjiIzvor(p, { ov: ovKatalog, bf: bfKatalog, gw: gwKatalog })
       if (!izvorUrl) {
         stat.preskoceno++
         console.log(`  -  ${ime.padEnd(44)} nema izvora`)
