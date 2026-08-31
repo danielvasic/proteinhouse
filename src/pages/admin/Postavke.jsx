@@ -161,7 +161,7 @@ function Brojka({ oznaka, v, upozorenje }) {
 }
 
 export default function Postavke() {
-  // Tab je u URL-u (?tab=mjerenje) da se na njega moze poslati link. Bez
+  // Tab je u URL-u (?tab=seo) da se na njega moze poslati link. Bez
   // toga se do postavki za oglase dolazilo samo klikom kroz Postavke, a to
   // je stranica koja se otvara svaki dan dok kampanje traju.
   const [params, setParams] = useSearchParams()
