@@ -97,18 +97,37 @@ const JAVNI_KLJUCEVI = {
   mjerenje_google_ads_label: 'google_ads_label',
 }
 
+/**
+ * Verifikacija vlasnistva domene. Nije mjerenje nego preduvjet za oglase:
+ * Meta bez svog taga ne da pokretati kampanje koje vode na nasu domenu ni
+ * pouzdano vezati CAPI dogadjaje, a Google Merchant Center bez svog ne
+ * prihvata feed. Oboje su obicni meta tagovi u <head>.
+ */
+const VERIFIKACIJE = {
+  mjerenje_meta_domain:   'facebook-domain-verification',
+  mjerenje_google_verify: 'google-site-verification',
+}
+
 async function fetchMjerenje() {
   const { data } = await supabase
     .from('site_content')
     .select('key, value')
-    .in('key', Object.keys(JAVNI_KLJUCEVI))
-  const out = {}
+    .in('key', [...Object.keys(JAVNI_KLJUCEVI), ...Object.keys(VERIFIKACIJE)])
+
+  const out = {}, verifikacije = []
   for (const red of data ?? []) {
-    const polje = JAVNI_KLJUCEVI[red.key]
     const vrijednost = String(red.value?.text ?? red.value ?? '').trim()
-    if (polje && vrijednost) out[polje] = vrijednost
+    if (!vrijednost) continue
+    if (JAVNI_KLJUCEVI[red.key]) out[JAVNI_KLJUCEVI[red.key]] = vrijednost
+    else if (VERIFIKACIJE[red.key]) verifikacije.push([VERIFIKACIJE[red.key], vrijednost])
   }
-  return out
+  return { kljucevi: out, verifikacije }
+}
+
+function verifikacijeHtml(parovi) {
+  return parovi
+    .map(([ime, sadrzaj]) => `<meta name="${esc(ime)}" content="${esc(sadrzaj)}" />`)
+    .join('\n    ')
 }
 
 /**
@@ -164,7 +183,13 @@ export async function render(url, origin) {
   // odgovor; ako upit padne, stranica se svejedno renderira bez mjerenja.
   const [pageMeta, mjerenjeCfg] = await Promise.all([
     prefetchMeta(url, origin).catch(() => null),
-    fetchMjerenje().catch(() => ({})),
+    // Ako ovo padne, stranica se svejedno renderira — ali BEZ Pixela i bez
+    // verifikacije domene, sto znaci da oglasi tiho prestanu mjeriti. Zato
+    // se greska ispisuje: u Netlify logu se vidi, u tihom catchu ne bi.
+    fetchMjerenje().catch((e) => {
+      console.error('mjerenje: postavke nisu ucitane —', e?.message || e)
+      return { kljucevi: {}, verifikacije: [] }
+    }),
   ])
 
   const html = renderToString(
@@ -194,5 +219,9 @@ export async function render(url, origin) {
       : ''
   }
 
-  return { html, head: head + mjerenjeScript(mjerenjeCfg) }
+  return {
+    html,
+    head: [head, verifikacijeHtml(mjerenjeCfg.verifikacije), mjerenjeScript(mjerenjeCfg.kljucevi)]
+      .filter(Boolean).join('\n    '),
+  }
 }
