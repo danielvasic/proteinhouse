@@ -14,60 +14,16 @@
  * AI crawleri su zabranjeni i to postujemo — ovo se vrti kao alat trgovca
  * koji preuzima fotografije proizvoda koje i sam prodaje.
  *
- * ── Poklapanje ────────────────────────────────────────────────────────────
- * Testirano na 18 nasih proizvoda: 11 poklopljeno, sva na ocjeni 1.00.
- * Pravila su izvedena iz stvarnih promasaja:
- *
- *   - Broj je GRAMAZA samo ako ga slijedi jedinica. Inace bi '8:1:1' u
- *     BCAA i '5' u 5-HTP bili shvaceni kao gramaza; posljedica je bila da
- *     se nas 'BCAA 8:1:1' samouvjereno poklopio s njihovim 'BCAA 2:1:1'.
- *   - Gramaza se usporedjuje po BROJU, ne po jedinici: mi pisemo '90 tabs',
- *     oni '90 capsules' za isti proizvod.
- *   - Boduje se SAMO ime, gramaza je filter. Inace se 'Dextrose 500 g'
- *     poklopi s 'Glutamina 500 g' — ista gramaza, krivi proizvod.
- *   - Okusi se izbacuju: nas naslov zna nositi 'Orange', njihov slug ne.
+ * Poklapanje naziva je u ./poklapanje.mjs. Na 18 testiranih nasih proizvoda
+ * 11 je poklopljeno, sva na ocjeni 1.00.
  */
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import { gunzipSync } from 'node:zlib'
+import { razlozi, pronadji } from './poklapanje.mjs'
 
 const UA = 'Mozilla/5.0 (compatible; ProteinHouse/1.0; +https://proteinhouse.ba)'
 const SITEMAP = 'https://ostrovit.com/sitemap.xml.gz'
-
-const SINONIM = {
-  tablets: 'tab', tablet: 'tab', tabs: 'tab', tab: 'tab',
-  capsules: 'cap', capsule: 'cap', caps: 'cap', cap: 'cap',
-  gram: 'g', grams: 'g', g: 'g', kg: 'kg', ml: 'ml', l: 'l', mg: 'mg',
-}
-// Rijeci koje ne razlikuju proizvode — u slugu su svuda ili nigdje.
-const SUVISNO = new Set(['ostrovit', 'vege', 'vega', 'r', 'the', 'and', 'plus'])
-const JEDINICE = new Set(['g', 'kg', 'ml', 'l', 'tab', 'cap', 'mg'])
-const OKUSI = new Set([
-  'orange', 'lemon', 'cherry', 'peach', 'natural', 'chocolate', 'vanilla',
-  'strawberry', 'raspberry', 'mango', 'coconut', 'almond', 'banana', 'apple',
-])
-
-/** Razlozi naziv na ime proizvoda i gramazu. */
-export function razlozi(s) {
-  const t = String(s ?? '').toLowerCase()
-    .replace(/&/g, ' ')
-    .replace(/(\d)\s*([a-z]+)/g, '$1 $2')   // '300g' → '300 g'
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim().split(/\s+/)
-    .map((x) => SINONIM[x] ?? x)
-    .filter((x) => x && !SUVISNO.has(x))
-
-  const ime = [], mjere = []
-  for (let i = 0; i < t.length; i++) {
-    if (/^\d+$/.test(t[i]) && JEDINICE.has(t[i + 1])) {
-      mjere.push(t[i])   // samo broj — 'tabs' i 'capsules' su isto
-      i++
-    } else if (!JEDINICE.has(t[i])) {
-      ime.push(t[i])
-    }
-  }
-  return { ime: new Set(ime.filter((x) => !OKUSI.has(x))), mjere }
-}
 
 async function dohvati(url, opts = {}) {
   const { data } = await axios.get(url, {
@@ -112,28 +68,6 @@ export async function ucitajKatalog() {
   return kesiraniKatalog
 }
 
-/**
- * Nadji proizvod u njihovom katalogu.
- * @returns {{url, slug, ocjena}|null} — null kad nije siguran
- */
-export function pronadji(katalog, naslov, velicina = '', prag = 0.7) {
-  const q = razlozi(`${naslov} ${velicina}`)
-  if (!q.ime.size) return null
-
-  let naj = null, najOcjena = 0
-  for (const k of katalog) {
-    // Gramaza je FILTER, ne bod. Kriva gramaza znaci krivu ambalazu na slici.
-    if (q.mjere.length && k.mjere.length && !q.mjere.some((m) => k.mjere.includes(m))) continue
-    if (!k.ime.size) continue
-
-    let pogodaka = 0
-    for (const x of q.ime) if (k.ime.has(x)) pogodaka++
-    const ocjena = pogodaka / Math.max(q.ime.size, k.ime.size)
-    if (ocjena > najOcjena) { najOcjena = ocjena; naj = k }
-  }
-  return najOcjena >= prag ? { ...naj, ocjena: najOcjena } : null
-}
-
 /** Fotografija s njihove stranice proizvoda. */
 export async function slikaSaStranice(url) {
   const html = await dohvati(url, { responseType: 'text' })
@@ -147,3 +81,5 @@ export async function slikaSaStranice(url) {
   if (img.startsWith('/')) img = new URL(img, url).href
   return img
 }
+
+export { pronadji }

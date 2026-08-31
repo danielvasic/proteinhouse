@@ -28,7 +28,8 @@
  */
 import { createClient } from '@supabase/supabase-js'
 import sharp from 'sharp'
-import { ucitajKatalog, pronadji, slikaSaStranice } from './lib/ostrovit.mjs'
+import { ucitajKatalog as ovKatalogUcitaj, pronadji as ovPronadji, slikaSaStranice } from './lib/ostrovit.mjs'
+import { ucitajKatalog as bfKatalogUcitaj, nadjiSliku as bfNadjiSliku, VENDORI as BF_BRENDOVI } from './lib/bodyandfit.mjs'
 import { readFileSync, writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -107,16 +108,20 @@ function upotrebljivUrl(u) {
 }
 
 /** Odakle uzeti fotografiju za ovaj proizvod. */
-async function nadjiIzvor(p, ovKatalog) {
+async function nadjiIzvor(p, katalozi) {
   if (upotrebljivUrl(p.image_url)) return { url: p.image_url, odakle: 'image_url' }
+  const vel = Array.isArray(p.sizes) && p.sizes.length ? p.sizes[0] : ''
 
-  if (p.brand === 'OstroVit' && ovKatalog) {
-    const vel = Array.isArray(p.sizes) && p.sizes.length ? p.sizes[0] : ''
-    const m = pronadji(ovKatalog, p.title, vel)
+  if (p.brand === 'OstroVit' && katalozi.ov) {
+    const m = ovPronadji(katalozi.ov, p.title, vel)
     if (m) {
       const img = await slikaSaStranice(m.url)
       if (img) return { url: img, odakle: `ostrovit.com (${m.ocjena.toFixed(2)})` }
     }
+  }
+  if (BF_BRENDOVI[p.brand] && katalozi.bf) {
+    const m = bfNadjiSliku(katalozi.bf, p.brand, p.title, vel)
+    if (m?.url) return { url: m.url, odakle: `bodyandfit.com (${m.ocjena.toFixed(2)}) — ${m.naslov}` }
   }
   return { url: null, odakle: null }
 }
@@ -139,14 +144,22 @@ async function main() {
   const { data: proizvodi, error } = await q
   if (error) throw error
 
-  // Katalog proizvodjaca se dohvaca samo ako ga stvarno trebamo.
+  // Tudji katalozi se dohvacaju samo ako ih stvarno trebamo.
+  const treba = (uvjet) => proizvodi.some((p) => uvjet(p) && !upotrebljivUrl(p.image_url))
+
   let ovKatalog = null
-  const trebaOstrovit = proizvodi.some((p) => p.brand === 'OstroVit' && !upotrebljivUrl(p.image_url))
-  if (trebaOstrovit) {
+  if (treba((p) => p.brand === 'OstroVit')) {
     process.stdout.write('ucitavam katalog ostrovit.com… ')
-    ovKatalog = await ucitajKatalog()
-    console.log(`${ovKatalog.length} proizvoda\n`)
+    ovKatalog = await ovKatalogUcitaj()
+    console.log(`${ovKatalog.length} proizvoda`)
   }
+  let bfKatalog = null
+  if (treba((p) => BF_BRENDOVI[p.brand])) {
+    process.stdout.write('ucitavam katalog bodyandfit.com… ')
+    bfKatalog = await bfKatalogUcitaj()
+    console.log(`${bfKatalog.length} proizvoda`)
+  }
+  console.log()
 
   console.log(`${primijeni ? 'PRIMJENJUJEM' : 'PREGLED (nista se ne upisuje)'} — ${proizvodi.length} proizvoda\n`)
 
@@ -156,7 +169,7 @@ async function main() {
   for (const p of proizvodi) {
     const ime = `${p.brand ?? ''} ${p.title}`.trim().slice(0, 42)
     try {
-      const { url: izvorUrl, odakle } = await nadjiIzvor(p, ovKatalog)
+      const { url: izvorUrl, odakle } = await nadjiIzvor(p, { ov: ovKatalog, bf: bfKatalog })
       if (!izvorUrl) {
         stat.preskoceno++
         console.log(`  -  ${ime.padEnd(44)} nema izvora`)
