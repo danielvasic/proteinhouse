@@ -82,7 +82,11 @@ export default function HeroBanner() {
     })
   }, [])
 
-  const slides = banners || [FALLBACK]
+  // Dok podaci ne stignu NE crtamo FALLBACK — inace posjetitelj vidi
+  // hardkodirani baner pa mu se pod rukom zamijeni pravim. FALLBACK sluzi
+  // samo za slucaj da u bazi stvarno nema nijednog aktivnog banera.
+  const ucitava = banners === null
+  const slides = banners?.length ? banners : [FALLBACK]
   const count  = slides.length
 
   useEffect(() => {
@@ -102,6 +106,24 @@ export default function HeroBanner() {
   const isImageOnly = b.layout === 'slika' && b.image_url
   const titleLines = (b.title_lines || FALLBACK.title_lines).split('/')
   const parallaxRef = useParallax(0.18)
+
+  // Kostur iste visine kao pravi baner — bez njega stranica poskoci kad
+  // podaci stignu, jer se sadrzaj ispod pomjeri za visinu banera.
+  if (ucitava) {
+    return (
+      <section className="relative overflow-hidden min-h-[46vh] max-h-[50vh] md:max-h-none md:min-h-[440px] lg:min-h-[520px] bg-[#101A30]">
+        <div className="container w-full h-full flex items-center">
+          <div className="max-w-[620px] py-8 md:py-16 space-y-4 animate-pulse">
+            <div className="h-3 w-28 bg-white/10 rounded hidden md:block" />
+            <div className="h-9 md:h-14 w-[85%] bg-white/10 rounded" />
+            <div className="h-9 md:h-14 w-[60%] bg-white/10 rounded" />
+            <div className="h-3 w-[70%] bg-white/[0.07] rounded mt-6" />
+            <div className="h-10 w-40 bg-white/10 rounded mt-6" />
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section
@@ -132,14 +154,17 @@ export default function HeroBanner() {
           dolje desno, manja, a tekst dobija desni padding da se ne sudare.
           Na desktopu desna trećina s radijalnim sjajem da proizvod "sjedne"
           na pozadinu umjesto da izgleda nalijepljen. */}
-      {/* Desktop: proizvod se namjerno podvlači POD tekst (veći od svoje
-          kolone + translate ulijevo) — jedna kompozicija umjesto dva
-          izolirana otoka. Tekstualna kolona je iznad njega (z-10). Na
-          mobilnom slika nije ovdje nego u toku sadržaja, pored CTA. */}
+      {/* Proizvod se namjerno podvlači POD tekst — jedna kompozicija umjesto
+          dva izolirana otoka. Tekstualna kolona je iznad njega (z-10), a
+          gradijent s lijeva drži tekst čitljivim.
+
+          Na mobilnom je slika ranije stajala u toku sadržaja pored CTA na
+          38% sirine — bila je premala da se vidi sto je proizvod. Sada je i
+          tamo apsolutna i sira, oslonjena na desni rub i dno. */}
       {!isImageOnly && b.fg_image_url && (
         <div
           key={`fg-${index}`}
-          className="hidden md:flex absolute inset-y-0 right-0 w-[46%] items-center justify-center pointer-events-none"
+          className="flex absolute inset-y-0 right-0 w-[68%] md:w-[46%] items-end md:items-center justify-end md:justify-center pointer-events-none"
           style={{ animation: 'heroFade 400ms ease' }}
         >
           <div
@@ -149,7 +174,7 @@ export default function HeroBanner() {
           <img
             src={b.fg_image_url}
             alt=""
-            className="relative max-h-[94%] max-w-[124%] -translate-x-[10%] object-contain drop-shadow-[0_28px_56px_rgba(0,0,0,0.6)]"
+            className="relative max-h-[78%] md:max-h-[94%] max-w-full md:max-w-[124%] translate-x-[6%] md:-translate-x-[10%] object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.55)] md:drop-shadow-[0_28px_56px_rgba(0,0,0,0.6)]"
           />
         </div>
       )}
@@ -186,12 +211,9 @@ export default function HeroBanner() {
             ))}
           </h1>
 
-          {/* Na mobilnom su podnaslov, cijena i CTA lijeva kolona, a slika
-              proizvoda desna — u toku sadržaja, oslonjena na dno reda, pa
-              nema lebdenja u praznom prostoru. Na desktopu slika živi u
-              apsolutnoj koloni iznad, a ovaj red je običan blok. */}
-          <div className={b.fg_image_url ? 'flex items-end gap-3 md:block' : ''}>
-          <div className={b.fg_image_url ? 'flex-1 min-w-0' : ''}>
+          {/* Tekst dobija desni razmak da ne naleti na sliku koja je iza
+              njega; slika je apsolutna, i na mobilnom i na desktopu. */}
+          <div className={b.fg_image_url ? 'pr-[34%] md:pr-0' : ''}>
           {/* Body */}
           {b.subtitle && (
             <p
@@ -265,15 +287,7 @@ export default function HeroBanner() {
               )
             })()}
           </div>
-          </div>
 
-          {b.fg_image_url && (
-            <img
-              src={b.fg_image_url}
-              alt=""
-              className="md:hidden w-[38%] shrink-0 self-end object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.55)]"
-            />
-          )}
           </div>
 
           {/* Stats — samo desktop, mobilni banner mora biti kratak */}
