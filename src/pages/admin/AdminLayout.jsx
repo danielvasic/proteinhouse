@@ -227,10 +227,10 @@ export default function AdminLayout() {
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
           <Stavka to="/admin" label="Dashboard" icon={LayoutDashboard} exact />
           <Stavka
-            to="/admin/postavke?tab=mjerenje"
-            label="Oglasi i mjerenje"
+            to="/admin/postavke?tab=seo"
+            label="SEO i oglasi"
             icon={Megaphone}
-            aktivnaKad={(l) => l.pathname === '/admin/postavke' && l.search.includes('tab=mjerenje')}
+            aktivnaKad={(l) => l.pathname === '/admin/postavke' && l.search.includes('tab=seo')}
           />
 
           {GRUPE.map((g) => (
@@ -254,8 +254,8 @@ export default function AdminLayout() {
             className={({ isActive }) => cn(
               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:text-white',
               // Ne oznacavaj kao aktivno kad si na tabu mjerenja — tamo je
-              // aktivna stavka "Oglasi i mjerenje" gore.
-              isActive && !location.search.includes('tab=mjerenje') ? 'text-white' : ''
+              // aktivna stavka "SEO i oglasi" gore.
+              isActive && !location.search.includes('tab=seo') ? 'text-white' : ''
             )}
             style={{ color: 'rgba(201,216,240,0.5)' }}
           >

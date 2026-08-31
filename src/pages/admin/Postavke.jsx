@@ -29,16 +29,24 @@ const SECTIONS = {
       { key: 'footer_copyright', label: 'Copyright tekst',          type: 'text',     placeholder: 'ProteinHouse d.o.o. Sva prava zadržana.' },
     ],
   },
-  mjerenje: {
-    label: 'Mjerenje',
-    opis: 'Sve za Meta i Google oglase. Vrijedi od sljedećeg učitavanja stranice — nije potreban novi deploy.',
+  seo: {
+    label: 'SEO i oglasi',
+    opis: 'Kako se stranica predstavlja Googleu i Meti — od naslova u rezultatima pretrage do mjerenja konverzija. Sve vrijedi od sljedećeg učitavanja, bez novog deploya.',
     fields: [
+      { grupa: 'Kako se stranica prikazuje' },
+      { key: 'site_title',       label: 'Naziv sajta',        type: 'text',     placeholder: 'ProteinHouse' },
+      { key: 'meta_description', label: 'Meta opis (početna)', type: 'textarea', placeholder: 'Kupujte proteine…' },
+      { key: 'og_image',         label: 'OG slika URL',       type: 'text',     placeholder: 'https://proteinhouse.ba/og-image.png' },
+
+      { grupa: 'Verifikacija vlasništva', napomena: 'Prvi korak. Bez ovoga Meta ne da pokrenuti kampanju, a Merchant Center ne prihvata feed.' },
       { key: 'mjerenje_meta_domain', label: 'Meta — verifikacija domene', type: 'text',
         placeholder: 'a1b2c3d4e5f6g7h8i9',
         pomoc: 'PRVI KORAK za Meta oglase. U Business Manageru → Brand Safety → Domains dodaj proteinhouse.ba i izaberi "Meta-tag verification". Zalijepi ovdje SAMO vrijednost iz content="…", ne cijeli tag. Snimi, pa u Meti klikni Verify — tag je odmah u izvoru stranice.' },
       { key: 'mjerenje_google_verify', label: 'Google — verifikacija vlasništva', type: 'text',
         placeholder: 'abcdefgh12345678',
         pomoc: 'Za Merchant Center i Search Console. Izaberi "HTML tag" način i zalijepi samo vrijednost iz content="…".' },
+
+      { grupa: 'Mjerenje na stranici', napomena: 'Učitava se tek nakon što posjetitelj prihvati kolačiće.' },
       { key: 'mjerenje_gtm_id', label: 'Google Tag Manager — ID kontejnera', type: 'text',
         placeholder: 'GTM-XXXXXXX', pomoc: 'Radi odmah čim ga upišeš. Učitava se tek nakon što posjetitelj prihvati kolačiće.' },
       { key: 'mjerenje_meta_pixel_id', label: 'Meta Pixel — ID', type: 'text',
@@ -49,6 +57,8 @@ const SECTIONS = {
         placeholder: 'AW-123456789', pomoc: 'Spremljeno za kasnije — koristit će ga server-side slanje konverzija.' },
       { key: 'mjerenje_google_ads_label', label: 'Google Ads — Conversion Label', type: 'text',
         placeholder: 'AbC-D_efG', pomoc: 'Spremljeno za kasnije.' },
+
+      { grupa: 'Slanje sa servera', napomena: 'Kroz preglednik prođe 60-80% kupovina; ovo šalje svaku. Tajne se čuvaju odvojeno i nikad ne izlaze na stranicu.' },
       { key: 'mjerenje_erp_status_konverzije', label: 'ERP status koji znači potvrđenu narudžbu', type: 'text',
         placeholder: '3', pomoc: 'Server-side kupovina se šalje tek kad narudžba u ERP-u dođe u ovaj status. Zadano 3 (Odobrena). Može više, odvojeno zarezom — npr. "2,3". Statusi: 1 Kreiranje, 2 Na čekanju, 3 Odobrena, 4 Otkazana, 5 Odbijena. Plaćanje je pouzećem, pa slanje prerano znači da reklame uče na narudžbama koje nisu preuzete.' },
       { key: 'meta_capi_token', label: 'Meta Conversions API — token', type: 'password', tajna: true,
@@ -56,17 +66,10 @@ const SECTIONS = {
       { key: 'ga4_api_secret', label: 'GA4 Measurement Protocol — api_secret', type: 'password', tajna: true,
         placeholder: 'abc123…', pomoc: 'TAJNA. GA4 → Admin → Data Streams → Measurement Protocol API secrets. Bez njega nema server-side slanja Googleu.' },
       { key: 'meta_test_event_code', label: 'Meta — Test Event Code', type: 'password', tajna: true,
-        placeholder: 'TEST12345', pomoc: 'TAJNA. Samo za testiranje u Meta Events Manageru, obriši kad završiš.' },
+        placeholder: 'TEST12345', pomoc: 'TAJNA. Samo za provjeru u Meta Events Manageru dok podešavaš — obriši kad završiš, inače pravi događaji završe kao testni.' },
     ],
   },
-  seo: {
-    label: 'SEO & Meta',
-    fields: [
-      { key: 'site_title',       label: 'Naziv sajta',         type: 'text',     placeholder: 'ProteinHouse' },
-      { key: 'meta_description', label: 'Meta opis (početna)',  type: 'textarea', placeholder: 'Kupujte proteine…' },
-      { key: 'og_image',         label: 'OG slika URL',        type: 'text',     placeholder: 'https://proteinhouse.ba/og-image.png' },
-    ],
-  },
+
 }
 
 /**
@@ -193,8 +196,10 @@ export default function Postavke() {
       const sada = new Date().toISOString()
       // Tajne u ad_secrets (samo admin čita), sve ostalo u site_content koji
       // je javno čitljiv jer ga SSR treba za prikaz stranice.
-      const javna = section.fields.filter((f) => !f.tajna)
-      const tajna = section.fields.filter((f) => f.tajna)
+      // Redovi bez `key` su samo podnaslovi u prikazu — nisu postavke.
+      const polja = section.fields.filter((f) => f.key)
+      const javna = polja.filter((f) => !f.tajna)
+      const tajna = polja.filter((f) => f.tajna)
 
       if (javna.length) {
         await supabase.from('site_content').upsert(
@@ -247,14 +252,21 @@ export default function Postavke() {
 
         {Object.entries(SECTIONS).map(([sectionKey, section]) => (
           <TabsContent key={sectionKey} value={sectionKey} className="mt-4">
-            {sectionKey === 'mjerenje' && <StanjeMjerenja content={content} />}
+            {sectionKey === 'seo' && <StanjeMjerenja content={content} />}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">{section.label}</CardTitle>
                 <CardDescription>{section.opis ?? 'Izmjene se automatski čuvaju po sekciji.'}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {section.fields.map((field) => (
+                {section.fields.map((field, i) => field.grupa ? (
+                  <div key={`g${i}`} className={i === 0 ? '' : 'pt-4 border-t'}>
+                    <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-gray-500">{field.grupa}</p>
+                    {field.napomena && (
+                      <p className="text-[11px] text-muted-foreground mt-1">{field.napomena}</p>
+                    )}
+                  </div>
+                ) : (
                   <div key={field.key} className="space-y-1.5">
                     <Label>{field.label}</Label>
                     {field.type === 'textarea' ? (
