@@ -126,23 +126,58 @@ function BatchUploader({ onDone }) {
   )
 }
 
+const PO_STRANICI = 50
+
 export default function Products() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [upit, setUpit]       = useState('')   // pretraga nakon odgode
+  const [stranica, setStranica] = useState(0)
+  const [ukupno, setUkupno]   = useState(0)
+
+  // Pretraga ceka da prestanes tipkati — inace bi svaki znak bio upit na
+  // bazu preko cijelog kataloga.
+  useEffect(() => {
+    const t = setTimeout(() => { setUpit(search.trim()); setStranica(0) }, 300)
+    return () => clearTimeout(t)
+  }, [search])
 
   const load = async () => {
     setLoading(true)
-    const { data } = await supabase
+    // Paginacija je na SERVERU, ne u pregledniku. Ranije se citalo sve
+    // odjednom bez ogranicenja — a Supabase REST rezuje na 1000 redova, pa
+    // su zadnji proizvodi jednostavno nedostajali iz popisa.
+    let q = supabase
       .from('products')
-      .select('id, brand, title, internal_title, price, old_price, category, is_active, badge, image_url, image_path, images')
+      .select('id, brand, title, internal_title, price, old_price, category, is_active, badge, image_url, image_path, images',
+        { count: 'exact' })
+
+    // I pretraga ide na server — inace bi trazila samo po trenutnoj stranici.
+    if (upit) {
+      const uzorak = `%${upit.replace(/[%,]/g, ' ')}%`
+      q = q.or([
+        `brand.ilike.${uzorak}`,
+        `title.ilike.${uzorak}`,
+        `internal_title.ilike.${uzorak}`,
+        `category.ilike.${uzorak}`,
+      ].join(','))
+    }
+
+    const od = stranica * PO_STRANICI
+    const { data, count } = await q
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })
+      .range(od, od + PO_STRANICI - 1)
+
     setProducts(data ?? [])
+    setUkupno(count ?? 0)
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [upit, stranica])   // eslint-disable-line react-hooks/exhaustive-deps
+
+  const zadnjaStranica = Math.max(0, Math.ceil(ukupno / PO_STRANICI) - 1)
 
   const toggleActive = async (id, current) => {
     await supabase.from('products').update({ is_active: !current }).eq('id', id)
@@ -153,11 +188,11 @@ export default function Products() {
     if (!confirm(`Obrisati "${title}"?`)) return
     await supabase.from('products').delete().eq('id', id)
     setProducts((ps) => ps.filter((p) => p.id !== id))
+    setUkupno((n) => Math.max(0, n - 1))
   }
 
-  const filtered = products.filter((p) =>
-    `${p.brand} ${p.title} ${p.internal_title ?? ''} ${p.category}`.toLowerCase().includes(search.toLowerCase())
-  )
+  // Pretraga i stranicenje su na serveru; ovo je samo ono sto je stiglo.
+  const filtered = products
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -165,7 +200,10 @@ export default function Products() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Proizvodi</h2>
-          <p className="text-sm text-muted-foreground">{products.length} ukupno</p>
+          <p className="text-sm text-muted-foreground">
+            {upit ? `${ukupno} po pretrazi` : `${ukupno} ukupno`}
+            {ukupno > PO_STRANICI && ` · stranica ${stranica + 1}/${zadnjaStranica + 1}`}
+          </p>
         </div>
         <Button asChild>
           <Link to="/admin/proizvodi/novi" className="flex items-center gap-2">
@@ -273,6 +311,24 @@ export default function Products() {
                 )}
               </TableBody>
             </Table>
+          )}
+
+          {ukupno > PO_STRANICI && (
+            <div className="flex items-center justify-between gap-4 pt-4 mt-2 border-t">
+              <p className="text-xs text-muted-foreground">
+                {stranica * PO_STRANICI + 1}–{Math.min((stranica + 1) * PO_STRANICI, ukupno)} od {ukupno}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={stranica === 0 || loading}
+                  onClick={() => setStranica((n) => Math.max(0, n - 1))}>
+                  Prethodna
+                </Button>
+                <Button variant="outline" size="sm" disabled={stranica >= zadnjaStranica || loading}
+                  onClick={() => setStranica((n) => Math.min(zadnjaStranica, n + 1))}>
+                  Sljedeća
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
