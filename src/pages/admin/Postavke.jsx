@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Save, RefreshCw, Settings, Info } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Button } from '../../components/ui/button'
@@ -157,6 +158,12 @@ function Brojka({ oznaka, v, upozorenje }) {
 }
 
 export default function Postavke() {
+  // Tab je u URL-u (?tab=mjerenje) da se na njega moze poslati link. Bez
+  // toga se do postavki za oglase dolazilo samo klikom kroz Postavke, a to
+  // je stranica koja se otvara svaki dan dok kampanje traju.
+  const [params, setParams] = useSearchParams()
+  const tab = SECTIONS[params.get('tab')] ? params.get('tab') : 'contact'
+
   const [content, setContent] = useState({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState({})
@@ -231,7 +238,7 @@ export default function Postavke() {
         <p>Izmjene se odmah snimaju u bazu i prikazuju na sajtu.</p>
       </div>
 
-      <Tabs defaultValue="contact">
+      <Tabs value={tab} onValueChange={(v) => setParams(v === 'contact' ? {} : { tab: v })}>
         <TabsList className="flex flex-wrap h-auto gap-1 p-1">
           {Object.entries(SECTIONS).map(([key, { label }]) => (
             <TabsTrigger key={key} value={key} className="text-xs">{label}</TabsTrigger>
