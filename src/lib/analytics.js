@@ -1,10 +1,31 @@
 /**
- * GTM / GA4 — učitava se ISKLJUČIVO nakon što korisnik prihvati kolačiće.
- * GTM container ID se postavlja u .env: VITE_GTM_ID=GTM-XXXXXXX
+ * Mjerenje konverzija — GTM i Meta Pixel, oboje tek nakon privole.
+ *
+ * ID-evi se čitaju u RUNTIME, iz `window.__PH_MJERENJE__` koji SSR ubaci u
+ * <head> (vidi entry-server.jsx). Ranije je stajao `VITE_GTM_ID`, ali Vite
+ * takve varijable zapeče u bundle pri buildu — Slaven ih nije mogao mijenjati
+ * bez novog deploya. Sada se postavljaju u adminu (Postavke → Mjerenje) i
+ * vrijede od sljedećeg učitavanja stranice.
+ *
+ * `import.meta.env` ostaje kao rezerva da lokalni razvoj i stariji deploy ne
+ * ostanu bez mjerenja dok se postavke ne popune.
  */
 const CONSENT_KEY = 'ph_cookie_consent'   // 'accepted' | 'declined'
 
-export const GTM_ID = import.meta.env.VITE_GTM_ID || ''
+/** Postavke mjerenja za ovu stranicu. Čita se lijeno — SSR ih ubaci u <head>. */
+export function mjerenje() {
+  const iz = (typeof window !== 'undefined' && window.__PH_MJERENJE__) || {}
+  return {
+    gtm_id:        iz.gtm_id        || import.meta.env.VITE_GTM_ID   || '',
+    ga4_id:        iz.ga4_id        || '',
+    meta_pixel_id: iz.meta_pixel_id || '',
+    google_ads_id: iz.google_ads_id || '',
+    google_ads_label: iz.google_ads_label || '',
+  }
+}
+
+/** Zadržano zbog postojećih uvoza; sada je runtime vrijednost, ne konstanta. */
+export const GTM_ID = ''
 
 export function getConsent() {
   if (typeof window === 'undefined') return null
@@ -13,20 +34,93 @@ export function getConsent() {
 
 export function setConsent(value) {
   try { localStorage.setItem(CONSENT_KEY, value) } catch { /* private mode */ }
-  if (value === 'accepted') loadGTM()
+  // Update ide i na odbijanje — Google mora znati da je odluka donesena,
+  // inače čeka wait_for_update pa svejedno pretpostavi odbijeno.
+  consentModeUpdate(value === 'accepted')
+  if (value === 'accepted') loadTags()
 }
 
 let gtmLoaded = false
+let pixelLoaded = false
+let consentModeSpreman = false
+
+/**
+ * Consent Mode v2.
+ *
+ * Nije dovoljno samo ne učitati tag. Google traži da mu se stanje privole
+ * javi izričito: prvo "default" sa svime odbijenim (mora ići PRIJE nego se
+ * ijedan Google tag učita), pa "update" kad korisnik odluči. Bez toga Google
+ * tretira posjete kao potpuno nepoznate umjesto da ih modelira, a od ožujka
+ * 2024. bez ovih signala remarketing u EU ne radi.
+ *
+ * ad_user_data i ad_personalization su dodani u v2 — v1 je imao samo
+ * ad_storage i analytics_storage.
+ */
+function gtag() {
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push(arguments)
+}
+
+export function consentModeDefault() {
+  if (consentModeSpreman || typeof window === 'undefined') return
+  consentModeSpreman = true
+  gtag('consent', 'default', {
+    ad_storage:            'denied',
+    ad_user_data:          'denied',
+    ad_personalization:    'denied',
+    analytics_storage:     'denied',
+    functionality_storage: 'granted',  // košarica i jezik rade i bez privole
+    security_storage:      'granted',
+    wait_for_update:       500,        // ms da korisnik stigne kliknuti
+  })
+}
+
+function consentModeUpdate(prihvaceno) {
+  const v = prihvaceno ? 'granted' : 'denied'
+  gtag('consent', 'update', {
+    ad_storage:         v,
+    ad_user_data:       v,
+    ad_personalization: v,
+    analytics_storage:  v,
+  })
+}
 
 export function loadGTM() {
-  if (gtmLoaded || !GTM_ID || typeof window === 'undefined') return
+  const { gtm_id } = mjerenje()
+  if (gtmLoaded || !gtm_id || typeof window === 'undefined') return
   gtmLoaded = true
   window.dataLayer = window.dataLayer || []
   window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
   const script = document.createElement('script')
   script.async = true
-  script.src = `https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`
+  script.src = `https://www.googletagmanager.com/gtm.js?id=${gtm_id}`
   document.head.appendChild(script)
+}
+
+/**
+ * Meta Pixel. Namjerno zaseban od GTM-a: Pixel se može voditi i kroz GTM
+ * kontejner, pa ako je ID upisan ovdje A tag postoji i u GTM-u, događaji bi
+ * se slali dvaput. Upiši ID ovdje SAMO ako Pixel nije u GTM kontejneru.
+ */
+export function loadMetaPixel() {
+  const { meta_pixel_id } = mjerenje()
+  if (pixelLoaded || !meta_pixel_id || typeof window === 'undefined') return
+  pixelLoaded = true
+  /* eslint-disable */
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+  (window,document,'script','https://connect.facebook.net/en_US/fbevents.js')
+  /* eslint-enable */
+  window.fbq('init', meta_pixel_id)
+  window.fbq('track', 'PageView')
+}
+
+/** Učitaj sve mjerne tagove za koje postoji ID. */
+export function loadTags() {
+  loadGTM()
+  loadMetaPixel()
 }
 
 /** Push GA4 e-commerce event u dataLayer (no-op bez consenta/GTM-a). */
@@ -37,5 +131,9 @@ export function trackEvent(event, params = {}) {
 
 /** Inicijalizacija pri učitavanju stranice — poštuje ranije dat consent. */
 export function initAnalytics() {
-  if (getConsent() === 'accepted') loadGTM()
+  // Redoslijed je bitan: default mora biti u dataLayeru prije ijednog taga.
+  consentModeDefault()
+  const odluka = getConsent()
+  if (odluka) consentModeUpdate(odluka === 'accepted')
+  if (odluka === 'accepted') loadTags()
 }

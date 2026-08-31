@@ -82,6 +82,65 @@ async function prefetchMeta(url, origin) {
   return null // fall through to Helmet (works for static pages)
 }
 
+// ─── Postavke mjerenja (GTM, Pixel…) ───────────────────────────────────────
+// Ubacuju se u <head> kao globalna varijabla da ih analytics.js pročita u
+// runtime. Ranije su bile VITE_ varijable koje Vite zapeče u bundle, pa ih
+// klijent nije mogao promijeniti bez novog builda.
+//
+// SAMO javni ID-evi. Tajne (Meta CAPI token i sl.) žive u tablici ad_secrets
+// koju anonimni ključ ne smije čitati — ovdje bi završile u izvoru stranice.
+const JAVNI_KLJUCEVI = {
+  mjerenje_gtm_id:           'gtm_id',
+  mjerenje_ga4_id:           'ga4_id',
+  mjerenje_meta_pixel_id:    'meta_pixel_id',
+  mjerenje_google_ads_id:    'google_ads_id',
+  mjerenje_google_ads_label: 'google_ads_label',
+}
+
+/**
+ * Verifikacija vlasnistva domene. Nije mjerenje nego preduvjet za oglase:
+ * Meta bez svog taga ne da pokretati kampanje koje vode na nasu domenu ni
+ * pouzdano vezati CAPI dogadjaje, a Google Merchant Center bez svog ne
+ * prihvata feed. Oboje su obicni meta tagovi u <head>.
+ */
+const VERIFIKACIJE = {
+  mjerenje_meta_domain:   'facebook-domain-verification',
+  mjerenje_google_verify: 'google-site-verification',
+}
+
+async function fetchMjerenje() {
+  const { data } = await supabase
+    .from('site_content')
+    .select('key, value')
+    .in('key', [...Object.keys(JAVNI_KLJUCEVI), ...Object.keys(VERIFIKACIJE)])
+
+  const out = {}, verifikacije = []
+  for (const red of data ?? []) {
+    const vrijednost = String(red.value?.text ?? red.value ?? '').trim()
+    if (!vrijednost) continue
+    if (JAVNI_KLJUCEVI[red.key]) out[JAVNI_KLJUCEVI[red.key]] = vrijednost
+    else if (VERIFIKACIJE[red.key]) verifikacije.push([VERIFIKACIJE[red.key], vrijednost])
+  }
+  return { kljucevi: out, verifikacije }
+}
+
+function verifikacijeHtml(parovi) {
+  return parovi
+    .map(([ime, sadrzaj]) => `<meta name="${esc(ime)}" content="${esc(sadrzaj)}" />`)
+    .join('\n    ')
+}
+
+/**
+ * Serijalizacija u <script>. JSON.stringify nije dovoljan: vrijednost koja
+ * sadrži "</script>" bi zatvorila tag i pretvorila ostatak u HTML. Zato se
+ * "<" pobjegne u \u003c — JSON to i dalje čita ispravno.
+ */
+function mjerenjeScript(cfg) {
+  if (!Object.keys(cfg).length) return ''
+  const json = JSON.stringify(cfg).replace(/</g, '\\u003c')
+  return `<script>window.__PH_MJERENJE__=${json}</script>`
+}
+
 // ─── Build raw <head> HTML from meta object ────────────────────────────────
 function esc(s) {
   return String(s ?? '')
@@ -120,7 +179,18 @@ export async function render(url, origin) {
   const helmetContext = {}
 
   // Pre-fetch before renderToString (data hooks can't run async during render)
-  const pageMeta = await prefetchMeta(url, origin).catch(() => null)
+  // Postavke mjerenja idu usporedo — neovisne su o stranici, pa ne produžuju
+  // odgovor; ako upit padne, stranica se svejedno renderira bez mjerenja.
+  const [pageMeta, mjerenjeCfg] = await Promise.all([
+    prefetchMeta(url, origin).catch(() => null),
+    // Ako ovo padne, stranica se svejedno renderira — ali BEZ Pixela i bez
+    // verifikacije domene, sto znaci da oglasi tiho prestanu mjeriti. Zato
+    // se greska ispisuje: u Netlify logu se vidi, u tihom catchu ne bi.
+    fetchMjerenje().catch((e) => {
+      console.error('mjerenje: postavke nisu ucitane —', e?.message || e)
+      return { kljucevi: {}, verifikacije: [] }
+    }),
+  ])
 
   const html = renderToString(
     <HelmetProvider context={helmetContext}>
@@ -149,5 +219,9 @@ export async function render(url, origin) {
       : ''
   }
 
-  return { html, head }
+  return {
+    html,
+    head: [head, verifikacijeHtml(mjerenjeCfg.verifikacije), mjerenjeScript(mjerenjeCfg.kljucevi)]
+      .filter(Boolean).join('\n    '),
+  }
 }

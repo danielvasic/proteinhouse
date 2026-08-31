@@ -6,6 +6,7 @@ import { useCart } from '../store/CartContext'
 import { fmtKM } from '../data/catalog'
 import { supabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
+import { zaNarudzbu } from '../lib/atribucija'
 import { calcShipping } from '../lib/shipping'
 import GiftPicker from '../components/GiftPicker'
 import BrandIcon from '../components/BrandIcon'
@@ -16,14 +17,6 @@ const STEPS = ['Dostava', 'Pregled', 'Potvrda']
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '', phone: '',
   address: '', city: '', zip: '', notes: '',
-}
-
-function genOrderNumber() {
-  const now  = new Date()
-  const yy   = String(now.getFullYear()).slice(-2)
-  const mm   = String(now.getMonth() + 1).padStart(2, '0')
-  const rand = Math.floor(Math.random() * 9000 + 1000)
-  return `PH-${yy}${mm}-${rand}`
 }
 
 function inputCls(error) {
@@ -142,6 +135,24 @@ export default function Checkout() {
     })
   }, [])
 
+  // begin_checkout — jednom po dolasku na checkout s punom korpom. Ovisi o
+  // broju stavki, ne o cijeloj korpi: mijenjanje količine na checkoutu nije
+  // novi početak naplate.
+  const brojStavki = items.length
+  useEffect(() => {
+    if (!brojStavki) return
+    trackEvent('begin_checkout', {
+      ecommerce: {
+        currency: 'BAM',
+        value: totalPrice,
+        items: items.map((i) => ({
+          item_id: i.id, item_name: i.title, item_brand: i.brand,
+          price: Number(i.price), quantity: i.qty,
+        })),
+      },
+    })
+  }, [brojStavki > 0])   // eslint-disable-line react-hooks/exhaustive-deps
+
   const prefillFromUser = (u) => {
     setUser(u)
     const meta = u.user_metadata || {}
@@ -236,31 +247,37 @@ export default function Checkout() {
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
-      const orderNumber = genOrderNumber()
-      const payload = {
-        order_number:     orderNumber,
-        customer_name:    `${form.firstName} ${form.lastName}`,
-        customer_email:   form.email,
-        customer_phone:   form.phone,
-        shipping_address: form.address,
-        shipping_city:    form.city,
-        shipping_zip:     form.zip,
-        notes:            form.notes,
-        items:            items.map((i) => ({
-          id: i.id, brand: i.brand, title: i.title,
-          price: i.price, qty: i.qty,
+      // Narudžbu kreira server (RPC kreiraj_narudzbu), ne preglednik. Šalju se
+      // SAMO proizvodi i količine — cijenu, popust, poštarinu i valjanost
+      // poklona računa baza iz vlastitih podataka. Ranije je preglednik sam
+      // upisivao red s cijenama koje je sam poslao, pa je svatko mogao
+      // naručiti robu za 0 KM.
+      const { data, error } = await supabase.rpc('kreiraj_narudzbu', {
+        p_customer_name:    `${form.firstName} ${form.lastName}`,
+        p_customer_email:   form.email,
+        p_customer_phone:   form.phone,
+        p_shipping_address: form.address,
+        p_shipping_city:    form.city,
+        p_shipping_zip:     form.zip,
+        p_notes:            form.notes,
+        p_payment_method:   'pouzece',
+        p_items: items.map((i) => ({
+          id: i.id, qty: i.qty,
           selectedSize: i.selectedSize, selectedFlavor: i.selectedFlavor,
         })),
-        subtotal:      totalPrice,
-        discount,
-        coupon_code:   coupon?.code ?? null,
-        shipping_cost: shipping,
-        gift,
-        total:   total,
-        status:  'nova',
-      }
-      const { error } = await supabase.from('orders').insert(payload)
+        p_coupon_code: coupon?.code ?? null,
+        p_gift:        gift ?? null,
+        // Klik ID-evi s reklame; null ako posjetitelj nije prihvatio kolačiće.
+        p_atribucija:  zaNarudzbu(),
+      })
       if (error) throw error
+
+      // Iznosi iz odgovora, ne oni izračunati u pregledniku — ako se razilaze
+      // (istekao kupon, promijenjena cijena), kupac i mjerenje vide ono što
+      // je stvarno naplaćeno.
+      const orderNumber   = data.order_number
+      const stvarniUkupno = Number(data.total)
+
       // Proslijedi narudžbu ERP-u u pozadini — kupac ne čeka, a ako poziv
       // propadne, satna metla uz erp-sync je pokupi (orders.erp_order_id).
       fetch('/api/erp-order', {
@@ -272,13 +289,13 @@ export default function Checkout() {
         ecommerce: {
           transaction_id: orderNumber,
           currency: 'BAM',
-          value: total,
-          shipping,
+          value: stvarniUkupno,
+          shipping: Number(data.shipping),
           items: items.map((i) => ({ item_id: i.id, item_name: i.title, item_brand: i.brand, price: i.price, quantity: i.qty })),
         },
       })
       setOrderNum(orderNumber)
-      setPlaced({ total, gift })
+      setPlaced({ total: stvarniUkupno, gift: data.gift ?? null })
       clearCart?.()
       setStep(2)
     } catch (err) {
