@@ -229,31 +229,51 @@ img {
    kartici, snižena cijena, lifetime banner — gdje nije bilo primjedbi.
    Boja je ovdje, a ne u Tailwind klasama, da CTA bude jedan pojam na
    jednom mjestu. */
+/**
+ * Glavni CTA — outline varijanta.
+ *
+ * Odluka iz Notion taska "CTA — solid ili outline"; usporedba varijanti je
+ * u artefaktu claude.ai/code/artifact/8941315d-10f2-45ba-af56-4fa7e3aa1c0d.
+ * Crvena je odbacena ("pretjerana"), ide plava.
+ *
+ * Rub je 1.5px a ne 1px: na 1px se na retina ekranima gubi i dugme izgleda
+ * kao obican tekst. Ispuna na hoveru daje jasan odgovor na klik, koji
+ * outline inace nema.
+ */
 .ph-cta {
+  background: #ffffff;
+  color: var(--ph-electric-blue);
+  border: 1.5px solid var(--ph-electric-blue);
+}
+.ph-cta:hover:not(:disabled) {
   background: var(--ph-electric-blue);
   color: #ffffff;
-  border: 0;
 }
-.ph-cta:hover:not(:disabled) { background: #0136C4; }
 .ph-cta:disabled {
-  background: var(--ph-gray-200);
-  color: var(--ph-gray-500);
+  background: transparent;
+  color: var(--ph-gray-400);
+  border-color: var(--ph-gray-200);
   cursor: not-allowed;
 }
-/* Alternativne varijante iz Notion taska "CTA — solid ili outline"
-   (poredjenje: claude.ai/code/artifact/8941315d-10f2-45ba-af56-4fa7e3aa1c0d).
-   Kad se odluci, zamijeni pravila u .ph-cta gore ovim blokom:
 
-   V2 — outline, plava slova:
-     background: #fff; color: var(--ph-electric-blue);
-     border: 1px solid var(--ph-electric-blue);
-     hover → background: var(--ph-electric-blue); color: #fff;
-
-   V3 — outline, crna slova:
-     background: #fff; color: var(--ph-night-black);
-     border: 1px solid var(--ph-electric-blue);
-     hover → background: var(--ph-electric-blue); color: #fff;
-*/
+/**
+ * Puna varijanta, za mjesta gdje outline nije dovoljno jak.
+ *
+ * Outline je po dogovoru default, ali dugme koje zavrsava kupovinu treba
+ * najvecu tezinu na ekranu — outline se tamo cita kao sporedna radnja.
+ * Stavi .ph-cta--puni uz .ph-cta gdje to treba.
+ */
+.ph-cta--puni {
+  background: var(--ph-electric-blue);
+  color: #ffffff;
+  border-color: var(--ph-electric-blue);
+}
+.ph-cta--puni:hover:not(:disabled) { background: #0136C4; border-color: #0136C4; }
+.ph-cta--puni:disabled {
+  background: var(--ph-gray-200);
+  color: var(--ph-gray-500);
+  border-color: var(--ph-gray-200);
+}
 
 /* Focus visible ring */
 :focus-visible {
