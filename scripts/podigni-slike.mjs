@@ -28,6 +28,7 @@
  */
 import { createClient } from '@supabase/supabase-js'
 import sharp from 'sharp'
+import { ucitajKatalog, pronadji, slikaSaStranice } from './lib/ostrovit.mjs'
 import { readFileSync, writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -94,6 +95,32 @@ async function skini(u) {
   return Buffer.from(await res.arrayBuffer())
 }
 
+/**
+ * Je li image_url upotrebljiv. weberp-api.com je od 31.08.2026. ugasen —
+ * domena je aktivna ali servira GoDaddy parking stranicu, pa adrese koje
+ * pokazuju tamo vise ne vode ni do cega.
+ */
+function upotrebljivUrl(u) {
+  if (!u || !u.trim()) return false
+  if (/weberp-api\.com/i.test(u)) return false
+  return true
+}
+
+/** Odakle uzeti fotografiju za ovaj proizvod. */
+async function nadjiIzvor(p, ovKatalog) {
+  if (upotrebljivUrl(p.image_url)) return { url: p.image_url, odakle: 'image_url' }
+
+  if (p.brand === 'OstroVit' && ovKatalog) {
+    const vel = Array.isArray(p.sizes) && p.sizes.length ? p.sizes[0] : ''
+    const m = pronadji(ovKatalog, p.title, vel)
+    if (m) {
+      const img = await slikaSaStranice(m.url)
+      if (img) return { url: img, odakle: `ostrovit.com (${m.ocjena.toFixed(2)})` }
+    }
+  }
+  return { url: null, odakle: null }
+}
+
 async function main() {
   if (!url || !key) {
     console.error('Nedostaje VITE_SUPABASE_URL ili SUPABASE_SERVICE_KEY.')
@@ -104,15 +131,22 @@ async function main() {
 
   let q = supabase
     .from('products')
-    .select('id, slug, brand, title, image_path, image_url, is_active')
-    .not('image_url', 'is', null)
-    .neq('image_url', '')
+    .select('id, slug, brand, title, sizes, image_path, image_url, is_active')
     .order('is_active', { ascending: false })
     .limit(limit)
   if (samoObjavljene) q = q.eq('is_active', true)
 
   const { data: proizvodi, error } = await q
   if (error) throw error
+
+  // Katalog proizvodjaca se dohvaca samo ako ga stvarno trebamo.
+  let ovKatalog = null
+  const trebaOstrovit = proizvodi.some((p) => p.brand === 'OstroVit' && !upotrebljivUrl(p.image_url))
+  if (trebaOstrovit) {
+    process.stdout.write('ucitavam katalog ostrovit.com… ')
+    ovKatalog = await ucitajKatalog()
+    console.log(`${ovKatalog.length} proizvoda\n`)
+  }
 
   console.log(`${primijeni ? 'PRIMJENJUJEM' : 'PREGLED (nista se ne upisuje)'} — ${proizvodi.length} proizvoda\n`)
 
@@ -122,7 +156,13 @@ async function main() {
   for (const p of proizvodi) {
     const ime = `${p.brand ?? ''} ${p.title}`.trim().slice(0, 42)
     try {
-      const noviBuf = await skini(p.image_url)
+      const { url: izvorUrl, odakle } = await nadjiIzvor(p, ovKatalog)
+      if (!izvorUrl) {
+        stat.preskoceno++
+        console.log(`  -  ${ime.padEnd(44)} nema izvora`)
+        continue
+      }
+      const noviBuf = await skini(izvorUrl)
       const novo = await dimenzije(noviBuf)
       if (!novo.w) throw new Error('nije slika')
 
@@ -157,8 +197,8 @@ async function main() {
       const put = `hd/${p.slug}.webp`
       promjene.push({
         ime, slug: p.slug, aktivan: p.is_active,
-        staro: staro.w, novo: konacne.w, izvor: ocijeniIzvor(p.image_url),
-        put, izvorUrl: p.image_url,
+        staro: staro.w, novo: konacne.w, izvor: ocijeniIzvor(izvorUrl),
+        put, izvorUrl, odakle,
         staraSlika: p.image_path ? javniUrl(p.image_path) : null,
         // data: URI da se pregled moze otvoriti prije nego je ista uploadano
         novaSlika: `data:image/webp;base64,${obradjen.toString('base64')}`,
@@ -225,7 +265,7 @@ export function pregledHtml(promjene) {
           <figcaption class="novo">nakon — ${x.novo}px</figcaption>
         </figure>
       </div>
-      <div class="izvor">${x.izvor === 2 ? 'tudji Shopify CDN' : x.izvor === 3 ? 'brendova stranica' : 'ERP'} &middot; ${x.izvorUrl.slice(0, 90)}</div>
+      <div class="izvor">${x.odakle ?? ''} &middot; ${String(x.izvorUrl).slice(0, 88)}</div>
     </div>`
 
   return `<!doctype html><meta charset="utf-8"><title>Pregled slika</title>
