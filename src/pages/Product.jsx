@@ -3,12 +3,12 @@ import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
   Star, Truck, ShieldCheck, Heart, Minus, Plus,
-  ShoppingCart, House, CaretRight,
+  ShoppingCart, House, CaretRight, CaretLeft, X,
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { trackEvent } from '../lib/analytics'
 import { getCategoryBySlug, fmtKM, discountChipClass } from '../data/catalog'
-import { useProduct, getVariantStock } from '../hooks/useProducts'
+import { useProduct, getVariantStock, getVariantPrice } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
 import BrandIcon from '../components/BrandIcon'
 import { BODY, DISPLAY, NUMERIC } from '../lib/typography'
@@ -52,6 +52,85 @@ function VariantSelector({ label, options, value, onChange }) {
   )
 }
 
+/**
+ * Uvecana slika preko cijelog ekrana.
+ *
+ * Escape i klik izvan slike zatvaraju; strelice listaju galeriju. Skrol
+ * stranice se zakljuca dok je otvoren, inace se pozadina pomjera pod prstom
+ * na mobilnom i djeluje kao da je nesto puklo.
+ */
+function Lightbox({ slike, idx, onIdx, onClose }) {
+  useEffect(() => {
+    const naTipku = (e) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowRight' && slike.length > 1) onIdx((idx + 1) % slike.length)
+      if (e.key === 'ArrowLeft'  && slike.length > 1) onIdx((idx - 1 + slike.length) % slike.length)
+    }
+    document.addEventListener('keydown', naTipku)
+    const staro = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', naTipku)
+      document.body.style.overflow = staro
+    }
+  }, [idx, slike.length, onIdx, onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 animate-fade-in"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Uvećana slika proizvoda"
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-4 right-4 text-white/70 hover:text-white p-2 cursor-pointer"
+        aria-label="Zatvori"
+      >
+        <X size={26} />
+      </button>
+
+      {slike.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onIdx((idx - 1 + slike.length) % slike.length) }}
+            className="absolute left-3 md:left-6 text-white/60 hover:text-white p-3 cursor-pointer"
+            aria-label="Prethodna slika"
+          >
+            <CaretLeft size={30} weight="bold" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onIdx((idx + 1) % slike.length) }}
+            className="absolute right-3 md:right-6 text-white/60 hover:text-white p-3 cursor-pointer"
+            aria-label="Sljedeća slika"
+          >
+            <CaretRight size={30} weight="bold" />
+          </button>
+        </>
+      )}
+
+      <img
+        src={slike[idx]}
+        alt=""
+        // Klik na samu sliku ne zatvara — inace se ne moze zumirati prstima
+        // na mobilnom bez da se odmah zatvori.
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[88vh] max-w-[92vw] object-contain"
+      />
+
+      {slike.length > 1 && (
+        <p className="absolute bottom-5 text-white/50 text-xs tracking-wider">
+          {idx + 1} / {slike.length}
+        </p>
+      )}
+    </div>
+  )
+}
+
 export default function Product() {
   const { slug } = useParams()
   const { addItem } = useCart()
@@ -61,6 +140,7 @@ export default function Product() {
   const [flavor, setFlavor] = useState(null)
   const [size,   setSize]   = useState(null)
   const [activeIdx, setActiveIdx] = useState(0)
+  const [lightbox, setLightbox] = useState(false)
 
   // view_item — jednom po proizvodu, ne na svaku promjenu okusa ili galerije.
   // Google i Meta ovaj događaj koriste za remarketing publike, pa ponavljanje
@@ -136,9 +216,14 @@ export default function Product() {
 
   const category   = getCategoryBySlug(product.cat)
   const isDiscount = product.badge?.startsWith('-')
+  // Cijena prati izbor okusa i gramaže; ista funkcija koju koristi i korpa.
+  const cijena     = getVariantPrice(product, flavor, size)
+  const imaPromo   = product.heroStats?.length > 0
 
   const handleAdd = () => {
-    const item = { ...product, selectedFlavor: flavor, selectedSize: size }
+    // price se namjerno gazi: `...product` nosi cijenu proizvoda, a u korpu
+    // mora ici cijena izabrane varijante. Server svejedno racuna iznova.
+    const item = { ...product, price: cijena, selectedFlavor: flavor, selectedSize: size }
     for (let i = 0; i < qty; i++) addItem(item)
   }
 
@@ -176,14 +261,38 @@ export default function Product() {
           </div>
         </div>
 
-        {/* ── Product layout ── */}
+        {lightbox && (() => {
+        const slike = product.images?.length
+          ? product.images.map((i) => i.src)
+          : (product.img ? [product.img] : [])
+        return slike.length ? (
+          <Lightbox
+            slike={slike}
+            idx={Math.min(activeIdx, slike.length - 1)}
+            onIdx={setActiveIdx}
+            onClose={() => setLightbox(false)}
+          />
+        ) : null
+      })()}
+
+      {/* ── Product layout ── */}
         <section className="py-12 md:py-16 bg-white">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
 
-              {/* Hero kartica — slika + najrelevantnije brojke (Ostrovit stil, editabilno u adminu) */}
-              <div className="relative bg-[#0145F2] flex flex-col items-center p-7 md:p-10 overflow-hidden">
-                <div className="absolute inset-0 ph-pattern opacity-[0.07] pointer-events-none" />
+              {/* Hero kartica — slika + najrelevantnije brojke (Ostrovit stil,
+                  editabilno u adminu).
+
+                  Plava podloga postoji zbog tih brojki: bijela slova na njoj
+                  imaju kontrast. Kad proizvod nema promo vrijednosti, podloga
+                  nema šta nositi — ostaje prazna ploha oko slike, pa je tada
+                  prozirna i vidi se sam proizvod. */}
+              <div className={`relative flex flex-col items-center p-7 md:p-10 overflow-hidden ${
+                imaPromo ? 'bg-[#0145F2] rounded-2xl' : 'bg-transparent'
+              }`}>
+                {imaPromo && (
+                  <div className="absolute inset-0 ph-pattern opacity-[0.07] pointer-events-none" />
+                )}
                 {isDiscount && (
                   <div className={`absolute top-5 left-5 z-10 px-2.5 py-1.5 ${discountChipClass(product.badge)} text-[13px] font-extrabold italic leading-none`}>
                     {product.badge}
@@ -198,13 +307,20 @@ export default function Product() {
                   const gallery = product.images?.length ? product.images : null
                   const mainSrc = gallery ? gallery[activeIdx]?.src || gallery[0]?.src : product.img
                   return mainSrc ? (
-                    <img
-                      src={mainSrc}
-                      alt={product.title}
-                      className="relative w-full max-w-[360px] object-contain drop-shadow-[0_24px_32px_rgba(0,0,0,0.25)]"
-                      width={600}
-                      height={540}
-                    />
+                    <button
+                      type="button"
+                      onClick={() => setLightbox(true)}
+                      className="relative w-full max-w-[360px] cursor-zoom-in"
+                      aria-label="Uvećaj sliku"
+                    >
+                      <img
+                        src={mainSrc}
+                        alt={product.title}
+                        className="w-full object-contain drop-shadow-[0_24px_32px_rgba(0,0,0,0.25)]"
+                        width={600}
+                        height={540}
+                      />
+                    </button>
                   ) : (
                     <div className="w-full max-w-[360px] aspect-square bg-white/10 flex items-center justify-center text-white/50 text-sm">
                       Nema slike
@@ -271,7 +387,7 @@ export default function Product() {
                 <div className="flex items-baseline gap-3 mb-4">
                   {/* Snižena cijena u Vulcan Orangeu — brand book tu boju drži za popuste */}
                   <span className={`text-3xl font-bold ${product.old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`} style={NUMERIC}>
-                    {fmtKM(product.price)}
+                    {fmtKM(cijena)}
                   </span>
                   {product.old && (
                     <span className="text-base text-gray-400 line-through font-normal">{fmtKM(product.old)}</span>
@@ -401,7 +517,7 @@ export default function Product() {
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-semibold text-[#1e272e] truncate m-0">{product.brand} · {product.title}</p>
               <p className="text-[15px] font-bold text-[#1e272e] m-0" style={NUMERIC}>
-                {fmtKM(product.price)}
+                {fmtKM(cijena)}
                 {product.old && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={BODY}>{fmtKM(product.old)}</span>}
               </p>
             </div>

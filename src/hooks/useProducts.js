@@ -91,6 +91,38 @@ export function getVariantStock(product, flavor, size) {
 }
 
 /**
+ * Cijena izabrane varijante.
+ *
+ * Cijena je funkcija varijante, ne proizvoda: Gold Whey ide od 7.50
+ * (vrećica 30 g) do 389 (4450 g). `product.price` ostaje rezerva za
+ * proizvode bez varijanti i za zapise koje sync još nije dopunio.
+ *
+ * Ključ se gradi isto kao u getVariantStock i u SQL funkciji koja naplaćuje
+ * narudžbu — sva tri mjesta moraju ostati usklađena.
+ */
+export function getVariantPrice(product, flavor, size) {
+  const key = flavor && size ? `${flavor}|${size}`
+            : flavor         ? flavor
+            : size           ? size
+            : ''
+  const cijena = key ? product?.stock_variants?.[key]?.price : null
+  return cijena != null ? Number(cijena) : Number(product?.price ?? 0)
+}
+
+/**
+ * Raspon cijena za prikaz na kartici, gdje varijanta još nije izabrana.
+ * Vraća null kad su sve cijene jednake — tada se prikazuje obična cijena.
+ */
+export function getPriceRange(product) {
+  const cijene = Object.values(product?.stock_variants ?? {})
+    .map((v) => (v?.price != null ? Number(v.price) : null))
+    .filter((x) => x != null && x > 0)
+  if (cijene.length < 2) return null
+  const min = Math.min(...cijene), max = Math.max(...cijene)
+  return min === max ? null : { min, max }
+}
+
+/**
  * Slika koja odgovara izabranom okusu/gramaži (galerija sa vezanim varijantama).
  * Prioritet: tačan par okus+gramaža → samo okus → samo gramaža → prva slika
  * u galeriji → stara jednostruka slika (product.img).
