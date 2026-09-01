@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
 import { Switch } from '../../components/ui/switch'
+import { cn } from '../../lib/utils'
 import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
 
@@ -135,6 +136,9 @@ export default function Products() {
   const [upit, setUpit]       = useState('')   // pretraga nakon odgode
   const [stranica, setStranica] = useState(0)
   const [ukupno, setUkupno]   = useState(0)
+  // 'sve' | 'objavljeni' | 'nacrti'
+  const [status, setStatus]   = useState('sve')
+  const [brojaci, setBrojaci] = useState({ objavljeni: 0, nacrti: 0 })
 
   // Pretraga ceka da prestanes tipkati — inace bi svaki znak bio upit na
   // bazu preko cijelog kataloga.
@@ -152,6 +156,9 @@ export default function Products() {
       .from('products')
       .select('id, brand, title, internal_title, price, old_price, category, is_active, badge, image_url, image_path, images',
         { count: 'exact' })
+
+    if (status === 'objavljeni') q = q.eq('is_active', true)
+    if (status === 'nacrti')     q = q.eq('is_active', false)
 
     // I pretraga ide na server — inace bi trazila samo po trenutnoj stranici.
     if (upit) {
@@ -175,9 +182,22 @@ export default function Products() {
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [upit, stranica])   // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load() }, [upit, stranica, status])   // eslint-disable-line react-hooks/exhaustive-deps
 
   const zadnjaStranica = Math.max(0, Math.ceil(ukupno / PO_STRANICI) - 1)
+
+  // Brojaci po statusu se citaju zasebno: `ukupno` prati trenutni filter, pa
+  // bi inace u pogledu "Nacrti" pisalo da objavljenih nema nijedan.
+  useEffect(() => {
+    async function prebroji() {
+      const [{ count: obj }, { count: nac }] = await Promise.all([
+        supabase.from('products').select('id', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('products').select('id', { count: 'exact', head: true }).eq('is_active', false),
+      ])
+      setBrojaci({ objavljeni: obj ?? 0, nacrti: nac ?? 0 })
+    }
+    prebroji().catch(() => {})
+  }, [products])
 
   const toggleActive = async (id, current) => {
     await supabase.from('products').update({ is_active: !current }).eq('id', id)
@@ -213,6 +233,30 @@ export default function Products() {
       </div>
 
       <BatchUploader onDone={load} />
+
+      {/* Filter po statusu — od 1043 proizvoda objavljeno je 18, pa je bez
+          ovoga prva stranica uvijek same nacrti i izgleda kao da nista nije
+          aktivno. */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {[
+          ['sve',        'Sve',        brojaci.objavljeni + brojaci.nacrti],
+          ['objavljeni', 'Objavljeni', brojaci.objavljeni],
+          ['nacrti',     'Nacrti',     brojaci.nacrti],
+        ].map(([kljuc, oznaka, n]) => (
+          <button
+            key={kljuc}
+            onClick={() => { setStatus(kljuc); setStranica(0) }}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+              status === kljuc
+                ? 'bg-gray-900 text-white border-gray-900'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400',
+            )}
+          >
+            {oznaka} <span className="opacity-60">{n}</span>
+          </button>
+        ))}
+      </div>
 
       {/* Search */}
       <div className="relative max-w-sm">
@@ -284,10 +328,20 @@ export default function Products() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Switch
-                          checked={p.is_active}
-                          onCheckedChange={() => toggleActive(p.id, p.is_active)}
-                        />
+                        <div className="flex items-center gap-2.5">
+                          <Switch
+                            checked={p.is_active}
+                            onCheckedChange={() => toggleActive(p.id, p.is_active)}
+                          />
+                          {/* Rijec uz prekidac: sam prekidac se na popisu od
+                              50 redova tesko cita, pogotovo kad su svi isti. */}
+                          <span className={cn(
+                            'text-[11px] font-medium',
+                            p.is_active ? 'text-emerald-600' : 'text-gray-400',
+                          )}>
+                            {p.is_active ? 'Objavljen' : 'Nacrt'}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
