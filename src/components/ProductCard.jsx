@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { fmtKM, discountChipClass } from '../data/catalog'
-import { hasAnyStock, getVariantStock, getVariantImageSrc } from '../hooks/useProducts'
+import { hasAnyStock, getVariantStock, getVariantImageSrc, getVariantPrice } from '../hooks/useProducts'
 import { BODY } from '../lib/typography'
 
 // Color coding po tipu (Notion: "Labels/Tagovi — Color coding"):
@@ -51,6 +51,7 @@ export default function ProductCard({ product, bestseller = false }) {
   const hasVariants   = flavors.length > 0 || sizes.length > 0
   const variantStock  = hasVariants ? getVariantStock(product, flavor, size) : (product.stock ?? 0)
   const canAdd        = inStock && (!hasVariants || variantStock > 0)
+  const cijenaVarijante = getVariantPrice(product, flavor, size)
   // Ako galerija ima sliku vezanu za izabrani okus/gramažu, prikaži nju umjesto cover slike
   const displayImg    = useMemo(() => getVariantImageSrc(product, flavor, size), [product, flavor, size])
 
@@ -142,9 +143,11 @@ export default function ProductCard({ product, bestseller = false }) {
             </div>
           )}
 
+          {/* Cijena prati izbor u kartici — bez toga bi Gold Whey od 30 g i
+              od 2270 g pokazivali istu cifru. */}
           <div className="flex items-baseline gap-2 mb-3">
             {/* Snižena cijena ide u Vulcan Orange — brand book tu boju drži za popuste */}
-            <span className={`text-[19px] font-extrabold ${old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`}>{fmtKM(price)}</span>
+            <span className={`text-[19px] font-extrabold ${old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`}>{fmtKM(cijenaVarijante)}</span>
             {old && (
               <span className="text-xs text-gray-400 line-through font-normal">{fmtKM(old)}</span>
             )}
@@ -155,7 +158,7 @@ export default function ProductCard({ product, bestseller = false }) {
                 ? 'ph-cta cursor-pointer'
                 : 'border border-gray-200 text-gray-400 bg-[#edf1f5] cursor-not-allowed'
             }`}
-            onClick={(e) => { e.stopPropagation(); if (canAdd) addItem({ ...product, selectedFlavor: flavor, selectedSize: size }) }}
+            onClick={(e) => { e.stopPropagation(); if (canAdd) addItem({ ...product, price: cijenaVarijante, selectedFlavor: flavor, selectedSize: size }) }}
             aria-label={`Dodaj ${title} u korpu`}
             disabled={!canAdd}
             style={BODY}

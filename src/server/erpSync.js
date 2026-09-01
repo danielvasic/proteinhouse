@@ -211,7 +211,23 @@ function stockFor(articles, existingVariants) {
               : a.flavor           ? a.flavor
               : a.size             ? a.size
               : null
-    if (key) variants[key] = { qty, sku: a.sku }
+    if (!key) continue
+
+    // Cijena ide UZ VARIJANTU, ne uz proizvod.
+    //
+    // Gold Whey ide od 7.50 (vrecica 30 g) do 389 (4450 g) — raspon 52 puta.
+    // Dok je cijena bila samo na proizvodu, takav se raspon nije dao prikazati
+    // pa je katalog bio razdvojen na vise proizvoda istog imena. Cijena je
+    // unutar iste gramaze uvijek ista (provjereno kroz cijeli katalog), pa je
+    // varijanta pravo mjesto za nju.
+    // NE koristi a.price_discount ovdje. To je cijenaHH — Happy Hour, ne
+    // trajna akcija. Kroz katalog je oko 10% ispod redovne, pa bi upisivanje
+    // znacilo stalni popust od 10% na sve. Isti razlog stoji iza
+    // PRICE_SOURCE = 'cijena' u erpMapping.js; ako se ikad uvede prava
+    // akcijska cijena, dolazi iz drugog polja.
+    const cijena = a.price != null ? Number(a.price) : null
+
+    variants[key] = { qty, sku: a.sku, ...(cijena != null && { price: cijena }) }
   }
   return { stock: total, stock_variants: variants }
 }
