@@ -23,13 +23,8 @@ export const products = []
 export const getProductBySlug   = (slug) => null
 export const getProductsByCategory = (cat) => []
 export const getCategoryBySlug  = (slug) => categories.find((c) => c.slug === slug) || null
-export const fmtKM = (n) => {
-  if (n === null || n === undefined) return '—'
-  return new Intl.NumberFormat('bs-BA', { style: 'currency', currency: 'BAM', minimumFractionDigits: 2 })
-    .format(n)
-    .replace('BAM', 'KM')
-    .trim()
-}
+// fmtKM je preseljen u src/lib/price.js — Intl.NumberFormat nije bio
+// determinističan između Node-a i preglednika i obarao je hidraciju.
 
 /**
  * Boja chipa popusta (Notion "Labels"): do 50% crna brand boja, 50% i preko

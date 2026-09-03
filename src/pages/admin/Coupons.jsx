@@ -9,6 +9,8 @@ import { Badge } from '../../components/ui/badge'
 import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
+import { fmtKM } from '../../lib/price'
+import { fmtDatum } from '../../lib/date'
 
 const EMPTY = {
   code: '', description: '',
@@ -98,7 +100,7 @@ export default function Coupons() {
 
   const discountLabel = (c) =>
     c.discount_percent ? `−${c.discount_percent}%`
-    : c.discount_amount ? `−${Number(c.discount_amount).toFixed(2)} KM`
+    : c.discount_amount ? `−${fmtKM(c.discount_amount)}`
     : c.free_shipping   ? 'Besplatna dostava'
     : '—'
 
@@ -151,7 +153,7 @@ export default function Coupons() {
                     </TableCell>
                     <TableCell><Badge variant="emerald">{discountLabel(c)}</Badge></TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {Number(c.min_order) > 0 && <p>Min. {Number(c.min_order).toFixed(2)} KM</p>}
+                      {Number(c.min_order) > 0 && <p>Min. {fmtKM(c.min_order)}</p>}
                       {c.once_per_email && <p>1× po kupcu</p>}
                       {c.free_shipping && c.discount_percent && <p>+ besplatna dostava</p>}
                     </TableCell>
@@ -159,8 +161,8 @@ export default function Coupons() {
                       {c.used_count}{c.max_uses ? ` / ${c.max_uses}` : ''}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {c.starts_at && <p>Od: {new Date(c.starts_at).toLocaleDateString('bs')}</p>}
-                      {c.ends_at   && <p>Do: {new Date(c.ends_at).toLocaleDateString('bs')}</p>}
+                      {c.starts_at && <p>Od: {fmtDatum(c.starts_at)}</p>}
+                      {c.ends_at   && <p>Do: {fmtDatum(c.ends_at)}</p>}
                       {!c.starts_at && !c.ends_at && '—'}
                     </TableCell>
                     <TableCell>

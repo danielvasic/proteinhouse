@@ -9,6 +9,7 @@ import { Switch } from '../../components/ui/switch'
 import { cn } from '../../lib/utils'
 import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
+import { fmtKM } from '../../lib/price'
 
 function BatchUploader({ onDone }) {
   const [open,     setOpen]     = useState(false)
@@ -318,11 +319,11 @@ export default function Products() {
                       <TableCell>
                         <div className="flex flex-col">
                           <span className={`font-bold text-sm ${p.old_price ? 'text-emerald-600' : 'text-gray-900'}`}>
-                            {Number(p.price).toFixed(2)} KM
+                            {fmtKM(p.price)}
                           </span>
                           {p.old_price && (
                             <span className="text-xs text-muted-foreground line-through">
-                              {Number(p.old_price).toFixed(2)} KM
+                              {fmtKM(p.old_price)}
                             </span>
                           )}
                         </div>

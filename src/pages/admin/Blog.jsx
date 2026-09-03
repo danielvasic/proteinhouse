@@ -8,6 +8,7 @@ import { Badge } from '../../components/ui/badge'
 import { Switch } from '../../components/ui/switch'
 import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
+import { fmtDatum } from '../../lib/date'
 
 export default function AdminBlog() {
   const [posts, setPosts] = useState([])
@@ -102,7 +103,7 @@ export default function AdminBlog() {
                       />
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {new Date(p.created_at).toLocaleDateString('bs')}
+                      {fmtDatum(p.created_at)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">

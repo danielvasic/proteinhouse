@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { MagnifyingGlass, X, ArrowRight } from '@phosphor-icons/react'
 import { useAllProducts, rankBestsellers, hasAnyStock } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
-import { fmtKM } from '../data/catalog'
+import { fmtKM } from '../lib/price'
 
 const FONT = 'Inter, system-ui, sans-serif'
 

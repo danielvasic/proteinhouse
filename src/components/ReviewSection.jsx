@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Star, SealCheck } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { BODY, DISPLAY } from '../lib/typography'
+import { fmtDatum } from '../lib/date'
 
 function Stars({ value, size = 13 }) {
   return (
@@ -179,7 +180,7 @@ export default function ReviewSection({ product }) {
                     <SealCheck size={12} weight="fill" /> Verificirana kupovina
                   </span>
                   <span className="text-[11px] text-gray-400 ml-auto">
-                    {new Date(r.created_at).toLocaleDateString('bs-BA')}
+                    {fmtDatum(r.created_at)}
                   </span>
                 </div>
                 {r.comment && <p className="text-[13px] text-gray-600 leading-relaxed m-0">{r.comment}</p>}

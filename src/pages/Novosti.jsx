@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { BODY, DISPLAY } from '../lib/typography'
+import { fmtDatumDugi } from '../lib/date'
 
 function formatDate(iso) {
   if (!iso) return ''
-  return new Date(iso).toLocaleDateString('bs', { day: 'numeric', month: 'long', year: 'numeric' })
+  return fmtDatumDugi(iso)
 }
 
 export default function Novosti() {

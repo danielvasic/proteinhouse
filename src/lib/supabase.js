@@ -71,6 +71,28 @@ export async function uploadProductImage(file, slug) {
   return { path: error ? null : path, error }
 }
 
+/**
+ * Dohvati SVE retke upita, u stranicama.
+ *
+ * Supabase REST vraca najvise 1000 redaka po pozivu i to tiho — bez greske i
+ * bez ikakvog znaka da je odrezao. Katalog je trenutno na ~811 proizvoda pa
+ * prolazi u jednom pozivu, ali bi preko te granice pocela nestajati roba.
+ *
+ * Prima FABRIKU upita, ne upit: PostgrestFilterBuilder se izvrsi kad ga se
+ * await-a, pa se isti objekt ne moze pouzdano pozvati dva puta s razlicitim
+ * .range(). Zato svaka stranica dobija svjez upit.
+ */
+export async function selectAllRows(makeQuery, pageSize = 1000) {
+  const out = []
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await makeQuery().range(from, from + pageSize - 1)
+    if (error) return { data: null, error }
+    out.push(...(data ?? []))
+    if (!data || data.length < pageSize) break
+  }
+  return { data: out, error: null }
+}
+
 // ------------------------------------------------
 // Product helpers (replace catalog.js once live)
 // ------------------------------------------------

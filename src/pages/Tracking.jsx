@@ -3,8 +3,9 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { House, CaretRight, Check, Package, Gear, Truck, XCircle, MagnifyingGlass } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
-import { fmtKM } from '../data/catalog'
+import { fmtKM } from '../lib/price'
 import { BODY, DISPLAY } from '../lib/typography'
+import { fmtDatum } from '../lib/date'
 
 // Koraci praćenja: Zaprimljena → U obradi → Poslano → Isporučena
 const STEPS = [
@@ -145,7 +146,7 @@ export default function Tracking() {
                             <p className={`text-[13px] font-bold m-0 ${done ? 'text-[#1e272e]' : 'text-gray-400'}`}>{label}</p>
                             {current && (
                               <p className="text-[11px] text-gray-400 mt-0.5 m-0">
-                                Ažurirano: {new Date(order.updated_at).toLocaleDateString('bs-BA')}
+                                Ažurirano: {fmtDatum(order.updated_at)}
                               </p>
                             )}
                           </div>

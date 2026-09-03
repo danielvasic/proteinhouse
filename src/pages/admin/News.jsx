@@ -8,6 +8,7 @@ import { Textarea } from '../../components/ui/textarea'
 import { Switch } from '../../components/ui/switch'
 import { Card, CardContent } from '../../components/ui/card'
 import { Badge } from '../../components/ui/badge'
+import { fmtDatum } from '../../lib/date'
 
 const EMPTY = { title: '', content: '', excerpt: '', published: true }
 
@@ -182,7 +183,7 @@ export default function NewsAdmin() {
                     </div>
                     {item.excerpt && <p className="text-xs text-muted-foreground truncate">{item.excerpt}</p>}
                     <p className="text-xs text-muted-foreground mt-1">
-                      {item.published_at ? new Date(item.published_at).toLocaleDateString('bs') : '—'}
+                      {fmtDatum(item.published_at)}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">

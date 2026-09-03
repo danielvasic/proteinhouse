@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
-import { fmtKM, discountChipClass } from '../data/catalog'
-import { hasAnyStock, getVariantStock, getVariantImageSrc, getVariantPrice } from '../hooks/useProducts'
+import { discountChipClass } from '../data/catalog'
+import { fmtKM } from '../lib/price'
+import { hasAnyStock, getVariantStock, getVariantImageSrc, getVariantPrice, getSizesForFlavor } from '../hooks/useProducts'
 import { BODY } from '../lib/typography'
 
 // Color coding po tipu (Notion: "Labels/Tagovi — Color coding"):
@@ -47,13 +48,17 @@ export default function ProductCard({ product, bestseller = false }) {
 
   // Izbor okusa/gramaže direktno na kartici — default prva opcija
   const [flavor, setFlavor] = useState(flavors[0] ?? null)
-  const [size,   setSize]   = useState(sizes[0] ?? null)
+  const [size,   setSize]   = useState(null)
   const hasVariants   = flavors.length > 0 || sizes.length > 0
-  const variantStock  = hasVariants ? getVariantStock(product, flavor, size) : (product.stock ?? 0)
+  // Ponuda gramaža zavisi od okusa — vidi getSizesForFlavor. Bez toga kartica
+  // nudi kombinacije kojih nema i cijena padne na osnovnu cijenu proizvoda.
+  const gramaze       = getSizesForFlavor(product, flavor)
+  const gramaza       = gramaze.includes(size) ? size : (gramaze[0] ?? null)
+  const variantStock  = hasVariants ? getVariantStock(product, flavor, gramaza) : (product.stock ?? 0)
   const canAdd        = inStock && (!hasVariants || variantStock > 0)
-  const cijenaVarijante = getVariantPrice(product, flavor, size)
+  const cijenaVarijante = getVariantPrice(product, flavor, gramaza)
   // Ako galerija ima sliku vezanu za izabrani okus/gramažu, prikaži nju umjesto cover slike
-  const displayImg    = useMemo(() => getVariantImageSrc(product, flavor, size), [product, flavor, size])
+  const displayImg    = useMemo(() => getVariantImageSrc(product, flavor, gramaza), [product, flavor, gramaza])
 
   return (
     <article
@@ -139,7 +144,7 @@ export default function ProductCard({ product, bestseller = false }) {
           {hasVariants && (
             <div className="flex gap-2 mb-3" onClick={(e) => e.stopPropagation()}>
               <VariantSelect label="Okus"    options={flavors} value={flavor} onChange={setFlavor} />
-              <VariantSelect label="Gramaža" options={sizes}   value={size}   onChange={setSize} />
+              <VariantSelect label="Gramaža" options={gramaze} value={gramaza} onChange={setSize} />
             </div>
           )}
 
@@ -158,7 +163,7 @@ export default function ProductCard({ product, bestseller = false }) {
                 ? 'ph-cta cursor-pointer'
                 : 'border border-gray-200 text-gray-400 bg-[#edf1f5] cursor-not-allowed'
             }`}
-            onClick={(e) => { e.stopPropagation(); if (canAdd) addItem({ ...product, price: cijenaVarijante, selectedFlavor: flavor, selectedSize: size }) }}
+            onClick={(e) => { e.stopPropagation(); if (canAdd) addItem({ ...product, price: cijenaVarijante, selectedFlavor: flavor, selectedSize: gramaza }) }}
             aria-label={`Dodaj ${title} u korpu`}
             disabled={!canAdd}
             style={BODY}

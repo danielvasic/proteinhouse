@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Plus } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
-import { norm } from '../hooks/useProducts'
+import { norm, hasAnyStock } from '../hooks/useProducts'
 import { useCart } from '../store/CartContext'
-import { fmtKM } from '../data/catalog'
+import { fmtKM } from '../lib/price'
 
 /**
  * "One-Click Add-on" — jeftini logični dodaci za ono što je već u korpi.
@@ -35,9 +35,9 @@ export default function CartAddons() {
       .from('products')
       .select('*')
       .in('id', ids.split(','))
-      .eq('is_active', true)
       .then(({ data, error }) => {
-        if (!cancelled && !error && data) setProducts(data.map(norm))
+        // Add-on koji nije na stanju se ne nudi — isto pravilo kao u listama.
+        if (!cancelled && !error && data) setProducts(data.map(norm).filter(hasAnyStock))
       })
     return () => { cancelled = true }
   }, [ids])

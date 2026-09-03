@@ -200,26 +200,52 @@ function priceFor(articles) {
  * stanju". Ovako ERP osvježava ono što prepoznaje, a ručni unosi za
  * nepokrivene ključeve prežive.
  */
+function variantKey(a) {
+  return a.flavor && a.size ? `${a.flavor}|${a.size}`
+       : a.flavor           ? a.flavor
+       : a.size             ? a.size
+       : null
+}
+
 function stockFor(articles, existingVariants) {
   const variants = { ...(existingVariants || {}) }
   let total = 0
+
+  // Kad ERP preimenuje artikal — parser drukcije rastavi naziv ili se ispravi
+  // tipfeler ("Chocolate Hezelnut" -> "Chocolate Hazelnut", "2015g" -> "2040g")
+  // — novi ključ se doda, a stari ostane zauvijek jer se spajamo s postojecim.
+  // Ista SKU tada stoji pod dva ključa, svaki sa svojom cijenom i svojim
+  // stanjem, a zastarjeli nosi stariju (visu) cijenu. Zato zatecene ključeve
+  // koji nose SKU iz ovog prolaza pod drugim imenom skidamo. Rucni unosi imaju
+  // drugu ili nikakvu SKU pa prezive — a to je i svrha spajanja.
+  const skuIzProlaza = new Set(
+    articles.filter((a) => a.sku != null).map((a) => String(a.sku))
+  )
+  const kljuceviIzProlaza = new Set(articles.map(variantKey).filter(Boolean))
+  for (const [key, v] of Object.entries(variants)) {
+    if (v?.sku != null && skuIzProlaza.has(String(v.sku)) && !kljuceviIzProlaza.has(key)) {
+      delete variants[key]
+    }
+  }
+
   for (const a of articles) {
     if (a.qty == null) continue
     const qty = Math.max(0, Math.floor(Number(a.qty)))
     total += qty
-    const key = a.flavor && a.size ? `${a.flavor}|${a.size}`
-              : a.flavor           ? a.flavor
-              : a.size             ? a.size
-              : null
+    const key = variantKey(a)
     if (!key) continue
 
     // Cijena ide UZ VARIJANTU, ne uz proizvod.
     //
-    // Gold Whey ide od 7.50 (vrecica 30 g) do 389 (4450 g) — raspon 52 puta.
-    // Dok je cijena bila samo na proizvodu, takav se raspon nije dao prikazati
-    // pa je katalog bio razdvojen na vise proizvoda istog imena. Cijena je
-    // unutar iste gramaze uvijek ista (provjereno kroz cijeli katalog), pa je
-    // varijanta pravo mjesto za nju.
+    // Gold Whey ide od 7.50 (vrecica 30 g) do 489 (4450 g). Dok je cijena bila
+    // samo na proizvodu, takav se raspon nije dao prikazati pa je katalog bio
+    // razdvojen na vise proizvoda istog imena.
+    //
+    // Ispravka ranije tvrdnje: cijena NIJE uvijek ista unutar iste gramaze.
+    // 780 g je 109 za jedne okuse a 110 za druge, 2040 g je 209 ili 220. Dio
+    // te razlike bili su dupli ključevi iste SKU (skidaju se gore), ostatak
+    // tako dolazi iz ERP-a. To samo jace opravdava cijenu na varijanti —
+    // po proizvodu se ovakav raspon ne bi dao predstaviti.
     // NE koristi a.price_discount ovdje. To je cijenaHH — Happy Hour, ne
     // trajna akcija. Kroz katalog je oko 10% ispod redovne, pa bi upisivanje
     // znacilo stalni popust od 10% na sve. Isti razlog stoji iza
