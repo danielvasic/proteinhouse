@@ -10,6 +10,7 @@ import { Badge } from '../../components/ui/badge'
 import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
+import { fmtDatum } from '../../lib/date'
 
 const EMPTY = {
   title: '', subtitle: '', badge: '', image_url: '', link: '',
@@ -154,8 +155,8 @@ export default function Promotions() {
                         }
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {p.starts_at && <p>Od: {new Date(p.starts_at).toLocaleDateString('bs')}</p>}
-                        {p.ends_at && <p>Do: {new Date(p.ends_at).toLocaleDateString('bs')}</p>}
+                        {p.starts_at && <p>Od: {fmtDatum(p.starts_at)}</p>}
+                        {p.ends_at && <p>Do: {fmtDatum(p.ends_at)}</p>}
                         {!p.starts_at && !p.ends_at && '—'}
                       </TableCell>
                       <TableCell>

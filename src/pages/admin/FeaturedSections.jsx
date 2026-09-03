@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
+import { fmtKM } from '../../lib/price'
 
 // Two carousel sections on the homepage
 const SECTIONS = [
@@ -36,7 +37,7 @@ function ProductRow({ product, onRemove }) {
         <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{product.brand}</p>
         <p className="text-sm font-semibold text-gray-800 truncate">{product.title}</p>
       </div>
-      <span className="text-sm font-bold text-gray-700 shrink-0">{product.price} KM</span>
+      <span className="text-sm font-bold text-gray-700 shrink-0">{fmtKM(product.price)}</span>
       <button
         className="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors duration-150 cursor-pointer bg-transparent border-0 shrink-0"
         onClick={() => onRemove(product.id)}
@@ -214,7 +215,7 @@ function SectionEditor({ section }) {
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{p.brand}</p>
                   <p className="text-sm font-semibold text-gray-800 truncate">{p.title}</p>
                 </div>
-                <span className="text-sm font-bold text-gray-700 shrink-0">{p.price} KM</span>
+                <span className="text-sm font-bold text-gray-700 shrink-0">{fmtKM(p.price)}</span>
                 <span className="text-xs text-primary font-bold px-2 py-1 border border-primary/30 shrink-0">+ Dodaj</span>
               </button>
             ))}

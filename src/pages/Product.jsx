@@ -7,8 +7,9 @@ import {
 } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { trackEvent } from '../lib/analytics'
-import { getCategoryBySlug, fmtKM, discountChipClass } from '../data/catalog'
-import { useProduct, getVariantStock, getVariantPrice } from '../hooks/useProducts'
+import { getCategoryBySlug, discountChipClass } from '../data/catalog'
+import { fmtKM } from '../lib/price'
+import { useProduct, getVariantStock, getVariantPrice, getSizesForFlavor } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
 import BrandIcon from '../components/BrandIcon'
 import { BODY, DISPLAY, NUMERIC } from '../lib/typography'
@@ -139,6 +140,11 @@ export default function Product() {
   const [qty,    setQty]    = useState(1)
   const [flavor, setFlavor] = useState(null)
   const [size,   setSize]   = useState(null)
+  // Ponuda gramaža zavisi od okusa — vidi getSizesForFlavor. Bez toga se
+  // može izabrati kombinacija koje nema i cijena padne na osnovnu cijenu.
+  const gramaze = getSizesForFlavor(product, flavor)
+  const gramaza = gramaze.includes(size) ? size : (gramaze[0] ?? null)
+
   const [activeIdx, setActiveIdx] = useState(0)
   const [lightbox, setLightbox] = useState(false)
 
@@ -166,12 +172,12 @@ export default function Product() {
   // Galerija: prebaci na sliku vezanu za izabrani okus/gramažu (ako postoji)
   useEffect(() => {
     if (!product?.images?.length) return
-    const comboKey = flavor && size ? `${flavor}|${size}` : null
+    const comboKey = flavor && gramaza ? `${flavor}|${gramaza}` : null
     const idx = product.images.findIndex((i) =>
-      (comboKey && i.variant === comboKey) || (flavor && i.variant === flavor) || (size && i.variant === size)
+      (comboKey && i.variant === comboKey) || (flavor && i.variant === flavor) || (gramaza && i.variant === gramaza)
     )
     if (idx >= 0) setActiveIdx(idx)
-  }, [flavor, size, product])
+  }, [flavor, gramaza, product])
 
   // Floating "kupi" traka — prati te dok skrolaš (Ostrovit stil)
   const buyRef = useRef(null)
@@ -188,10 +194,9 @@ export default function Product() {
 
   // Set defaults when product loads
   if (product && flavor === null && product.flavors?.length) setFlavor(product.flavors[0])
-  if (product && size   === null && product.sizes?.length)   setSize(product.sizes[0])
 
   // Compute current variant stock
-  const currentStock = product ? getVariantStock(product, flavor, size) : 0
+  const currentStock = product ? getVariantStock(product, flavor, gramaza) : 0
   const outOfStock   = currentStock === 0
   const lowStock     = currentStock > 0 && currentStock <= 5
 
@@ -217,13 +222,13 @@ export default function Product() {
   const category   = getCategoryBySlug(product.cat)
   const isDiscount = product.badge?.startsWith('-')
   // Cijena prati izbor okusa i gramaže; ista funkcija koju koristi i korpa.
-  const cijena     = getVariantPrice(product, flavor, size)
+  const cijena     = getVariantPrice(product, flavor, gramaza)
   const imaPromo   = product.heroStats?.length > 0
 
   const handleAdd = () => {
     // price se namjerno gazi: `...product` nosi cijenu proizvoda, a u korpu
     // mora ici cijena izabrane varijante. Server svejedno racuna iznova.
-    const item = { ...product, price: cijena, selectedFlavor: flavor, selectedSize: size }
+    const item = { ...product, price: cijena, selectedFlavor: flavor, selectedSize: gramaza }
     for (let i = 0; i < qty; i++) addItem(item)
   }
 
@@ -424,8 +429,8 @@ export default function Product() {
                 {/* Sizes selector */}
                 <VariantSelector
                   label="Težina / Veličina"
-                  options={product.sizes}
-                  value={size}
+                  options={gramaze}
+                  value={gramaza}
                   onChange={setSize}
                 />
 

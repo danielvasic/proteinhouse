@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Gift, Check, Sparkle } from '@phosphor-icons/react'
 import { supabase, getProductImageUrl } from '../lib/supabase'
+import { fmtKM } from '../lib/price'
 
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
 const SHOE_SIZES     = ['38', '39', '40', '41', '42', '43', '44', '45', '46', '47']
@@ -88,7 +89,7 @@ export default function GiftPicker({ subtotal, value, onChange }) {
       <div className="border border-dashed border-[#0145F2]/40 bg-[#edf1f5] p-5 flex items-center gap-3">
         <Gift size={22} weight="duotone" className="text-[#0145F2] shrink-0" />
         <p className="text-[12px] text-gray-600">
-          Još <strong className="text-[#1e272e]">{missing.toFixed(2)} KM</strong> do besplatnog poklona
+          Još <strong className="text-[#1e272e]">{fmtKM(missing)}</strong> do besplatnog poklona
           {campaign.headline ? ` — ${campaign.headline.toLowerCase()}` : ''}.
         </p>
       </div>

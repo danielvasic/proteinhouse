@@ -8,6 +8,8 @@ import { Card, CardContent } from '../../components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
 import { cn } from '../../lib/utils'
+import { fmtKM } from '../../lib/price'
+import { fmtDatum } from '../../lib/date'
 
 // Statusi praćenja pošiljke: nova (zaprimljena) → u_obradi → poslano → isporučena
 const STATUSES = ['nova', 'u_obradi', 'poslano', 'isporučena', 'otkazana']
@@ -129,7 +131,7 @@ export default function Orders() {
                           {o.customer_phone && <p className="text-xs text-muted-foreground">{o.customer_phone}</p>}
                         </TableCell>
                         <TableCell className="text-sm">{o.shipping_city || '—'}</TableCell>
-                        <TableCell className="font-bold text-sm">{Number(o.total).toFixed(2)} KM</TableCell>
+                        <TableCell className="font-bold text-sm">{fmtKM(o.total)}</TableCell>
                         <TableCell>
                           <Select value={o.status} onValueChange={(v) => updateStatus(o.id, v)}>
                             <SelectTrigger className="h-7 text-xs w-32">
@@ -149,7 +151,7 @@ export default function Orders() {
                           </Select>
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">
-                          {new Date(o.created_at).toLocaleDateString('bs')}
+                          {fmtDatum(o.created_at)}
                         </TableCell>
                         <TableCell>
                           <Button
@@ -174,13 +176,13 @@ export default function Orders() {
                                     <span className="text-gray-700">{item.brand} {item.title}</span>
                                     <div className="flex items-center gap-3 shrink-0 ml-4">
                                       <span className="text-muted-foreground">× {item.qty}</span>
-                                      <span className="font-semibold">{(item.price * item.qty).toFixed(2)} KM</span>
+                                      <span className="font-semibold">{fmtKM(item.price * item.qty)}</span>
                                     </div>
                                   </div>
                                 ))}
                                 <div className="flex justify-between font-bold text-sm pt-2 border-t mt-2">
                                   <span>Ukupno</span>
-                                  <span>{Number(o.total).toFixed(2)} KM</span>
+                                  <span>{fmtKM(o.total)}</span>
                                 </div>
                               </div>
                               {/* Shipping */}

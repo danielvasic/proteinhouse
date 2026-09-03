@@ -27,7 +27,8 @@ async function prefetchMeta(url, origin) {
       .from('products')
       .select('brand, title, description, price, image_path, image_url, slug')
       .eq('slug', productMatch[1])
-      .eq('is_active', true)
+      // Bez is_active filtera — useProduct ga takoder ne gleda, pa bi inace
+      // stranica renderovala a meta tagovi pali na genericke.
       .maybeSingle()
 
     if (data) {

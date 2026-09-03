@@ -10,6 +10,7 @@ import { Textarea } from '../../components/ui/textarea'
 import { Switch } from '../../components/ui/switch'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
+import { fmtKM } from '../../lib/price'
 
 const EMPTY = {
   brand: '', title: '', slug: '', price: '', old_price: '',
@@ -90,7 +91,7 @@ function AddonEditor({ selfId, value, onChange }) {
               <p className="text-sm font-medium truncate">
                 {p ? `${p.brand} ${p.title}` : 'Proizvod je obrisan ili neaktivan'}
               </p>
-              {p && <p className="text-xs text-muted-foreground">Redovna: {Number(p.price).toFixed(2)} KM</p>}
+              {p && <p className="text-xs text-muted-foreground">Redovna: {fmtKM(p.price)}</p>}
             </div>
             <Input
               className="w-28"
@@ -113,7 +114,7 @@ function AddonEditor({ selfId, value, onChange }) {
         <SelectContent>
           {free.map((p) => (
             <SelectItem key={p.id} value={p.id}>
-              {p.brand} {p.title} — {Number(p.price).toFixed(2)} KM
+              {p.brand} {p.title} — {fmtKM(p.price)}
             </SelectItem>
           ))}
         </SelectContent>

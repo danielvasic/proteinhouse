@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Badge } from '../../components/ui/badge'
 import { Button } from '../../components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
+import { fmtKM } from '../../lib/price'
+import { fmtDatum } from '../../lib/date'
 
 const STATUS_VARIANT = {
   'nova':       { variant: 'info',      icon: Clock },
@@ -90,7 +92,7 @@ export default function Dashboard() {
         <StatCard
           icon={TrendingUp}
           label="Ukupno prihoda"
-          value={stats.revenue !== null ? stats.revenue.toFixed(2) + ' KM' : '—'}
+          value={fmtKM(stats.revenue)}
           to="/admin/narudzbe"
           accent="bg-emerald-500"
         />
@@ -130,12 +132,12 @@ export default function Dashboard() {
                     <TableRow key={o.order_number}>
                       <TableCell className="font-mono text-xs font-medium">{o.order_number}</TableCell>
                       <TableCell className="font-medium">{o.customer_name}</TableCell>
-                      <TableCell>{Number(o.total).toFixed(2)} KM</TableCell>
+                      <TableCell>{fmtKM(o.total)}</TableCell>
                       <TableCell>
                         <Badge variant={variant}>{o.status}</Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-xs">
-                        {new Date(o.created_at).toLocaleDateString('bs')}
+                        {fmtDatum(o.created_at)}
                       </TableCell>
                     </TableRow>
                   )

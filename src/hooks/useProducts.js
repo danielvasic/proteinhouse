@@ -10,7 +10,7 @@
  *                description, flavors, sizes, rating, reviews }
  */
 import { useEffect, useState, useMemo } from 'react'
-import { supabase, getProductImageUrl, getProductThumbUrl } from '../lib/supabase'
+import { supabase, getProductImageUrl, getProductThumbUrl, selectAllRows } from '../lib/supabase'
 
 /**
  * Ako naziv počinje imenom brenda, skini ga iz prikaza — brend se prikazuje
@@ -27,8 +27,48 @@ function displayTitle(brand, title) {
   return t
 }
 
+/**
+ * Ista SKU sifra ume stajati pod dva ključa: ERP preimenuje artikal, a
+ * stock_variants se spaja pa stari ključ ostane (vidi stockFor u erpSync.js).
+ * Zastarjeli ključ nosi svoju cijenu i svoje stanje, pa bi hasAnyStock mogao
+ * proizvod drzati "na stanju" po zalihi koje vise nema — a od kad vidljivost
+ * odlucuje stanje, to znaci prikazan proizvod koji se ne moze kupiti.
+ *
+ * Zadrzavamo ključ čiji su i okus i gramaža u deklarisanim listama proizvoda.
+ * U svim zatecenim slucajevima (16 grupa) to je tacno jedan ključ, i to onaj
+ * sa svjezijom cijenom. Sync isto ovo rjesava na upisu; ovo je zastita za
+ * podatke koji su vec u bazi i za artikle koje ERP prestane slati.
+ */
+export function dedupeVariants(stockVariants, flavors = [], sizes = []) {
+  const kljucevi = Object.keys(stockVariants ?? {})
+  if (kljucevi.length === 0) return stockVariants ?? {}
+
+  const kanonski = (key) => {
+    const i = key.indexOf('|')
+    if (i < 0) return flavors.includes(key) || sizes.includes(key)
+    return flavors.includes(key.slice(0, i)) && sizes.includes(key.slice(i + 1))
+  }
+
+  const zaSku = new Map()
+  for (const key of kljucevi) {
+    const sku = stockVariants[key]?.sku
+    if (sku == null) continue
+    const dosad = zaSku.get(String(sku))
+    if (dosad == null || (!kanonski(dosad) && kanonski(key))) zaSku.set(String(sku), key)
+  }
+
+  const out = {}
+  for (const key of kljucevi) {
+    const sku = stockVariants[key]?.sku
+    if (sku == null || zaSku.get(String(sku)) === key) out[key] = stockVariants[key]
+  }
+  return out
+}
+
 /** Normalise a DB row */
 export function norm(p) {
+  const flavors = Array.isArray(p.flavors) ? p.flavors : []
+  const sizes   = Array.isArray(p.sizes)   ? p.sizes   : []
   return {
     id:             p.id,
     brand:          p.brand,
@@ -48,12 +88,12 @@ export function norm(p) {
     // Sve kategorije proizvoda: primarna + dodatne (visestruka pripadnost)
     cats:           [p.category ?? p.cat, ...(Array.isArray(p.extra_categories) ? p.extra_categories : [])].filter(Boolean),
     description:    p.description || '',
-    flavors:        Array.isArray(p.flavors) ? p.flavors : [],
-    sizes:          Array.isArray(p.sizes)   ? p.sizes   : [],
+    flavors,
+    sizes,
     rating:         p.rating  ?? null,
     reviews:        p.reviews ?? p.review_count ?? 0,
     stock:          p.stock          ?? 0,
-    stock_variants: p.stock_variants ?? {},
+    stock_variants: dedupeVariants(p.stock_variants, flavors, sizes),
     tags:           Array.isArray(p.tags) ? p.tags : [],
     sales:          p.sales_count ?? 0,
     usage:          p.usage_instructions || '',
@@ -110,6 +150,27 @@ export function getVariantPrice(product, flavor, size) {
 }
 
 /**
+ * Gramaže koje STVARNO postoje za izabrani okus.
+ *
+ * U bazi su `flavors` i `sizes` dva nezavisna niza, pa bi njihov Kartezijev
+ * proizvod nudio i kombinacije kojih nema: Gold Whey ima okus "Banana" i
+ * gramažu "4450g", ali ključ "Banana|4450g" ne postoji (4450 g postoji samo
+ * za Vanilla Ice Cream i Double Rich Chocolate). getVariantPrice bi na takav
+ * promašaj pao na `product.price`, a to je 7.50 — cijena vrećice od 30 g.
+ * Zato ponudu gramaža uvijek filtriramo kroz stvarne ključeve varijanti.
+ *
+ * Poredak se čuva iz `product.sizes`. Ako proizvod ne koristi složene
+ * ključeve (npr. samo "60 caps"), vraća se cijela lista nepromijenjena.
+ */
+export function getSizesForFlavor(product, flavor) {
+  const sve = product?.sizes ?? []
+  const varijante = product?.stock_variants ?? {}
+  if (!flavor || Object.keys(varijante).length === 0) return sve
+  const valjane = sve.filter((s) => `${flavor}|${s}` in varijante)
+  return valjane.length ? valjane : sve
+}
+
+/**
  * Raspon cijena za prikaz na kartici, gdje varijanta još nije izabrana.
  * Vraća null kad su sve cijene jednake — tada se prikazuje obična cijena.
  */
@@ -145,21 +206,25 @@ export function hasAnyStock(product) {
   return Object.values(product.stock_variants ?? {}).some((v) => (v?.qty ?? 0) > 0)
 }
 
-/** All active products from DB */
+/**
+ * Proizvodi za storefront.
+ *
+ * Vidljivost odlučuje STANJE, ne `is_active`: proizvod se prikazuje tek kad
+ * ga ima na stanju. Nema smisla nuditi ono što se ne može kupiti, a artikli
+ * se kroz ERP sync stalno vraćaju na stanje pa ručno prebacivanje zastavice
+ * nikad ne bi bilo u koraku sa lagerom.
+ */
 export function useAllProducts() {
   const [products, setProducts] = useState([])
   const [loading,  setLoading]  = useState(true)
 
   useEffect(() => {
-    supabase
-      .from('products')
-      .select('*')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .then(({ data, error }) => {
-        if (!error && data) setProducts(data.map(norm))
-        setLoading(false)
-      })
+    selectAllRows(() =>
+      supabase.from('products').select('*').order('sort_order', { ascending: true })
+    ).then(({ data, error }) => {
+      if (!error && data) setProducts(data.map(norm).filter(hasAnyStock))
+      setLoading(false)
+    })
   }, [])
 
   return { products, loading }
@@ -175,7 +240,11 @@ export function useProductsByCategory(slug) {
   return { products: filtered, loading }
 }
 
-/** Single product by slug — DB only */
+/**
+ * Jedan proizvod po slugu. Ostaje dostupan direktnim linkom i kad padne sa
+ * stanja — liste ga sakriju, ali postojeći linkovi i indeksirane stranice ne
+ * smiju odjednom vraćati 404. Dugme se svejedno prikaže kao "Nema na stanju".
+ */
 export function useProduct(slug) {
   const [product, setProduct] = useState(null)
   const [loading,  setLoading]  = useState(true)
@@ -186,7 +255,6 @@ export function useProduct(slug) {
       .from('products')
       .select('*')
       .eq('slug', slug)
-      .eq('is_active', true)
       .maybeSingle()
       .then(({ data, error }) => {
         setProduct(!error && data ? norm(data) : null)

@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
+import { fmtKM } from '../../lib/price'
 
 export const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
 export const SHOE_SIZES     = ['38', '39', '40', '41', '42', '43', '44', '45', '46', '47']
@@ -229,7 +230,7 @@ export default function Gifts() {
                 <div>
                   <CardTitle className="text-base">{activeCampaign.headline || activeCampaign.name}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Prag: <strong>{Number(activeCampaign.min_order_total).toFixed(2)} KM</strong>
+                    Prag: <strong>{fmtKM(activeCampaign.min_order_total)}</strong>
                     {activeCampaign.allow_mystery && ` · ${activeCampaign.mystery_label} uključen`}
                   </p>
                 </div>

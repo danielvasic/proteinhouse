@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { categories } from '../data/catalog'
 import { BODY } from '../lib/typography'
+import { formatPrice } from '../lib/price'
 
 const BRANDS = ['Optimum Nutrition', 'Ostrovit', 'BSN', 'MuscleTech', 'AllNutrition', 'Scitec']
 
@@ -55,8 +56,8 @@ export default function CategorySidebar({ activeSlug, onPriceFilter }) {
           aria-label="Maksimalna cijena"
         />
         <div className="flex items-center justify-between mt-2 mb-4">
-          <span className="text-[11px] text-gray-400">0 KM</span>
-          <span className="text-[12px] font-bold text-[#1e272e]">{priceMax} KM</span>
+          <span className="text-[11px] text-gray-400">{formatPrice(0, { decimals: 0 })}</span>
+          <span className="text-[12px] font-bold text-[#1e272e]">{formatPrice(priceMax, { decimals: 0 })}</span>
         </div>
         <button
           className="w-full py-2.5 border border-[#0145F2] text-[#1e272e] text-[10px] font-bold tracking-[0.12em] hover:bg-[#0145F2] hover:text-white transition-all duration-150 cursor-pointer bg-transparent"
