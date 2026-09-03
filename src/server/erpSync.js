@@ -347,8 +347,14 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
   }
 
   const existingSlugs = new Set(products.map((p) => p.slug))
+  // Postojeci proizvodi po slugu koji bi im sync dodijelio. Sluzi da se
+  // sifre PRIPOJE postojecem umjesto da nastane dvojnik — vidi nize.
+  const poSlugu = new Map(products.map((p) => [p.slug, p]))
   let created = 0
   const drafts = []
+  // Zaseban popis: pendingUpdates se prazni PRIJE ove petlje, pa bi upisi
+  // dodani ovdje tiho propali.
+  const pripajanja = []
 
   // Iz osakaćenog odgovora se ne stvaraju NOVI proizvodi — tako je 27.8.
   // nastalo 2128 nacrta bez brenda, kategorije i slike. Cijene i stanje
@@ -364,10 +370,35 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
     const brand = first.brand || FALLBACK_BRAND
     const base  = first.base_name || first.name
 
-    let slug = slugify(`${brand} ${base}`)
+    const slug = slugify(`${brand} ${base}`)
     if (!slug) continue
-    if (existingSlugs.has(slug)) slug = `${slug}-${first.sku}`
-    if (existingSlugs.has(slug)) continue
+
+    // Kad proizvod s tim slugom vec postoji, sifre se PRIPAJAJU njemu.
+    //
+    // Ranije je ovdje stajalo `slug = `${slug}-${first.sku}`` pa je nastajao
+    // novi proizvod istog imena. Tako je katalog zavrsio sa 163 razdvojene
+    // grupe: Gold Whey je imao tri reda — objavljen s jednom sifrom, i dva
+    // nacrta s preostalih 46. Kupac je vidio samo vrecicu od 30 g.
+    //
+    // Sada je jedan proizvod nosilac svih svojih varijanti; cijena i stanje
+    // se ionako citaju po varijanti (stock_variants), pa raspon od 7.50 do
+    // 389 vise nije problem.
+    const postojeci = poSlugu.get(slug)
+    if (postojeci) {
+      const spojene = [...new Set([...(postojeci.erp_skus ?? []), ...mine.map((a) => a.sku)])]
+      if (spojene.length !== (postojeci.erp_skus ?? []).length) {
+        pripajanja.push({
+          id: postojeci.id,
+          patch: {
+            erp_skus: spojene,
+            flavors: [...new Set(mine.map((a) => a.flavor).filter(Boolean))],
+            sizes:   [...new Set(mine.map((a) => a.size).filter(Boolean))],
+            erp_synced_at: new Date().toISOString(),
+          },
+        })
+      }
+      continue
+    }
     existingSlugs.add(slug)
 
     const { description, usage } = splitUsage(stripHtml(first.description_html))
@@ -400,6 +431,15 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
     created++
   }
 
+  if (!dryRun && pripajanja.length) {
+    for (let i = 0; i < pripajanja.length; i += 8) {
+      await Promise.all(pripajanja.slice(i, i + 8).map(async ({ id, patch }) => {
+        const { error } = await supabase.from('products').update(patch).eq('id', id)
+        if (error) throw error
+      }))
+    }
+  }
+
   if (!dryRun && drafts.length) {
     for (let i = 0; i < drafts.length; i += BATCH) {
       // ignoreDuplicates: sudar na slugu (npr. prolaz koji se preklopio s
@@ -414,6 +454,7 @@ export async function reconcileProducts(supabase, { createLimit = 200, dryRun = 
 
   return {
     updated, stockUpdated, healed,
+    pripojeno: pripajanja.length,
     created: drafts.length,
     remaining: Math.max(0, groups.size - drafts.length),
     webFiltered: anyWebFlag,
