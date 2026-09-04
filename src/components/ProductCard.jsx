@@ -4,7 +4,7 @@ import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { discountChipClass } from '../data/catalog'
 import { fmtKM } from '../lib/price'
-import { hasAnyStock, getVariantStock, getVariantImageSrc, getVariantPrice, getSizesForFlavor } from '../hooks/useProducts'
+import { hasAnyStock, getVariantStock, getVariantImageSrc, getVariantPrice, getSizeOptions, getFlavorOptions, getDefaultVariant } from '../hooks/useProducts'
 import { BODY } from '../lib/typography'
 
 // Color coding po tipu (Notion: "Labels/Tagovi — Color coding"):
@@ -29,7 +29,11 @@ function VariantSelect({ label, options, value, onChange }) {
       aria-label={label}
       style={BODY}
     >
-      {options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+      {options.map(({ value: opt, disabled }) => (
+        <option key={opt} value={opt} disabled={disabled}>
+          {disabled ? `${opt} — nema` : opt}
+        </option>
+      ))}
     </select>
   )
 }
@@ -46,14 +50,23 @@ export default function ProductCard({ product, bestseller = false }) {
     ? TAG_LABELS.bestseller
     : tags.map((t) => TAG_LABELS[t] || (t[0].toUpperCase() + t.slice(1))).find((t) => t !== badge)
 
-  // Izbor okusa/gramaže direktno na kartici — default prva opcija
-  const [flavor, setFlavor] = useState(flavors[0] ?? null)
-  const [size,   setSize]   = useState(null)
+  // Pocetni izbor je prva kombinacija koja se moze kupiti, ne prva po redu.
+  const [flavor, setFlavor] = useState(() => getDefaultVariant(product).flavor)
+  const [size,   setSize]   = useState(() => getDefaultVariant(product).size)
   const hasVariants   = flavors.length > 0 || sizes.length > 0
-  // Ponuda gramaža zavisi od okusa — vidi getSizesForFlavor. Bez toga kartica
-  // nudi kombinacije kojih nema i cijena padne na osnovnu cijenu proizvoda.
-  const gramaze       = getSizesForFlavor(product, flavor)
-  const gramaza       = gramaze.includes(size) ? size : (gramaze[0] ?? null)
+
+  // Sve gramaže ostaju u popisu, nedostupne su onemogucene — vidi
+  // getSizeOptions. Ako izabrana gramaža nema stanja uz novi okus, padamo na
+  // prvu koja ima; inace bi kupac ostao na rasprodanoj kombinaciji. Izbor se
+  // izvodi, ne upisuje u state, pa se vraca cim se vrati na okus koji ga ima.
+  const okusOpcije    = getFlavorOptions(product)
+  const gramazaOpcije = getSizeOptions(product, flavor)
+  const gramaza       = (
+    gramazaOpcije.find((o) => o.value === size && !o.disabled) ??
+    gramazaOpcije.find((o) => !o.disabled) ??
+    gramazaOpcije.find((o) => o.value === size) ??
+    gramazaOpcije[0]
+  )?.value ?? null
   const variantStock  = hasVariants ? getVariantStock(product, flavor, gramaza) : (product.stock ?? 0)
   const canAdd        = inStock && (!hasVariants || variantStock > 0)
   const cijenaVarijante = getVariantPrice(product, flavor, gramaza)
@@ -143,8 +156,8 @@ export default function ProductCard({ product, bestseller = false }) {
           {/* Varijante — odmah na kartici */}
           {hasVariants && (
             <div className="flex gap-2 mb-3" onClick={(e) => e.stopPropagation()}>
-              <VariantSelect label="Okus"    options={flavors} value={flavor} onChange={setFlavor} />
-              <VariantSelect label="Gramaža" options={gramaze} value={gramaza} onChange={setSize} />
+              <VariantSelect label="Okus"    options={okusOpcije}    value={flavor}  onChange={setFlavor} />
+              <VariantSelect label="Gramaža" options={gramazaOpcije} value={gramaza} onChange={setSize} />
             </div>
           )}
 

@@ -9,7 +9,7 @@ import { useCart } from '../store/CartContext'
 import { trackEvent } from '../lib/analytics'
 import { getCategoryBySlug, discountChipClass } from '../data/catalog'
 import { fmtKM } from '../lib/price'
-import { useProduct, getVariantStock, getVariantPrice, getSizesForFlavor } from '../hooks/useProducts'
+import { useProduct, getVariantStock, getVariantPrice, getSizeOptions, getFlavorOptions, getDefaultVariant } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
 import BrandIcon from '../components/BrandIcon'
 import { BODY, DISPLAY, NUMERIC } from '../lib/typography'
@@ -35,15 +35,19 @@ function VariantSelector({ label, options, value, onChange }) {
     <div className="mb-6">
       <p className="text-[10px] font-bold tracking-[0.16em] text-gray-400 mb-3">{label}</p>
       <div className="flex flex-wrap gap-2">
-        {options.map((opt) => (
+        {options.map(({ value: opt, disabled }) => (
           <button
             key={opt}
-            className={`px-3 py-2 text-[11px] font-bold tracking-[0.06em] border transition-all duration-150 cursor-pointer ${
-              opt === value
-                ? 'border-[#0145F2] bg-[#0145F2] text-white'
-                : 'border-gray-300 text-gray-600 bg-transparent hover:border-[#0145F2] hover:text-[#0145F2]'
+            disabled={disabled}
+            title={disabled ? 'Nema na stanju' : undefined}
+            className={`px-3 py-2 text-[11px] font-bold tracking-[0.06em] border transition-all duration-150 ${
+              disabled
+                ? 'border-gray-200 text-gray-300 bg-[#f7f8fa] line-through cursor-not-allowed'
+                : opt === value
+                  ? 'border-[#0145F2] bg-[#0145F2] text-white cursor-pointer'
+                  : 'border-gray-300 text-gray-600 bg-transparent hover:border-[#0145F2] hover:text-[#0145F2] cursor-pointer'
             }`}
-            onClick={() => onChange(opt)}
+            onClick={() => !disabled && onChange(opt)}
           >
             {opt}
           </button>
@@ -140,10 +144,17 @@ export default function Product() {
   const [qty,    setQty]    = useState(1)
   const [flavor, setFlavor] = useState(null)
   const [size,   setSize]   = useState(null)
-  // Ponuda gramaža zavisi od okusa — vidi getSizesForFlavor. Bez toga se
-  // može izabrati kombinacija koje nema i cijena padne na osnovnu cijenu.
-  const gramaze = getSizesForFlavor(product, flavor)
-  const gramaza = gramaze.includes(size) ? size : (gramaze[0] ?? null)
+  // Sve gramaže ostaju vidljive, nedostupne su precrtane i onemogucene —
+  // vidi getSizeOptions. Kad izabrana gramaža nema stanja uz novi okus,
+  // padamo na prvu koja ima umjesto da kupca ostavimo na rasprodanoj.
+  const okusOpcije    = getFlavorOptions(product)
+  const gramazaOpcije = getSizeOptions(product, flavor)
+  const gramaza       = (
+    gramazaOpcije.find((o) => o.value === size && !o.disabled) ??
+    gramazaOpcije.find((o) => !o.disabled) ??
+    gramazaOpcije.find((o) => o.value === size) ??
+    gramazaOpcije[0]
+  )?.value ?? null
 
   const [activeIdx, setActiveIdx] = useState(0)
   const [lightbox, setLightbox] = useState(false)
@@ -193,7 +204,7 @@ export default function Product() {
   }, [product])
 
   // Set defaults when product loads
-  if (product && flavor === null && product.flavors?.length) setFlavor(product.flavors[0])
+  if (product && flavor === null && product.flavors?.length) setFlavor(getDefaultVariant(product).flavor)
 
   // Compute current variant stock
   const currentStock = product ? getVariantStock(product, flavor, gramaza) : 0
@@ -429,7 +440,7 @@ export default function Product() {
                 {/* Sizes selector */}
                 <VariantSelector
                   label="Težina / Veličina"
-                  options={gramaze}
+                  options={gramazaOpcije}
                   value={gramaza}
                   onChange={setSize}
                 />
@@ -437,7 +448,7 @@ export default function Product() {
                 {/* Flavors selector */}
                 <VariantSelector
                   label="Okus"
-                  options={product.flavors}
+                  options={okusOpcije}
                   value={flavor}
                   onChange={setFlavor}
                 />
