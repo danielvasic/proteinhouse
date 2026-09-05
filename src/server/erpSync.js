@@ -15,6 +15,7 @@
  * Novi artikli ulaze kao NEAKTIVNI nacrti — ERP šalje isWeb=false na svih 1344
  * artikala, pa nema načina da se iz podataka zaključi šta smije na web.
  */
+import { createHash } from 'node:crypto'
 import { serviceClient } from './supabaseAdmin.js'
 import { toErpArticle, sellPrice, slugify, stripHtml, splitUsage, suggestExtraCategories } from './erpMapping.js'
 
@@ -561,65 +562,89 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
 const IMG_BASE = 'https://weberp-api.com/images/'
 
 /**
- * Postepeno prebacivanje ERP slika u naš storage.
+ * Prebacivanje i OSVJEZAVANJE ERP slika u nas storage.
  *
- * Nacrti pri stvaranju dobiju hotlink na weberp server (da se odmah vide);
- * ovo skida sliku i uploaduje je u bucket product-images, pa postavlja
- * image_path — koji pri prikazu ima prednost nad image_url. Ograničeno po
- * prolazu da stane u timeout funkcije; vrti se dok red ne presuši, poslije
- * čega je svaki prolaz no-op.
+ * Dvije vrste posla:
+ *   (a) proizvod nema nikakvu sliku              -> prvi uvoz
+ *   (b) nasa slika je iz 'erp/', a ERP ima drugu -> osvjezavanje
+ *
+ * Rucne slike se NE diraju. Admin upload ide pod '<slug>-<timestamp>.<ext>',
+ * a ovaj sync pise iskljucivo pod 'erp/', pa je prefiks pouzdana granica.
+ * Kurirana galerija (images != '[]') takodjer iskljucuje proizvod iz oba
+ * slucaja — te su radjene rucno i ERP ih ne smije pregaziti.
+ *
+ * Ime fajla nosi hash sadrzaja, pa se javni URL mijenja tek kad se slika
+ * stvarno promijeni: nema zastarjelog kesa, a ako je ERP samo preimenovao
+ * isti fajl, put ostaje isti i baza se ne dira.
+ *
+ * Ograniceno po prolazu da stane u timeout funkcije; vrti se svakih 15 minuta
+ * dok red ne presusi, poslije cega je svaki prolaz no-op.
  */
 export async function runImageSync({ limit = 40 } = {}) {
   const supabase = serviceClient()
 
-  const { data: prods, error } = await supabase
-    .from('products')
-    .select('id, erp_skus')
-    .is('image_path', null)
-    .eq('images', '[]')
-    .neq('erp_skus', '{}')
-    .limit(limit)
-  if (error) throw error
-  const candidates = (prods ?? []).filter((p) => p.erp_skus?.length)
-  if (!candidates.length) return { uploaded: 0, failed: 0, done: true }
+  const prods = await selectAll(
+    supabase
+      .from('products')
+      .select('id, erp_skus, image_path, erp_image_name')
+      .eq('images', '[]')
+      .neq('erp_skus', '{}')
+      // PostgREST u .or() koristi * kao wildcard, ne %.
+      .or('image_path.is.null,image_path.like.erp/*')
+  )
+  const kandidati = prods.filter((p) => p.erp_skus?.length)
+  if (!kandidati.length) return { uploaded: 0, refreshed: 0, failed: 0, done: true }
 
-  const { data: arts, error: aErr } = await supabase
-    .from('erp_articles')
-    .select('sku, image_path')
-    .in('sku', candidates.map((p) => p.erp_skus[0]))
-  if (aErr) throw aErr
+  const arts = await selectAll(
+    supabase.from('erp_articles').select('sku, image_path')
+      .in('sku', kandidati.map((p) => p.erp_skus[0]))
+  )
   const imgBySku = new Map(arts.map((a) => [a.sku, a.image_path]))
 
-  let uploaded = 0, failed = 0
-  const one = async (p) => {
+  // Skidamo samo ono sto je novo ili promijenjeno u ERP-u.
+  const posao = []
+  for (const p of kandidati) {
     const remote = imgBySku.get(p.erp_skus[0])
-    if (!remote) { failed++; return }
+    if (!remote) continue
+    const novi = p.image_path == null
+    if (novi || p.erp_image_name !== remote) posao.push({ ...p, remote, novi })
+    if (posao.length >= limit) break
+  }
+  if (!posao.length) return { uploaded: 0, refreshed: 0, failed: 0, done: true }
+
+  let uploaded = 0, refreshed = 0, failed = 0
+  const one = async (p) => {
     try {
-      const res = await fetch(IMG_BASE + remote)
+      const res = await fetch(IMG_BASE + p.remote)
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const buf = Buffer.from(await res.arrayBuffer())
       const contentType = res.headers.get('content-type') || 'image/png'
       const ext = contentType.includes('jpeg') ? 'jpg' : contentType.includes('webp') ? 'webp' : 'png'
-      const path = `erp/${p.erp_skus[0]}.${ext}`
-      const { error: upErr } = await supabase.storage
-        .from('product-images')
-        .upload(path, buf, { contentType, upsert: true })
-      if (upErr) throw upErr
+      const hash = createHash('sha1').update(buf).digest('hex').slice(0, 8)
+      const path = `erp/${p.erp_skus[0]}-${hash}.${ext}`
+
+      if (path !== p.image_path) {
+        const { error: upErr } = await supabase.storage
+          .from('product-images')
+          .upload(path, buf, { contentType, upsert: true })
+        if (upErr) throw upErr
+      }
       const { error: dbErr } = await supabase
         .from('products')
-        .update({ image_path: path })
+        .update({ image_path: path, erp_image_name: p.remote })
         .eq('id', p.id)
       if (dbErr) throw dbErr
-      uploaded++
+      if (p.novi) uploaded++
+      else refreshed++
     } catch (err) {
       console.error('erp-images:', p.erp_skus[0], err.message)
       failed++
     }
   }
 
-  // Po 5 paralelno — 40 slika stane u timeout, a ne guši ni weberp ni storage.
-  for (let i = 0; i < candidates.length; i += 5) {
-    await Promise.all(candidates.slice(i, i + 5).map(one))
+  // Po 5 paralelno — 40 slika stane u timeout, a ne gusi ni weberp ni storage.
+  for (let i = 0; i < posao.length; i += 5) {
+    await Promise.all(posao.slice(i, i + 5).map(one))
   }
-  return { uploaded, failed, done: candidates.length < limit }
+  return { uploaded, refreshed, failed, done: posao.length < limit }
 }

@@ -119,13 +119,17 @@ export function rankBestsellers(products, limit = 4) {
 }
 
 /** Get stock for a specific variant combination */
+export function variantKey(flavor, size) {
+  return flavor && size ? `${flavor}|${size}`
+       : flavor         ? flavor
+       : size           ? size
+       : ''
+}
+
 export function getVariantStock(product, flavor, size) {
   const hasVariants = product.flavors?.length > 0 || product.sizes?.length > 0
   if (!hasVariants) return product.stock ?? 0
-  const key = flavor && size ? `${flavor}|${size}`
-            : flavor         ? flavor
-            : size           ? size
-            : ''
+  const key = variantKey(flavor, size)
   if (!key) return product.stock ?? 0
   return product.stock_variants?.[key]?.qty ?? 0
 }
@@ -141,33 +145,74 @@ export function getVariantStock(product, flavor, size) {
  * narudžbu — sva tri mjesta moraju ostati usklađena.
  */
 export function getVariantPrice(product, flavor, size) {
-  const key = flavor && size ? `${flavor}|${size}`
-            : flavor         ? flavor
-            : size           ? size
-            : ''
+  const key = variantKey(flavor, size)
   const cijena = key ? product?.stock_variants?.[key]?.price : null
   return cijena != null ? Number(cijena) : Number(product?.price ?? 0)
 }
 
 /**
- * Gramaže koje STVARNO postoje za izabrani okus.
+ * Ponuda gramaža za izabrani okus, sa oznakom dostupnosti.
  *
- * U bazi su `flavors` i `sizes` dva nezavisna niza, pa bi njihov Kartezijev
- * proizvod nudio i kombinacije kojih nema: Gold Whey ima okus "Banana" i
- * gramažu "4450g", ali ključ "Banana|4450g" ne postoji (4450 g postoji samo
- * za Vanilla Ice Cream i Double Rich Chocolate). getVariantPrice bi na takav
- * promašaj pao na `product.price`, a to je 7.50 — cijena vrećice od 30 g.
- * Zato ponudu gramaža uvijek filtriramo kroz stvarne ključeve varijanti.
+ * Vraća SVE gramaže proizvoda, ne samo one koje postoje. Ranije su nedostupne
+ * bile sakrivene pa je popis skakao pri promjeni okusa: kupac izabere okus
+ * ocekujuci da ima 3 kg, gramaža u medjuvremenu nestane i mora traziti
+ * ispocetka. Sada su vidljive ali onemogucene, pa se odmah vidi sta postoji i
+ * uz koji okus — bez pogadjanja.
  *
- * Poredak se čuva iz `product.sizes`. Ako proizvod ne koristi složene
- * ključeve (npr. samo "60 caps"), vraća se cijela lista nepromijenjena.
+ * disabled = kombinacija ne postoji ILI je rasprodana; kupcu je to ista stvar.
  */
-export function getSizesForFlavor(product, flavor) {
+export function getSizeOptions(product, flavor) {
   const sve = product?.sizes ?? []
   const varijante = product?.stock_variants ?? {}
-  if (!flavor || Object.keys(varijante).length === 0) return sve
-  const valjane = sve.filter((s) => `${flavor}|${s}` in varijante)
-  return valjane.length ? valjane : sve
+  if (Object.keys(varijante).length === 0) return sve.map((value) => ({ value, disabled: false }))
+
+  const okusi = product?.flavors ?? []
+  // Dok okus jos nije izabran, gramaža vrijedi ako je ima uz bilo koji okus —
+  // inace bi na prvom renderu sve ispalo rasprodano.
+  const dostupna = (s) =>
+    flavor || okusi.length === 0
+      ? (varijante[variantKey(flavor, s)]?.qty ?? 0) > 0
+      : okusi.some((f) => (varijante[variantKey(f, s)]?.qty ?? 0) > 0)
+
+  return sve.map((value) => ({ value, disabled: !dostupna(value) }))
+}
+
+/**
+ * Ponuda okusa, sa oznakom dostupnosti. Okus je onemogucen kad nijedna
+ * njegova gramaža nema stanja.
+ */
+export function getFlavorOptions(product) {
+  const sve = product?.flavors ?? []
+  const varijante = product?.stock_variants ?? {}
+  if (Object.keys(varijante).length === 0) return sve.map((value) => ({ value, disabled: false }))
+
+  const gramaze = product?.sizes ?? []
+  const dostupan = (f) =>
+    gramaze.length
+      ? gramaze.some((s) => (varijante[variantKey(f, s)]?.qty ?? 0) > 0)
+      : (varijante[variantKey(f, null)]?.qty ?? 0) > 0
+
+  return sve.map((value) => ({ value, disabled: !dostupan(value) }))
+}
+
+/**
+ * Prva kombinacija koja se stvarno moze kupiti — pocetni izbor kartice i
+ * stranice. Bez ovoga kupac slijece na rasprodanu kombinaciju samo zato sto je
+ * prva po redu, i odmah vidi "Nema na stanju" na proizvodu koji ima zalihu.
+ */
+export function getDefaultVariant(product) {
+  const okusi = product?.flavors ?? []
+  const gramaze = product?.sizes ?? []
+  const varijante = product?.stock_variants ?? {}
+
+  if (Object.keys(varijante).length) {
+    for (const f of (okusi.length ? okusi : [null])) {
+      for (const s of (gramaze.length ? gramaze : [null])) {
+        if ((varijante[variantKey(f, s)]?.qty ?? 0) > 0) return { flavor: f, size: s }
+      }
+    }
+  }
+  return { flavor: okusi[0] ?? null, size: gramaze[0] ?? null }
 }
 
 /**
@@ -209,10 +254,13 @@ export function hasAnyStock(product) {
 /**
  * Proizvodi za storefront.
  *
- * Vidljivost odlučuje STANJE, ne `is_active`: proizvod se prikazuje tek kad
- * ga ima na stanju. Nema smisla nuditi ono što se ne može kupiti, a artikli
- * se kroz ERP sync stalno vraćaju na stanje pa ručno prebacivanje zastavice
- * nikad ne bi bilo u koraku sa lagerom.
+ * Vidljivost odlučuje `is_active`, dakle admin.
+ *
+ * Ranije je ovdje stajalo stanje ("ne nudi se ono sto se ne moze kupiti"), ali
+ * ERP zna stanje za samo 40% artikala (1572 od 3968) — ostalima je qty NULL,
+ * sto znaci NEPOZNATO, ne nula. Filtriranje po stanju je zato sakrilo i robu
+ * koju imamo. Stanje ostaje za oznaku "Nema na stanju" i za onemogucavanje
+ * varijanti, ne za skrivanje proizvoda.
  */
 export function useAllProducts() {
   const [products, setProducts] = useState([])
@@ -220,9 +268,11 @@ export function useAllProducts() {
 
   useEffect(() => {
     selectAllRows(() =>
-      supabase.from('products').select('*').order('sort_order', { ascending: true })
+      supabase.from('products').select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
     ).then(({ data, error }) => {
-      if (!error && data) setProducts(data.map(norm).filter(hasAnyStock))
+      if (!error && data) setProducts(data.map(norm))
       setLoading(false)
     })
   }, [])
