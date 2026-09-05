@@ -254,10 +254,13 @@ export function hasAnyStock(product) {
 /**
  * Proizvodi za storefront.
  *
- * Vidljivost odlučuje STANJE, ne `is_active`: proizvod se prikazuje tek kad
- * ga ima na stanju. Nema smisla nuditi ono što se ne može kupiti, a artikli
- * se kroz ERP sync stalno vraćaju na stanje pa ručno prebacivanje zastavice
- * nikad ne bi bilo u koraku sa lagerom.
+ * Vidljivost odlučuje `is_active`, dakle admin.
+ *
+ * Ranije je ovdje stajalo stanje ("ne nudi se ono sto se ne moze kupiti"), ali
+ * ERP zna stanje za samo 40% artikala (1572 od 3968) — ostalima je qty NULL,
+ * sto znaci NEPOZNATO, ne nula. Filtriranje po stanju je zato sakrilo i robu
+ * koju imamo. Stanje ostaje za oznaku "Nema na stanju" i za onemogucavanje
+ * varijanti, ne za skrivanje proizvoda.
  */
 export function useAllProducts() {
   const [products, setProducts] = useState([])
@@ -265,9 +268,11 @@ export function useAllProducts() {
 
   useEffect(() => {
     selectAllRows(() =>
-      supabase.from('products').select('*').order('sort_order', { ascending: true })
+      supabase.from('products').select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
     ).then(({ data, error }) => {
-      if (!error && data) setProducts(data.map(norm).filter(hasAnyStock))
+      if (!error && data) setProducts(data.map(norm))
       setLoading(false)
     })
   }, [])
