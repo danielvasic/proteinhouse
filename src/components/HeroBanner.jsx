@@ -230,7 +230,11 @@ export default function HeroBanner() {
       <div className="container w-full relative z-10">
         <div
           key={index}
-          className="max-w-[620px] py-8 md:py-16"
+          // py mora ostaviti zraka iznad prvog reda naslova: leading-[0.95]
+          // stisne okvir reda ispod visine glifova, pa velika verzalna slova
+          // vire iznad njega. Kad sadrzaj tacno ispuni sekciju, overflow-hidden
+          // (drzi ga parallax pozadina) odsijece im vrhove.
+          className="max-w-[620px] py-10 md:py-20"
           style={{ animation: 'heroFade 400ms ease' }}
         >
 
@@ -271,17 +275,21 @@ export default function HeroBanner() {
             </p>
           )}
 
-          {/* Cjenovni blok (mockup 2 — istaknuta akcija topsellera) */}
+          {/* Cjenovni blok (mockup 2 — istaknuta akcija topsellera).
+              flex-wrap uz nowrap po iznosu: na uskom ekranu je desni prostor
+              sužen zbog slike proizvoda, pa bi se "189,95 KM" prelomilo na
+              "189,95" i "KM". Ovako se prelama IZMEDJU cijena, nikad unutar
+              samog iznosa. */}
           {b.price_text && (
-            <div className="flex items-baseline gap-3 mb-5 md:mb-8">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5 md:mb-8">
               <span
-                className="text-[30px] md:text-[44px] font-bold text-white leading-none"
+                className="text-[30px] md:text-[44px] font-bold text-white leading-none whitespace-nowrap"
                 style={DISPLAY}
               >
                 {b.price_text}
               </span>
               {b.old_price_text && (
-                <span className="text-[15px] md:text-[19px] text-white/45 line-through" style={BODY}>
+                <span className="text-[15px] md:text-[19px] text-white/45 line-through whitespace-nowrap" style={BODY}>
                   {b.old_price_text}
                 </span>
               )}
