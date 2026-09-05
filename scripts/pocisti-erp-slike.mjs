@@ -28,7 +28,7 @@
  * anon kljuc nema pravo brisanja u storageu).
  */
 import { createClient } from '@supabase/supabase-js'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -37,15 +37,42 @@ const PRIMIJENI = process.argv.includes('--primijeni')
 const KANTA = 'product-images'
 const FOLDER = 'erp'
 
-function ucitajEnv() {
-  const put = resolve(__dirname, '..', '.env.local')
-  const env = {}
+/**
+ * Gdje sve trazimo .env.local.
+ *
+ * Kad se radi u git worktreeu, .env.local ne postoji pored skripte — gitignore
+ * ga drzi samo u glavnom checkoutu. Worktree u .git ima pokazivac oblika
+ * "gitdir: /put/do/glavnog/.git/worktrees/<ime>", pa iz njega izvucemo korijen
+ * glavnog checkouta i pogledamo i tamo.
+ */
+function kandidatiZaEnv() {
+  const korijen = resolve(__dirname, '..')
+  const puts = [resolve(korijen, '.env.local'), resolve(process.cwd(), '.env.local')]
+
   try {
+    const gitPut = resolve(korijen, '.git')
+    if (existsSync(gitPut)) {
+      const sadrzaj = readFileSync(gitPut, 'utf8')
+      const m = sadrzaj.match(/^gitdir:\s*(.+?)[\r\n]*$/)
+      if (m) {
+        const i = m[1].indexOf('/.git/worktrees/')
+        if (i > 0) puts.push(resolve(m[1].slice(0, i), '.env.local'))
+      }
+    }
+  } catch { /* .git je obican direktorij — nismo u worktreeu */ }
+
+  return [...new Set(puts)]
+}
+
+function ucitajEnv() {
+  const env = {}
+  for (const put of kandidatiZaEnv()) {
+    if (!existsSync(put)) continue
     for (const red of readFileSync(put, 'utf8').split('\n')) {
       const m = red.match(/^\s*([A-Z_]+)\s*=\s*(.*)\s*$/)
-      if (m) env[m[1]] = m[2].replace(/^["']|["']$/g, '')
+      if (m && env[m[1]] === undefined) env[m[1]] = m[2].replace(/^["']|["']$/g, '')
     }
-  } catch { /* env moze doci i iz okruzenja */ }
+  }
   return { ...env, ...process.env }
 }
 
@@ -53,7 +80,9 @@ const env = ucitajEnv()
 const url = env.VITE_SUPABASE_URL
 const key = env.SUPABASE_SERVICE_KEY || env.SUPABASE_SERVICE_ROLE_KEY
 if (!url || !key) {
-  console.error('Nedostaje VITE_SUPABASE_URL ili SUPABASE_SERVICE_KEY (service role) u .env.local.')
+  console.error('Nedostaje VITE_SUPABASE_URL ili SUPABASE_SERVICE_KEY (service role).')
+  console.error('Trazio sam .env.local ovdje:')
+  for (const put of kandidatiZaEnv()) console.error(`  ${existsSync(put) ? '[ima]  ' : '[nema] '}${put}`)
   process.exit(1)
 }
 
