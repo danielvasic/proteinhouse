@@ -21,6 +21,16 @@ const STATS = [
   { value: '10k+', label: 'Kupaca' },
 ]
 
+/**
+ * Pozadina produktnog banera: zatamnjenje s lijeva da tekst ostane citljiv,
+ * pa slika. Bez slike ide brend gradijent.
+ */
+function pozadinaZa(url) {
+  return url
+    ? `linear-gradient(105deg, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.70) 52%, rgba(10,14,23,0.18) 100%), url('${url}')`
+    : 'linear-gradient(135deg, #1e272e 0%, #101A30 55%, #0136C4 100%)'
+}
+
 const SLIDE_MS  = 6500
 const MAX_SLIDES = 3
 
@@ -103,7 +113,7 @@ export default function HeroBanner() {
   const b = slides[index % count]
   // Slajd "samo slika": pozadina bez gradijenta, teksta i statistike — admin
   // slaze gotov vizual u sliku, a klik (ako je link zadan) vodi na akciju.
-  const isImageOnly = b.layout === 'slika' && b.image_url
+  const isImageOnly = b.layout === 'slika' && (b.image_url || b.image_mobile_url)
   const titleLines = (b.title_lines || FALLBACK.title_lines).split('/')
   const parallaxRef = useParallax(0.18)
 
@@ -127,21 +137,58 @@ export default function HeroBanner() {
 
   return (
     <section
-      className={`relative flex items-center overflow-hidden min-h-[46vh] max-h-[50vh] md:max-h-none md:min-h-[440px] lg:min-h-[520px] ${isImageOnly && b.cta_primary_link ? 'cursor-pointer' : ''}`}
+      className={`relative flex overflow-hidden ${
+        isImageOnly
+          // Gotov vizual sam odredjuje visinu — vidi <picture> nize.
+          ? 'items-stretch'
+          : 'items-center min-h-[46vh] max-h-[50vh] md:max-h-none md:min-h-[440px] lg:min-h-[520px]'
+      } ${isImageOnly && b.cta_primary_link ? 'cursor-pointer' : ''}`}
       onClick={isImageOnly && b.cta_primary_link ? () => navigate(b.cta_primary_link) : undefined}
     >
-      {/* Pozadinski sloj — parallax na scroll */}
+      {isImageOnly ? (
+        /* Gotov vizual ide kao <img>, ne kao bg-cover pozadina.
+           Naslov, cijena i CTA su utisnuti u grafiku, pa bi ga svako rezanje
+           osakatilo: cover u nizi okvir odsijeca rubove, a parallax ga jos i
+           razvuce 14% preko gornjeg i donjeg ruba. Zato slika sama odredjuje
+           visinu sekcije i prikazuje se cijela.
+
+           Desktop izvedba je 1920x720 (2.67:1), mobilna 1080x~1000 (1.1:1) —
+           ista datoteka ne moze posluziti za oboje, pa <source> bira po
+           sirini. Kad mobilne nema, pada na desktop. */
+        <picture key={index} className="block w-full" style={{ animation: 'heroFade 400ms ease' }}>
+          {b.image_url && b.image_mobile_url && (
+            <source media="(min-width: 768px)" srcSet={b.image_url} />
+          )}
+          <img
+            src={b.image_mobile_url || b.image_url}
+            alt={b.subtitle || b.eyebrow || b.cta_primary_text || ''}
+            className="block w-full h-auto"
+            loading="eager"
+          />
+        </picture>
+      ) : (
+      /* Pozadina u dva sloja, prebacuju se na 768px.
+         Siroki kadar (2.67:1) se u visokom mobilnom okviru cover-om svede na
+         sredinu i izgubi kompoziciju, pa admin moze dati uspravnu verziju za
+         mobilni. Prebacivanje ide CSS-om, ne JS-om: mjerenje sirine u renderu
+         bi dalo razlicit rezultat na serveru i klijentu i oborilo hidraciju.
+         Pozadina skrivenog sloja se i ne preuzima jer je display:none. */
       <div
         ref={parallaxRef}
-        className="absolute inset-x-0 -inset-y-[14%] bg-cover bg-center bg-no-repeat will-change-transform transition-[background-image] duration-300"
-        style={{
-          backgroundImage: b.image_url
-            ? (isImageOnly
-                ? `url('${b.image_url}')`
-                : `linear-gradient(105deg, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.70) 52%, rgba(10,14,23,0.18) 100%), url('${b.image_url}')`)
-            : 'linear-gradient(135deg, #1e272e 0%, #101A30 55%, #0136C4 100%)',
-        }}
-      />
+        className="absolute inset-x-0 -inset-y-[14%] will-change-transform"
+      >
+        <div
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-[background-image] duration-300 ${b.image_mobile_url ? 'md:hidden' : ''}`}
+          style={{ backgroundImage: pozadinaZa(b.image_mobile_url || b.image_url) }}
+        />
+        {b.image_mobile_url && (
+          <div
+            className="absolute inset-0 hidden md:block bg-cover bg-center bg-no-repeat transition-[background-image] duration-300"
+            style={{ backgroundImage: pozadinaZa(b.image_url || b.image_mobile_url) }}
+          />
+        )}
+      </div>
+      )}
       {/* Brand pattern overlay (mozaik) — suptilno, desna strana */}
       {!isImageOnly && (
         <div

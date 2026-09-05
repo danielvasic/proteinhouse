@@ -47,7 +47,7 @@ const EMPTY = {
   eyebrow: '', title_lines: '', subtitle: '',
   cta_primary_text: '', cta_primary_link: '/kategorija/akcija', cta_style: 'plavi',
   cta_secondary_text: '', cta_secondary_link: '/kategorija/proteini',
-  image_url: '', sort_order: 0, is_active: false,
+  image_url: '', image_mobile_url: '', sort_order: 0, is_active: false,
   price_text: '', old_price_text: '', usp_lines: '', fg_image_url: '',
   cta_primary_icon: 'tag', cta_secondary_icon: 'strelica',
 }
@@ -69,6 +69,7 @@ function BannerForm({ item, onSave, onCancel }) {
   const [error,     setError]     = useState('')
   const fileRef = useRef(null)
   const fgFileRef = useRef(null)
+  const mobFileRef = useRef(null)
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
   const isImageOnly = (form.layout ?? 'produkt') === 'slika'
@@ -248,6 +249,25 @@ function BannerForm({ item, onSave, onCancel }) {
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload('image_url')} />
                 <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex items-center gap-1.5">
                   {uploading ? <><RefreshCw size={12} className="animate-spin" /> Uploaduje…</> : <><Upload size={12} /> Upload slike</>}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Field>
+
+        <Field label="Pozadinska slika — mobilni" hint="Neobavezno. Široki kadar se na uskom ekranu reže na sredinu i izgubi kompoziciju; ovdje ide uspravna verzija. Prazno = koristi se gornja slika.">
+          <div className="flex gap-3 items-start">
+            {form.image_mobile_url && (
+              <div className="w-16 h-20 rounded-lg overflow-hidden border border-gray-200 shrink-0">
+                <img src={form.image_mobile_url} alt="" className="w-full h-full object-cover" onError={(e) => e.target.style.display='none'} />
+              </div>
+            )}
+            <div className="flex-1 space-y-2">
+              <Input value={form.image_mobile_url ?? ''} onChange={set('image_mobile_url')} placeholder="https://... ili uploaduj ispod" />
+              <div className="flex gap-2">
+                <input ref={mobFileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload('image_mobile_url')} />
+                <Button type="button" variant="outline" size="sm" onClick={() => mobFileRef.current?.click()} disabled={uploading} className="flex items-center gap-1.5">
+                  {uploading ? <><RefreshCw size={12} className="animate-spin" /> Uploaduje…</> : <><Upload size={12} /> Upload mobilne</>}
                 </Button>
               </div>
             </div>
