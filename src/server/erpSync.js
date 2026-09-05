@@ -562,6 +562,20 @@ export async function runErpSync({ triggerSource = 'schedule', createLimit = 200
 const IMG_BASE = 'https://weberp-api.com/images/'
 
 /**
+ * Ima li artikal upotrebljivu sliku u ERP-u.
+ *
+ * ERP koristi 'placeholder.jpg' kao oznaku "nema slike" — tako je oznaceno
+ * 2254 od 3968 artikala — a taj fajl na weberp serveru vraca 404. Bez ove
+ * provjere bi ga svaki prolaz iznova pokusavao skinuti: preuzimanje pukne,
+ * erp_image_name se ne upise, pa isti artikal opet udje u sljedeci prolaz i
+ * trosi mjesto u kvoti od 40, unedogled. Isto vrijedi za imena bez ekstenzije
+ * ('638466343058164195.'), koja su ocito odsjecena pri upisu u ERP.
+ */
+function nemaSliku(ime) {
+  return !ime || ime === 'placeholder.jpg' || !/\.[a-z0-9]+$/i.test(ime)
+}
+
+/**
  * Prebacivanje i OSVJEZAVANJE ERP slika u nas storage.
  *
  * Dvije vrste posla:
@@ -605,7 +619,7 @@ export async function runImageSync({ limit = 40 } = {}) {
   const posao = []
   for (const p of kandidati) {
     const remote = imgBySku.get(p.erp_skus[0])
-    if (!remote) continue
+    if (nemaSliku(remote)) continue
     const novi = p.image_path == null
     if (novi || p.erp_image_name !== remote) posao.push({ ...p, remote, novi })
     if (posao.length >= limit) break
