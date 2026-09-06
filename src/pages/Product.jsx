@@ -9,7 +9,7 @@ import { useCart } from '../store/CartContext'
 import { trackEvent } from '../lib/analytics'
 import { getCategoryBySlug, discountChipClass } from '../data/catalog'
 import { fmtKM } from '../lib/price'
-import { useProduct, getVariantStock, getVariantPrice, getSizeOptions, getFlavorOptions, getDefaultVariant } from '../hooks/useProducts'
+import { useProduct, getVariantStock, getVariantPrice, getVariantOldPrice, getSizeOptions, getFlavorOptions, getDefaultVariant } from '../hooks/useProducts'
 import ReviewSection from '../components/ReviewSection'
 import BrandIcon from '../components/BrandIcon'
 import { BODY, DISPLAY, NUMERIC } from '../lib/typography'
@@ -155,6 +155,7 @@ export default function Product() {
     gramazaOpcije.find((o) => o.value === size) ??
     gramazaOpcije[0]
   )?.value ?? null
+  const staraCijena   = getVariantOldPrice(product, flavor, gramaza)
 
   const [activeIdx, setActiveIdx] = useState(0)
   const [lightbox, setLightbox] = useState(false)
@@ -402,11 +403,11 @@ export default function Product() {
                 {/* Price */}
                 <div className="flex items-baseline gap-3 mb-4">
                   {/* Snižena cijena u Vulcan Orangeu — brand book tu boju drži za popuste */}
-                  <span className={`text-3xl font-bold ${product.old ? 'text-[#ff4103]' : 'text-[#1e272e]'}`} style={NUMERIC}>
+                  <span className={`text-3xl font-bold ${staraCijena ? 'text-[#ff4103]' : 'text-[#1e272e]'}`} style={NUMERIC}>
                     {fmtKM(cijena)}
                   </span>
-                  {product.old && (
-                    <span className="text-base text-gray-400 line-through font-normal">{fmtKM(product.old)}</span>
+                  {staraCijena && (
+                    <span className="text-base text-gray-400 line-through font-normal">{fmtKM(staraCijena)}</span>
                   )}
                 </div>
 
@@ -534,7 +535,7 @@ export default function Product() {
               <p className="text-[11px] font-semibold text-[#1e272e] truncate m-0">{product.brand} · {product.title}</p>
               <p className="text-[15px] font-bold text-[#1e272e] m-0" style={NUMERIC}>
                 {fmtKM(cijena)}
-                {product.old && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={BODY}>{fmtKM(product.old)}</span>}
+                {staraCijena && <span className="text-[11px] text-gray-400 line-through font-normal ml-2" style={BODY}>{fmtKM(staraCijena)}</span>}
               </p>
             </div>
             <button
