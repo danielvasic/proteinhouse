@@ -17,7 +17,15 @@ const STEPS = ['Dostava', 'Pregled', 'Potvrda']
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '', phone: '',
   address: '', city: '', zip: '', notes: '',
+  viberConsent: false,
 }
+
+// Privola za Viber podsjetnike. Tekst mora biti IDENTICAN konstanti
+// c_viber_privola u supabase/kreiraj_narudzbu.sql — baza pamti svoju kopiju
+// kao dokaz, a ovo je ono sto kupac stvarno vidi. Iskljucena po defaultu:
+// Viber promotivne poruke traze izricit opt-in, unaprijed kvacica se ne racuna.
+export const VIBER_PRIVOLA =
+  'Želim na Viber, na broj koji sam unio/la, dobijati podsjetnike za obnovu zaliha i povremene ponude ProteinHouse-a. Odjava odgovorom STOP.'
 
 function inputCls(error) {
   return `w-full border ${error ? 'border-red-400' : 'border-gray-300'} px-4 py-3 text-[13px] text-[#1e272e] placeholder:text-gray-400 focus:outline-none focus:border-[#0145F2] transition-colors duration-150 bg-white`
@@ -269,6 +277,7 @@ export default function Checkout() {
         p_gift:        gift ?? null,
         // Klik ID-evi s reklame; null ako posjetitelj nije prihvatio kolačiće.
         p_atribucija:  zaNarudzbu(),
+        p_viber_consent: form.viberConsent === true,
       })
       if (error) throw error
 
@@ -454,6 +463,15 @@ export default function Checkout() {
                       <input className={inputCls(errors.phone)} value={form.phone} onChange={set('phone')} placeholder="+387 6x xxx xxx" />
                       {errors.phone && <p className="text-red-500 text-[11px]">{errors.phone}</p>}
                     </div>
+                    <label className="flex items-start gap-3 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#0145F2]"
+                        checked={form.viberConsent}
+                        onChange={(e) => setForm((f) => ({ ...f, viberConsent: e.target.checked }))}
+                      />
+                      <span className="text-[12px] text-gray-600 leading-relaxed">{VIBER_PRIVOLA}</span>
+                    </label>
                   </div>
 
                   <div className="bg-white border border-gray-200 p-6 space-y-4">
@@ -497,6 +515,7 @@ export default function Checkout() {
                     <div className="grid grid-cols-2 gap-2 text-[13px]">
                       <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Ime</p><p className="font-semibold text-[#1e272e]">{form.firstName} {form.lastName}</p></div>
                       <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Telefon</p><p className="font-semibold text-[#1e272e]">{form.phone}</p></div>
+                      <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Viber podsjetnici</p><p className="font-semibold text-[#1e272e]">{form.viberConsent ? 'Da' : 'Ne'}</p></div>
                       <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Email</p><p className="font-semibold text-[#1e272e]">{form.email}</p></div>
                       <div><p className="text-gray-400 text-[10px] tracking-wide mb-0.5">Adresa</p><p className="font-semibold text-[#1e272e]">{form.address}, {form.city} {form.zip}</p></div>
                     </div>

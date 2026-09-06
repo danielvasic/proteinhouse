@@ -128,7 +128,17 @@ export default function Orders() {
                         <TableCell className="font-mono text-xs font-semibold">{o.order_number}</TableCell>
                         <TableCell>
                           <p className="font-medium text-sm">{o.customer_name}</p>
-                          {o.customer_phone && <p className="text-xs text-muted-foreground">{o.customer_phone}</p>}
+                          {o.customer_phone && (
+                            <p className="text-xs text-muted-foreground">
+                              {o.customer_phone}
+                              {o.viber_consent_at && (
+                                <span
+                                  className={`ml-1.5 font-semibold ${o.viber_opt_out_at ? 'text-gray-400 line-through' : 'text-[#7360f2]'}`}
+                                  title={o.viber_opt_out_at ? 'Odjavio se s Viber podsjetnika (STOP)' : 'Dao privolu za Viber podsjetnike'}
+                                >Viber</span>
+                              )}
+                            </p>
+                          )}
                         </TableCell>
                         <TableCell className="text-sm">{o.shipping_city || '—'}</TableCell>
                         <TableCell className="font-bold text-sm">{fmtKM(o.total)}</TableCell>
