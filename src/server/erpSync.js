@@ -11,7 +11,8 @@
  * Šta sinhronizacija SMIJE prepisati na postojećem proizvodu:
  *   cijena i stara cijena (samo ako je erp_sync_price uključen), badge popusta
  * Šta NIKAD ne dira:
- *   opis, način upotrebe, sastav, galerija, tagovi, slug, is_active, sort_order
+ *   opis, način upotrebe, sastav, galerija, tagovi, slug, is_active, sort_order,
+ *   price_sale po varijanti (rucna akcija — vidi stockFor)
  * Novi artikli ulaze kao NEAKTIVNI nacrti — ERP šalje isWeb=false na svih 1344
  * artikala, pa nema načina da se iz podataka zaključi šta smije na web.
  */
@@ -254,7 +255,15 @@ function stockFor(articles, existingVariants) {
     // akcijska cijena, dolazi iz drugog polja.
     const cijena = a.price != null ? Number(a.price) : null
 
-    variants[key] = { qty, sku: a.sku, ...(cijena != null && { price: cijena }) }
+    // Rucna akcija zivi u price_sale i NE dolazi iz ERP-a — RPC kreiraj_narudzbu
+    // je naplacuje ispred price. Prenosi se na novi zapis; inace bi je svaki
+    // sat pregazio sync stanja i "akcija" bi trajala do prvog prolaza.
+    const akcija = variants[key]?.price_sale
+    variants[key] = {
+      qty, sku: a.sku,
+      ...(cijena != null && { price: cijena }),
+      ...(akcija != null && { price_sale: Number(akcija) }),
+    }
   }
   return { stock: total, stock_variants: variants }
 }
