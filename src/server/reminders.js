@@ -9,6 +9,7 @@
  * pa bi bez odvojenog test ulaza jedini način provjere bio čekati 25 dana.
  */
 import { serviceClient } from './supabaseAdmin.js'
+import { posaljiViber, viberKonfigurisan, normalizujBrojBiH } from './viber.js'
 
 export const DEFAULT_DAYS = 25
 
@@ -44,6 +45,13 @@ function emailHtml({ name, coupon, siteUrl, days, proizvod }) {
 </div>`.trim()
 }
 
+/** Najvrjednija stavka narudzbe — nosi naslov poruke ("Tvoj Gold Whey je pri kraju?"). */
+function glavniProizvod(order) {
+  const glavna = (Array.isArray(order.items) ? order.items : [])
+    .slice().sort((a, b) => Number(b.price) * Number(b.qty || 1) - Number(a.price) * Number(a.qty || 1))[0]
+  return glavna ? [glavna.brand, glavna.title].filter(Boolean).join(' ') : null
+}
+
 async function sendEmail({ to, subject, html }) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -60,12 +68,17 @@ async function sendEmail({ to, subject, html }) {
  * @param {{days?: number, dryRun?: boolean, onlyEmail?: string}} opts
  *   days      — koliko stara narudžba mora biti (default 25); manji broj za test
  *   dryRun    — samo nabroji koga bi pogodilo, bez slanja i bez upisa
- *   onlyEmail — ograniči na jednu adresu (test na sebi)
+ *   onlyEmail — ograniči email na jednu adresu (test na sebi)
+ *   onlyPhone — ograniči Viber na jedan broj (test na sebi)
  * @returns {Promise<{processed:number, sent:number, failed:number, recipients:string[]}>}
  */
-export async function runReminders({ days = DEFAULT_DAYS, dryRun = false, onlyEmail = null } = {}) {
-  if (!dryRun && (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM)) {
-    throw Object.assign(new Error('Nedostaje RESEND_API_KEY ili RESEND_FROM.'), { code: 'NOT_CONFIGURED' })
+export async function runReminders({ days = DEFAULT_DAYS, dryRun = false, onlyEmail = null, onlyPhone = null } = {}) {
+  // Dva nezavisna kanala: email (Resend) i Viber (BulkGate). Svaki radi ako je
+  // konfigurisan; greska je tek kad nije nijedan.
+  const emailOk = Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM)
+  const viberOk = viberKonfigurisan()
+  if (!dryRun && !emailOk && !viberOk) {
+    throw Object.assign(new Error('Nedostaje RESEND_API_KEY/RESEND_FROM (email) ili BULKGATE_* (Viber).'), { code: 'NOT_CONFIGURED' })
   }
 
   const coupon  = process.env.REMINDER_COUPON || 'POPUST5'
@@ -83,8 +96,12 @@ export async function runReminders({ days = DEFAULT_DAYS, dryRun = false, onlyEm
     .limit(200)
   if (onlyEmail) query = query.ilike('customer_email', onlyEmail)
 
-  const { data: orders, error } = await query
-  if (error) throw error
+  let orders = []
+  if (emailOk || dryRun) {
+    const { data, error } = await query
+    if (error) throw error
+    orders = data ?? []
+  }
 
   // Jedan podsjetnik po kupcu po ciklusu — kupac s više narudžbi ne dobija spam.
   const seen = new Set()
@@ -99,10 +116,7 @@ export async function runReminders({ days = DEFAULT_DAYS, dryRun = false, onlyEm
         seen.add(email)
         continue
       }
-      // Najvrjednija stavka narudzbe nosi naslov poruke.
-      const glavna = (Array.isArray(order.items) ? order.items : [])
-        .slice().sort((a, b) => Number(b.price) * Number(b.qty || 1) - Number(a.price) * Number(a.qty || 1))[0]
-      const proizvod = glavna ? [glavna.brand, glavna.title].filter(Boolean).join(' ') : null
+      const proizvod = glavniProizvod(order)
       try {
         await sendEmail({
           to: email,
@@ -122,5 +136,58 @@ export async function runReminders({ days = DEFAULT_DAYS, dryRun = false, onlyEm
     }
   }
 
-  return { processed: orders?.length ?? 0, sent, failed, recipients: [...seen] }
+  // ── Viber ────────────────────────────────────────────────────────────────
+  // Samo narudzbe s privolom (kvacica na checkoutu), bez odjave (STOP) i bez
+  // vec poslanog podsjetnika. Jedna poruka po broju po ciklusu.
+  const viber = { configured: viberOk, processed: 0, sent: 0, failed: 0, skipped: 0, recipients: [] }
+  if (viberOk || dryRun) {
+    const { data: vOrders, error: vErr } = await supabase
+      .from('orders')
+      .select('id, customer_name, customer_phone, items')
+      .not('viber_consent_at', 'is', null)
+      .is('viber_opt_out_at', null)
+      .is('reminder_viber_sent_at', null)
+      .lte('created_at', cutoff)
+      .neq('status', 'otkazana')
+      .not('customer_phone', 'is', null)
+      .limit(200)
+    if (vErr) throw vErr
+
+    const zeljeni = onlyPhone ? normalizujBrojBiH(onlyPhone) : null
+    const vSeen = new Set()
+    const oznaci = (id) => dryRun ? Promise.resolve() :
+      supabase.from('orders').update({ reminder_viber_sent_at: new Date().toISOString() }).eq('id', id)
+
+    for (const order of vOrders ?? []) {
+      const broj = normalizujBrojBiH(order.customer_phone)
+      if (zeljeni && broj !== zeljeni) continue
+      viber.processed++
+      if (!broj || vSeen.has(broj)) {
+        // Fiksni/strani broj nikad nece dobiti Viber, a duplikat je vec
+        // dobio — oznaci da se ne pokusava svaki dan iznova.
+        viber.skipped++
+        await oznaci(order.id)
+        continue
+      }
+      if (dryRun) { vSeen.add(broj); continue }
+
+      const ime = (order.customer_name || '').trim().split(' ')[0]
+      const proizvod = glavniProizvod(order) || 'proizvod'
+      const text =
+        `${ime ? `${ime}, tvoj` : 'Tvoj'} ${proizvod} je pri kraju? ` +
+        `Obnovi zalihe uz kupon ${coupon} — dodatnih 5% popusta na sljedeću kupnju. ` +
+        `Odjava: odgovori STOP.`
+      try {
+        const r = await posaljiViber({ to: broj, text, button: { caption: 'Obnovi zalihe', url: siteUrl }, tag: 'podsjetnik-25' })
+        if (r.ok) { vSeen.add(broj); viber.sent++ } else { viber.skipped++ }
+        await oznaci(order.id)
+      } catch (err) {
+        console.error(`reminder viber: slanje na ${broj} nije uspjelo —`, err.message)
+        viber.failed++   // reminder_viber_sent_at ostaje prazan — pokusaj sutra
+      }
+    }
+    viber.recipients = [...vSeen]
+  }
+
+  return { processed: orders.length, sent, failed, recipients: [...seen], email: { configured: emailOk }, viber }
 }

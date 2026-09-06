@@ -10,7 +10,8 @@
  *
  *   days      — koliko stara narudžba mora biti (0 = sve narudžbe)
  *   dryRun    — samo nabroji kome bi otišlo, bez slanja i bez upisa
- *   onlyEmail — pošalji samo na jednu adresu (test na sebi)
+ *   onlyEmail — pošalji email samo na jednu adresu (test na sebi)
+ *   onlyPhone — pošalji Viber samo na jedan broj (test na sebi)
  */
 import { verifyAdmin } from '../../src/server/supabaseAdmin.js'
 import { runReminders } from '../../src/server/reminders.js'
@@ -32,6 +33,7 @@ export default async (req) => {
       days:      Number.isFinite(body.days) ? Math.max(0, body.days) : undefined,
       dryRun:    body.dryRun === true,
       onlyEmail: body.onlyEmail || null,
+      onlyPhone: body.onlyPhone || null,
     })
     return json(result)
   } catch (err) {
