@@ -28,6 +28,21 @@
   to = "/.netlify/functions/feed"
   status = 200
 
+# Naslovnica MORA imati force. dist/client/index.html postoji kao prava
+# datoteka, a Netlify staticke datoteke servira PRIJE nego pogleda redirecte
+# (osim uz force) — pa je "/" dobijala goli sablon s nezamijenjenim
+# <!--app-head--> i <!--app-html-->: bez SSR sadrzaja, bez __PH_MJERENJE__
+# (GTM se nikad nije ucitao posjetiocima koji udju preko naslovnice, a to je
+# vecina) i bez google-site-verification meta taga na korijenu, gdje ga
+# Search Console trazi. Ostale rute nemaju istoimenu datoteku pa rewrite
+# ispod radi i bez force. Force ide SAMO ovdje: na "/*" bi pregazio i
+# /assets/ i sve iz public/.
+[[redirects]]
+  from = "/"
+  to = "/.netlify/functions/ssr"
+  status = 200
+  force = true
+
 # Static assets in dist/client are served directly by Netlify CDN (fast, cached, no function hit).
 # Every other URL is an SSR rewrite — the browser URL stays the same (status 200).
 [[redirects]]
