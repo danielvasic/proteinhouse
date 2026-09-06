@@ -4,7 +4,7 @@ import { Star } from '@phosphor-icons/react'
 import { useCart } from '../store/CartContext'
 import { discountChipClass } from '../data/catalog'
 import { fmtKM } from '../lib/price'
-import { hasAnyStock, getVariantStock, getVariantImageSrc, getVariantPrice, getSizeOptions, getFlavorOptions, getDefaultVariant } from '../hooks/useProducts'
+import { hasAnyStock, getVariantStock, getVariantImageSrc, getVariantPrice, getVariantOldPrice, getSizeOptions, getFlavorOptions, getDefaultVariant } from '../hooks/useProducts'
 import { BODY } from '../lib/typography'
 
 // Color coding po tipu (Notion: "Labels/Tagovi — Color coding"):
@@ -43,7 +43,7 @@ export default function ProductCard({ product, bestseller = false }) {
   const { addItem } = useCart()
   const [hover, setHover] = useState(false)
 
-  const { slug, brand, title, price, old, badge, rating, reviews, tags = [], flavors = [], sizes = [] } = product
+  const { slug, brand, title, price, badge, rating, reviews, tags = [], flavors = [], sizes = [] } = product
   const isDiscount   = badge && badge.startsWith('-')
   const inStock      = hasAnyStock(product)
   const tagChip      = (bestseller && !tags.includes('bestseller'))
@@ -70,6 +70,7 @@ export default function ProductCard({ product, bestseller = false }) {
   const variantStock  = hasVariants ? getVariantStock(product, flavor, gramaza) : (product.stock ?? 0)
   const canAdd        = inStock && (!hasVariants || variantStock > 0)
   const cijenaVarijante = getVariantPrice(product, flavor, gramaza)
+  const old             = getVariantOldPrice(product, flavor, gramaza)
   // Ako galerija ima sliku vezanu za izabrani okus/gramažu, prikaži nju umjesto cover slike
   const displayImg    = useMemo(() => getVariantImageSrc(product, flavor, gramaza), [product, flavor, gramaza])
 

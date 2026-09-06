@@ -186,7 +186,12 @@ function StockTable({ flavors, sizes, stockVariants, stock, onChangeVariants, on
   const update = (key, field, value) =>
     onChangeVariants({
       ...stockVariants,
-      [key]: { ...getEntry(key), [field]: field === 'qty' ? (parseInt(value) || 0) : value },
+      [key]: {
+        ...getEntry(key),
+        [field]: field === 'qty' ? (parseInt(value) || 0)
+               : (field === 'price' || field === 'price_sale') ? (value === '' ? null : Number(value))
+               : value,
+      },
     })
 
   if (!hasVariants) {
@@ -223,6 +228,8 @@ function StockTable({ flavors, sizes, stockVariants, stock, onChangeVariants, on
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500">Varijanta</th>
               <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 w-36">Stanje (kom)</th>
+              <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 w-28" title="Redovna cijena. Dolazi iz ERP-a i sync je osvježava svaki sat.">Cijena (KM)</th>
+              <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 w-28" title="Ručna akcija. Kupcu se naplaćuje ona, redovna se prikazuje precrtana. Sync je ne dira — obriši polje da akcija prestane.">Akcijska (KM)</th>
               <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 w-48">SKU / ERP šifra</th>
             </tr>
           </thead>
@@ -246,6 +253,20 @@ function StockTable({ flavors, sizes, stockVariants, stock, onChangeVariants, on
                         <span className="text-[10px] text-amber-600 font-bold whitespace-nowrap">MALO</span>
                       )}
                     </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input
+                      type="number" min="0" step="0.01" value={entry.price ?? ''}
+                      onChange={(e) => update(key, 'price', e.target.value)}
+                      placeholder="iz ERP-a" className="w-24 h-8 text-sm"
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input
+                      type="number" min="0" step="0.01" value={entry.price_sale ?? ''}
+                      onChange={(e) => update(key, 'price_sale', e.target.value)}
+                      placeholder="—" className={`w-24 h-8 text-sm ${entry.price_sale != null ? 'border-[#ff4103] text-[#ff4103] font-bold' : ''}`}
+                    />
                   </td>
                   <td className="px-3 py-2">
                     <Input

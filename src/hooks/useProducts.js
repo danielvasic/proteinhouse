@@ -144,10 +144,30 @@ export function getVariantStock(product, flavor, size) {
  * Ključ se gradi isto kao u getVariantStock i u SQL funkciji koja naplaćuje
  * narudžbu — sva tri mjesta moraju ostati usklađena.
  */
-export function getVariantPrice(product, flavor, size) {
+/** Zapis varijante za izabrani okus/gramažu, ili null. */
+function variantOf(product, flavor, size) {
   const key = variantKey(flavor, size)
-  const cijena = key ? product?.stock_variants?.[key]?.price : null
+  return key ? (product?.stock_variants?.[key] ?? null) : null
+}
+
+export function getVariantPrice(product, flavor, size) {
+  const v = variantOf(product, flavor, size)
+  // price_sale je rucna akcija. RPC kreiraj_narudzbu naplacuje
+  // price_sale ?? price ?? products.price — prikaz slijedi isti redoslijed da
+  // kupac vidi tacno ono sto ce platiti.
+  const cijena = v?.price_sale ?? v?.price
   return cijena != null ? Number(cijena) : Number(product?.price ?? 0)
+}
+
+/**
+ * Precrtana "stara" cijena za izabranu varijantu: redovna cijena kad varijanta
+ * ima akciju (price_sale), inace stara cijena s nivoa proizvoda. Bez ovoga bi
+ * product.old izlazio i uz vrecicu od 30 g iako je akcija samo na 2 kg.
+ */
+export function getVariantOldPrice(product, flavor, size) {
+  const v = variantOf(product, flavor, size)
+  if (v?.price_sale != null && v?.price != null && Number(v.price) > Number(v.price_sale)) return Number(v.price)
+  return product?.old ?? null
 }
 
 /**
@@ -221,7 +241,7 @@ export function getDefaultVariant(product) {
  */
 export function getPriceRange(product) {
   const cijene = Object.values(product?.stock_variants ?? {})
-    .map((v) => (v?.price != null ? Number(v.price) : null))
+    .map((v) => ((v?.price_sale ?? v?.price) != null ? Number(v.price_sale ?? v.price) : null))
     .filter((x) => x != null && x > 0)
   if (cijene.length < 2) return null
   const min = Math.min(...cijene), max = Math.max(...cijene)

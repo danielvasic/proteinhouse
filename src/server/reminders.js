@@ -12,18 +12,23 @@ import { serviceClient } from './supabaseAdmin.js'
 
 export const DEFAULT_DAYS = 25
 
-function emailHtml({ name, coupon, siteUrl, days }) {
-  const firstName = (name || '').trim().split(' ')[0] || 'zdravo'
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
+function emailHtml({ name, coupon, siteUrl, days, proizvod }) {
+  const firstName = esc((name || '').trim().split(' ')[0] || 'zdravo')
+  // Naslov po proizvodu iz narudzbe ("Tvoj Gold Whey je pri kraju?") — generican
+  // tek kad narudzba nema stavki.
+  const naslov = proizvod ? `${firstName}, tvoj ${esc(proizvod)} je pri kraju?` : `${firstName}, jesu li ti zalihe pri kraju?`
   return `
 <div style="font-family:Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;color:#1e272e">
   <div style="background:#0145f2;padding:24px;text-align:center">
     <span style="color:#fff;font-weight:900;letter-spacing:.08em;font-size:18px">PROTEINHOUSE</span>
   </div>
   <div style="padding:32px 24px">
-    <h1 style="font-size:20px;margin:0 0 16px;font-style:italic;text-transform:uppercase">${firstName}, jesu li ti zalihe pri kraju?</h1>
+    <h1 style="font-size:20px;margin:0 0 16px;font-style:italic;text-transform:uppercase">${naslov}</h1>
     <p style="font-size:14px;line-height:1.6;color:#4b5563;margin:0 0 24px">
-      Prošlo je oko ${days} dana od tvoje zadnje narudžbe. Obnovi zalihe i iskoristi
-      dodatni popust na sljedeću kupovinu.
+      Prošlo je oko ${days} dana od tvoje zadnje narudžbe. Obnovi zalihe i iskoristi kupon
+      <strong>${esc(coupon)}</strong> — dodatnih 5% popusta na sljedeću kupnju.
     </p>
     <div style="border:2px dashed #ff4103;padding:16px;text-align:center;margin-bottom:24px">
       <p style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6b7280;margin:0 0 6px">Tvoj kupon</p>
@@ -70,7 +75,7 @@ export async function runReminders({ days = DEFAULT_DAYS, dryRun = false, onlyEm
   const supabase = serviceClient()
   let query = supabase
     .from('orders')
-    .select('id, customer_name, customer_email')
+    .select('id, customer_name, customer_email, items')
     .is('reminder_sent_at', null)
     .lte('created_at', cutoff)
     .neq('status', 'otkazana')
@@ -94,11 +99,15 @@ export async function runReminders({ days = DEFAULT_DAYS, dryRun = false, onlyEm
         seen.add(email)
         continue
       }
+      // Najvrjednija stavka narudzbe nosi naslov poruke.
+      const glavna = (Array.isArray(order.items) ? order.items : [])
+        .slice().sort((a, b) => Number(b.price) * Number(b.qty || 1) - Number(a.price) * Number(a.qty || 1))[0]
+      const proizvod = glavna ? [glavna.brand, glavna.title].filter(Boolean).join(' ') : null
       try {
         await sendEmail({
           to: email,
-          subject: 'Jesu li ti zalihe pri kraju? Evo 5% popusta',
-          html: emailHtml({ name: order.customer_name, coupon, siteUrl, days }),
+          subject: proizvod ? `Tvoj ${proizvod} je pri kraju? Evo 5% popusta` : 'Jesu li ti zalihe pri kraju? Evo 5% popusta',
+          html: emailHtml({ name: order.customer_name, coupon, siteUrl, days, proizvod }),
         })
         seen.add(email)
         sent++
